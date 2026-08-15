@@ -1,0 +1,40 @@
+[project]
+name = "latent-noether-paper1"
+version = "0.1.0"
+description = "Recover physical laws from the internal dynamics of frozen world models (Phase 1: state-space oscillator kill-test)"
+requires-python = ">=3.12"
+dependencies = [
+    "gymnasium>=1.3.0",
+    "matplotlib>=3.11.1",
+    "numpy>=1.26",
+    "pygame>=2.6.1",
+    "pyyaml>=6.0.3",
+    "ruamel-yaml>=0.19.1",
+    "tensorboard>=2.21.0",
+    "torch>=2.4",
+]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["latent_noether"]
+
+[tool.uv.sources]
+# Switched from the CPU index 2026-08-10: this box has an RTX PRO 6000 Blackwell (96 GB) with
+# the kernel driver loaded, and the real-world-model work needs it. Revert the index name to
+# "pytorch-cpu"/whl/cpu to go back.
+torch = [{ index = "pytorch-cu128" }]
+
+[[tool.uv.index]]
+name = "latent-noether-paper1"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

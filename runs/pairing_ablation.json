@@ -1,0 +1,53 @@
+[
+  {
+    "ckpt": "runs/dreamer_ref_s3.pt",
+    "invariance_only": {
+      "rho_energy": 0.954665087815135,
+      "drift": 5.9787086536465184e-05,
+      "edit_slope": -0.08654019908214348,
+      "edit_at_max_alpha": -0.03535597856458481,
+      "in_sample_ratio": 6.081289266024489e-05
+    },
+    "joint": {
+      "rho_energy": 0.9729099379801308,
+      "drift": 7.242173427603886e-05,
+      "edit_slope": -0.07079974984621383,
+      "edit_at_max_alpha": -0.02927541573562874,
+      "pairing_residual": 0.8290861705365002
+    }
+  },
+  {
+    "ckpt": "runs/dreamer_ref_s4.pt",
+    "invariance_only": {
+      "rho_energy": 0.9198229700948728,
+      "drift": 0.00010353599182329666,
+      "edit_slope": -0.0619818721493685,
+      "edit_at_max_alpha": -0.024437935147829788,
+      "in_sample_ratio": 9.479531893756131e-05
+    },
+    "joint": {
+      "rho_energy": 0.9672981733125726,
+      "drift": 0.00013050395182103328,
+      "edit_slope": -0.08664717380386382,
+      "edit_at_max_alpha": -0.03270156171338331,
+      "pairing_residual": 0.861520041893479
+    }
+  },
+  {
+    "ckpt": "runs/dreamer_ref_s5.pt",
+    "invariance_only": {
+      "rho_energy": 0.9496607061132508,
+      "drift": 8.53346839815774e-05,
+      "edit_slope": -0.10369822838173748,
+      "edit_at_max_alpha": -0.04101085193800488,
+      "in_sample_ratio": 8.406125089901464e-05
+    },
+    "joint": {
+      "rho_energy": 0.9752191552373445,
+      "drift": 0.00010676538350740052,
+      "edit_slope": -0.07662861090692674,
+      "edit_at_max_alpha": -0.035038395139824145,
+      "pairing_residual": 0.8650799638307025
+    }
+  }
+]

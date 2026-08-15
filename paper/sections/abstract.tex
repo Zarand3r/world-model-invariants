@@ -1,0 +1,34 @@
+\begin{abstract}
+A world model that predicts video well may have learned something about the underlying physics, or
+it may simply be good at interpolating frames. Standard probes cannot tell the difference: even
+randomly initialised DreamerV3 models can contain latent directions that correlate strongly with a
+pendulum's energy. We instead ask whether the model has learned a quantity that its \emph{own
+dynamics} treat as conserved. In a frozen DreamerV3 trained only on $64\times64$ pendulum videos,
+with no physical supervision, we recover a scalar that correlates with true energy at $0.973$ and
+remains nearly constant along encoded trajectories. When the model rolls forward without new
+observations, however, this quantity begins to drift.
+
+We use three controls to test whether the recovered quantity reflects physics. First, six untrained
+models span energy correlations from $0.170$ to $0.908$, showing that high correlation alone is weak
+evidence; what training produces is reproducibility, with three trained models agreeing within
+$0.008$. Second, when we apply the same procedure to models trained on a damped pendulum, where no
+conserved energy should exist, it correctly refuses to find one: four separate statistics
+distinguish conservative and dissipative models with no seed overlap. Third, the recovered quantity
+is causally useful. Projecting imagined states back toward its level set reduces rollout error on
+every trained seed, whereas sixty matched random polynomial constraints increase error by $53.9\%$
+at the median. The recovered law outperforms every random constraint on two of three models, though
+not on the third.
+
+The internal representation is also less coordinate-specific than it first appears.
+Basis-independent properties of the recovered law agree closely across independently trained models,
+while selectors based on individual latent coordinates can even change sign. The same physical
+structure therefore appears in different internal charts. We also report two negative results.
+Requiring the recovered quantity both to stay conserved and to generate the model's flow improves
+reproducibility but not accuracy, suggesting that conservation does most of the work here. And a
+frequency-weighted error-accumulation mechanism that we previously established in a much smaller
+recurrent model is indistinguishable from an unweighted version in DreamerV3.
+
+Overall, a pixel-trained world model can learn a reproducible conserved quantity that its own
+dynamics respect, violate during free imagination, and can be causally corrected against, while also
+showing why correlation alone cannot establish that a model has learned physics.
+\end{abstract}

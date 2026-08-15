@@ -1,0 +1,191 @@
+[
+  {
+    "ckpt": "runs/dreamer_ref_s0.pt",
+    "ld": 2,
+    "eff_dim": 2,
+    "rho_energy": 0.02569356134260554,
+    "pairing_residual": 0.9814647094700758,
+    "participation_ratio": 1.9989246129989624,
+    "variance_kept": 0.24128295327297505
+  },
+  {
+    "ckpt": "runs/dreamer_ref_s0.pt",
+    "ld": 3,
+    "eff_dim": 3,
+    "rho_energy": 0.15928049950807394,
+    "pairing_residual": 0.9278952028419902,
+    "participation_ratio": 2.962111711502075,
+    "variance_kept": 0.33553260533039353
+  },
+  {
+    "ckpt": "runs/dreamer_ref_s0.pt",
+    "ld": 4,
+    "eff_dim": 4,
+    "rho_energy": 0.19130702748190825,
+    "pairing_residual": 0.7510251285227798,
+    "participation_ratio": 3.924135684967041,
+    "variance_kept": 0.4245413089585449
+  },
+  {
+    "ckpt": "runs/dreamer_ref_s0.pt",
+    "ld": 6,
+    "eff_dim": 6,
+    "rho_energy": 0.6744174683347172,
+    "pairing_residual": 0.7523144715555651,
+    "participation_ratio": 5.595640659332275,
+    "variance_kept": 0.546693496584231
+  },
+  {
+    "ckpt": "runs/dreamer_ref_s0.pt",
+    "ld": 8,
+    "eff_dim": 8,
+    "rho_energy": 0.974282066875457,
+    "pairing_residual": 0.8294032843248603,
+    "participation_ratio": 6.971901893615723,
+    "variance_kept": 0.6297137177628667
+  },
+  {
+    "ckpt": "runs/dreamer_ref_s0.pt",
+    "ld": 12,
+    "eff_dim": 12,
+    "rho_energy": 0.9733253948629511,
+    "pairing_residual": 0.8887726009561455,
+    "participation_ratio": 9.233381271362305,
+    "variance_kept": 0.7460693338888841
+  },
+  {
+    "ckpt": "runs/dreamer_ref_s0.pt",
+    "ld": 16,
+    "eff_dim": 16,
+    "rho_energy": 0.9565390237193997,
+    "pairing_residual": 0.9348049034749627,
+    "participation_ratio": 10.977022171020508,
+    "variance_kept": 0.8238533809023648
+  },
+  {
+    "ckpt": "runs/dreamer_ref_s1.pt",
+    "ld": 2,
+    "eff_dim": 2,
+    "rho_energy": 0.2645953172279595,
+    "pairing_residual": 0.6800059017776338,
+    "participation_ratio": 1.9087997674942017,
+    "variance_kept": 0.30207556370035593
+  },
+  {
+    "ckpt": "runs/dreamer_ref_s1.pt",
+    "ld": 3,
+    "eff_dim": 3,
+    "rho_energy": 0.20983340819803745,
+    "pairing_residual": 0.7786726734708287,
+    "participation_ratio": 2.8128058910369873,
+    "variance_kept": 0.4060374788059387
+  },
+  {
+    "ckpt": "runs/dreamer_ref_s1.pt",
+    "ld": 4,
+    "eff_dim": 4,
+    "rho_energy": 0.2810708658274826,
+    "pairing_residual": 0.6809739037186597,
+    "participation_ratio": 3.6183059215545654,
+    "variance_kept": 0.483544850090563
+  },
+  {
+    "ckpt": "runs/dreamer_ref_s1.pt",
+    "ld": 6,
+    "eff_dim": 6,
+    "rho_energy": 0.9702452509034761,
+    "pairing_residual": 0.7376358391046888,
+    "participation_ratio": 5.03918981552124,
+    "variance_kept": 0.6020469496236921
+  },
+  {
+    "ckpt": "runs/dreamer_ref_s1.pt",
+    "ld": 8,
+    "eff_dim": 8,
+    "rho_energy": 0.9673051763348725,
+    "pairing_residual": 0.7607867963333389,
+    "participation_ratio": 6.085780620574951,
+    "variance_kept": 0.6732733864112527
+  },
+  {
+    "ckpt": "runs/dreamer_ref_s1.pt",
+    "ld": 12,
+    "eff_dim": 12,
+    "rho_energy": 0.9667969787941442,
+    "pairing_residual": 0.816794168886243,
+    "participation_ratio": 7.8830976486206055,
+    "variance_kept": 0.781164292921648
+  },
+  {
+    "ckpt": "runs/dreamer_ref_s1.pt",
+    "ld": 16,
+    "eff_dim": 16,
+    "rho_energy": 0.9707806441872555,
+    "pairing_residual": 0.9509491648607536,
+    "participation_ratio": 9.113898277282715,
+    "variance_kept": 0.845716751402303
+  },
+  {
+    "ckpt": "runs/dreamer_ref_s2.pt",
+    "ld": 2,
+    "eff_dim": 2,
+    "rho_energy": 0.042650105509304474,
+    "pairing_residual": 0.9853533404281838,
+    "participation_ratio": 1.97841215133667,
+    "variance_kept": 0.2765541955859197
+  },
+  {
+    "ckpt": "runs/dreamer_ref_s2.pt",
+    "ld": 3,
+    "eff_dim": 3,
+    "rho_energy": 0.05351083523317801,
+    "pairing_residual": 0.8699897037145969,
+    "participation_ratio": 2.9206044673919678,
+    "variance_kept": 0.37848322241693844
+  },
+  {
+    "ckpt": "runs/dreamer_ref_s2.pt",
+    "ld": 4,
+    "eff_dim": 4,
+    "rho_energy": 0.06987208064854827,
+    "pairing_residual": 0.7942156149131633,
+    "participation_ratio": 3.875185012817383,
+    "variance_kept": 0.47780541830107043
+  },
+  {
+    "ckpt": "runs/dreamer_ref_s2.pt",
+    "ld": 6,
+    "eff_dim": 6,
+    "rho_energy": 0.7211812495061979,
+    "pairing_residual": 0.660189879530522,
+    "participation_ratio": 5.432875633239746,
+    "variance_kept": 0.6015356583709167
+  },
+  {
+    "ckpt": "runs/dreamer_ref_s2.pt",
+    "ld": 8,
+    "eff_dim": 8,
+    "rho_energy": 0.9369213781542263,
+    "pairing_residual": 0.812758808466886,
+    "participation_ratio": 6.549287796020508,
+    "variance_kept": 0.6732733705140539
+  },
+  {
+    "ckpt": "runs/dreamer_ref_s2.pt",
+    "ld": 12,
+    "eff_dim": 12,
+    "rho_energy": 0.9670010278266433,
+    "pairing_residual": 0.8758527630972166,
+    "participation_ratio": 8.445133209228516,
+    "variance_kept": 0.7804277549377931
+  },
+  {
+    "ckpt": "runs/dreamer_ref_s2.pt",
+    "ld": 16,
+    "eff_dim": 16,
+    "rho_energy": 0.8794945541170857,
+    "pairing_residual": 0.9465988755952751,
+    "participation_ratio": 9.81572437286377,
+    "variance_kept": 0.8481906510458537
+  }
+]

@@ -1,0 +1,76 @@
+\section{Setup}
+\label{sec:setup}
+
+We analyse a DreamerV3 world model \citep{hafner2023dreamerv3} trained on video of a pendulum. The
+model is the reference PyTorch implementation at its published architecture: 13.5M parameters,
+categorical $32\times32$ stochastic latents, a convolutional encoder and decoder, Kullback-Leibler (KL) balancing, and
+unimix. We train the world model alone, with no actor and no critic, because we never need a policy.
+
+\paragraph{Relation to our earlier study.} We developed this extraction procedure on a much
+smaller system, and we describe it here in full because there is no separate paper to cite. A gated
+recurrent unit (GRU) of about 13k parameters was trained to predict the next position of a simulated
+oscillator from position alone, so it read the state directly instead of inferring it from pixels.
+On that substrate the same search recovered a quantity correlating with true energy at $0.972$ or
+better, scored close to zero on damped controls, and lowered rollout error by 68\% when enforced.
+That study is also where the three controls in this paper come from: an untrained network, a
+dissipative system, and a random law of matched complexity.
+
+Two of its findings are retested in Section~\ref{sec:limits} and neither survives here. We treat
+everything from it as a hypothesis to retest rather than as support, for two reasons. It is our own
+unpublished work, so a reader cannot check it. And the two substrates do not share an error metric:
+the GRU's rollout error lives in the oscillator's two-dimensional state space, while ours is pixel
+error against held-out video. Percentages from the two are not interchangeable, and
+Section~\ref{sec:intervention} says so where it quotes one.
+Appendix~\ref{sec:gru} describes that study in full, including the results that did not survive it.
+
+\paragraph{Code and run logs.} Every experiment in this paper, the run logs its figures are drawn
+from, and the source of the paper itself are at
+\url{https://github.com/Zarand3r/latent-noether-paper1}. The figures regenerate from the committed
+logs with no GPU, so each number can be checked against the run that produced it. Model checkpoints
+and rendered video are too large to commit; the repository pins the upstream commit of the DreamerV3
+implementation our adapter is built against and gives the commands to rebuild both.
+
+\paragraph{Data.} We render the video ourselves from gymnasium's \texttt{Pendulum-v1}
+\citep{towers2024gymnasium}. Each step produces a $500\times500$ RGB frame, which we crop to
+$448\times448$ and block-average to $64\times64$. We write initial conditions directly into the
+environment state, sampling $\theta$ uniformly on $[-1.8, 1.8]$ and $\dot\theta$ on $[-2.2, 2.2]$,
+and we reject any trajectory that reaches the simulator's $|\dot\theta| = 8$ speed clip, since that
+clip is a hard nonlinearity that would destroy conservation. Actions are always zero, so the
+pendulum evolves freely.
+
+Velocity never appears in a single frame. There is no motion blur, no trail, and no torque arrow,
+so the model has to infer $\dot\theta$ from the frame sequence on its own. That is what makes the
+latent worth examining.
+
+\paragraph{Training.} We train on a fixed dataset of 256 trajectories of 120 frames, using Adam at
+$10^{-4}$, batch 16, sequence length 64, for a wall-clock budget of half an hour. That budget buys
+about 6{,}500 gradient steps, a small fraction of a standard DreamerV3 run. We set free bits to 0
+rather than the reference default of 1.0; the measured KL settles near 1.8 nats, far from collapse,
+so the floor does no work here. Three seeds train independently and all three pass acceptance
+checks we registered beforehand: KL above 1 nat, one-step decoding at least $4\times$ better than
+predicting the dataset mean, and rollouts that stay finite. A model that failed to train would tell
+us nothing about the analysis, so we discard it rather than report it.
+
+This regime is offline, world-model-only, zero-action, and short. Our claims are about a DreamerV3
+world model fitted to pendulum video, and not about DreamerV3 as a reinforcement learning agent.
+
+\paragraph{Extraction.} After training we freeze the model. Everything that follows reads the
+hidden state and never updates a weight. We encode the held-out videos, take the deterministic
+recurrent state $h$, and project it onto its top 12 principal directions, dropping any direction the
+data does not occupy. Inside that subspace we take the flow $F$ to be the model's own one-step
+transition displacement, $T(h) - h$, rather than a vector field we fit ourselves. Fitting a field and
+then analysing it would interpret our own regression instead of the model.
+
+We then search for a degree-4 polynomial $C$ that is constant along the model's trajectories. The
+search is a generalized eigenproblem: the invariance ratio, within-trajectory variance over total
+variance, is a Rayleigh quotient, so one eigendecomposition returns the whole ranked family. We fit
+$C$ jointly with an antisymmetric $B$ satisfying $F \approx B\nabla C$, which is the condition that
+$C$ generates the flow rather than merely staying constant along it \citep{arnold1989mathematical}.
+Section~\ref{sec:limits} reports how much that second condition contributes, which is less than we
+expected.
+
+\paragraph{What we compare against.} We score $C$ against the textbook energy
+$E = \tfrac{1}{6}\dot\theta^2 + 5\cos\theta$. Gymnasium integrates semi-implicitly, so it conserves a
+shadow Hamiltonian $\tilde H = H + O(\Delta t)$ rather than $E$ exactly
+\citep{hairer2006geometric}. We measure about 12\% relative oscillation in $E$ from that mismatch,
+with no secular drift. Ground truth enters only when we score a result, never inside the search.

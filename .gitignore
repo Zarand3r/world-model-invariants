@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.ipynb_checkpoints/
+
+# Experiments / artifacts (keep results logs small & explicit; heavy stuff out of git)
+/checkpoints/
+/runs/*.pt
+/runs/*.npz
+/dist/
+/wandb/
+/renders/
+*.pt
+*.ckpt
+*.npz
+*.mp4
+*.log
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+runs/model_cache/
+
+# vendored third-party checkout (nested git repo); see docs/REPRODUCE.md
+external/
+logs/
+
+paper/project_context.md
+paper/*.png
+# paper/main.pdf is committed: the built artefact is the deliverable
+paper2/project_context.md
+paper2/*.png
+paper2/figures/*.png
+
+# built PDF is committed: it is the deliverable
+!paper/main.pdf

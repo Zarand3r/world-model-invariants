@@ -1,0 +1,180 @@
+{
+  "conservative": [
+    {
+      "ckpt": "runs/dreamer_ref_s3.pt",
+      "rho_energy": 0.9729099382111738,
+      "pairing_residual": 0.8290861705365005,
+      "heldout_invariance_ratio": 0.0026949543202357254,
+      "drift_of_C": 7.242173427603829e-05,
+      "participation_ratio": 8.063182830810547,
+      "retained_rank": 12,
+      "nulls": {
+        "flow_shuffle": {
+          "drift_pct": 0.0,
+          "residual_pct": 0.0,
+          "null_drift_median": 0.00025664170255911944,
+          "null_residual_median": 0.9983758976405896
+        },
+        "traj_reassign": {
+          "drift_pct": 0.0,
+          "residual_pct": 0.0,
+          "null_drift_median": 0.9891661755958838,
+          "null_residual_median": 0.9681487454472357
+        },
+        "random_C": {
+          "drift_pct": 0.0,
+          "residual_pct": 17.0,
+          "null_drift_median": 0.9248394977015111,
+          "null_residual_median": 0.8550231403506863
+        }
+      }
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s4.pt",
+      "rho_energy": 0.9672981735532296,
+      "pairing_residual": 0.8615200418934791,
+      "heldout_invariance_ratio": 0.003500329498921159,
+      "drift_of_C": 0.0001305039518210275,
+      "participation_ratio": 8.526528358459473,
+      "retained_rank": 12,
+      "nulls": {
+        "flow_shuffle": {
+          "drift_pct": 0.0,
+          "residual_pct": 0.0,
+          "null_drift_median": 0.0006893695983980977,
+          "null_residual_median": 0.9983245453464734
+        },
+        "traj_reassign": {
+          "drift_pct": 0.0,
+          "residual_pct": 0.0,
+          "null_drift_median": 0.9883724501573175,
+          "null_residual_median": 0.9695562614402549
+        },
+        "random_C": {
+          "drift_pct": 0.0,
+          "residual_pct": 66.0,
+          "null_drift_median": 0.9179347267115667,
+          "null_residual_median": 0.8519731669236381
+        }
+      }
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s5.pt",
+      "rho_energy": 0.9752191554222228,
+      "pairing_residual": 0.8650799638307023,
+      "heldout_invariance_ratio": 0.012126996398052644,
+      "drift_of_C": 0.0001067653835073997,
+      "participation_ratio": 8.296910285949707,
+      "retained_rank": 12,
+      "nulls": {
+        "flow_shuffle": {
+          "drift_pct": 0.0,
+          "residual_pct": 0.0,
+          "null_drift_median": 0.0009959861296397541,
+          "null_residual_median": 0.9982837866716588
+        },
+        "traj_reassign": {
+          "drift_pct": 0.0,
+          "residual_pct": 0.0,
+          "null_drift_median": 0.9793702993130077,
+          "null_residual_median": 0.9642761854396755
+        },
+        "random_C": {
+          "drift_pct": 0.0,
+          "residual_pct": 59.5,
+          "null_drift_median": 0.9168182488744683,
+          "null_residual_median": 0.8597317085069281
+        }
+      }
+    }
+  ],
+  "damped": [
+    {
+      "ckpt": "runs/dreamer_damped_s0.pt",
+      "rho_energy": 0.01824056184823753,
+      "pairing_residual": 0.9504680817833757,
+      "heldout_invariance_ratio": 0.9935503903726677,
+      "drift_of_C": 0.26621298782902847,
+      "participation_ratio": 6.845890045166016,
+      "retained_rank": 12,
+      "nulls": {
+        "flow_shuffle": {
+          "drift_pct": 0.0,
+          "residual_pct": 0.0,
+          "null_drift_median": 0.6534687578680696,
+          "null_residual_median": 0.9983440541993258
+        },
+        "traj_reassign": {
+          "drift_pct": 0.0,
+          "residual_pct": 0.0,
+          "null_drift_median": 0.9896226337632853,
+          "null_residual_median": 0.9622026120370534
+        },
+        "random_C": {
+          "drift_pct": 0.0,
+          "residual_pct": 100.0,
+          "null_drift_median": 0.9994490631503212,
+          "null_residual_median": 0.8148469041397153
+        }
+      }
+    },
+    {
+      "ckpt": "runs/dreamer_damped_s1.pt",
+      "rho_energy": 0.048338252526166206,
+      "pairing_residual": 0.933673336721299,
+      "heldout_invariance_ratio": 0.9870487091499989,
+      "drift_of_C": 0.20297722131921983,
+      "participation_ratio": 6.614746570587158,
+      "retained_rank": 12,
+      "nulls": {
+        "flow_shuffle": {
+          "drift_pct": 0.0,
+          "residual_pct": 0.0,
+          "null_drift_median": 0.43373632900938897,
+          "null_residual_median": 0.998437841276594
+        },
+        "traj_reassign": {
+          "drift_pct": 0.0,
+          "residual_pct": 0.0,
+          "null_drift_median": 0.979886329122579,
+          "null_residual_median": 0.9693079767748645
+        },
+        "random_C": {
+          "drift_pct": 0.0,
+          "residual_pct": 100.0,
+          "null_drift_median": 1.0008258546036073,
+          "null_residual_median": 0.8088264353006411
+        }
+      }
+    },
+    {
+      "ckpt": "runs/dreamer_damped_s2.pt",
+      "rho_energy": 0.09022458925767517,
+      "pairing_residual": 0.957061746478013,
+      "heldout_invariance_ratio": 0.9829252727345048,
+      "drift_of_C": 0.2576810359462875,
+      "participation_ratio": 7.011995315551758,
+      "retained_rank": 12,
+      "nulls": {
+        "flow_shuffle": {
+          "drift_pct": 0.0,
+          "residual_pct": 0.0,
+          "null_drift_median": 0.7731898971524167,
+          "null_residual_median": 0.9984162995317166
+        },
+        "traj_reassign": {
+          "drift_pct": 0.0,
+          "residual_pct": 0.0,
+          "null_drift_median": 0.9873383718940096,
+          "null_residual_median": 0.9679979894950757
+        },
+        "random_C": {
+          "drift_pct": 0.0,
+          "residual_pct": 100.0,
+          "null_drift_median": 0.9991178432211959,
+          "null_residual_median": 0.8035479835364677
+        }
+      }
+    }
+  ]
+}

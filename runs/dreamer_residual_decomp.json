@@ -1,0 +1,41 @@
+[
+  {
+    "ckpt": "runs/dreamer_ref_s0.pt",
+    "ld": 12,
+    "split": 6,
+    "rho_full": 0.9709068482902424,
+    "overall_residual": 0.9020492029135974,
+    "first6_energy_r2": 0.28529244354637284,
+    "first6_resid_share": 0.5511925062143542,
+    "first6_flow_share": 0.5649606867460404,
+    "added7_12_energy_r2": 0.6355612068223582,
+    "added7_12_resid_share": 0.44880749378564583,
+    "added7_12_flow_share": 0.4350393132539597
+  },
+  {
+    "ckpt": "runs/dreamer_ref_s1.pt",
+    "ld": 12,
+    "split": 6,
+    "rho_full": 0.9354670803394558,
+    "overall_residual": 0.8866706702458496,
+    "first6_energy_r2": 0.49577305301633423,
+    "first6_resid_share": 0.5110815322210215,
+    "first6_flow_share": 0.5371172864464471,
+    "added7_12_energy_r2": 0.4490119351641634,
+    "added7_12_resid_share": 0.4889184677789785,
+    "added7_12_flow_share": 0.46288271355355287
+  },
+  {
+    "ckpt": "runs/dreamer_ref_s2.pt",
+    "ld": 12,
+    "split": 6,
+    "rho_full": 0.9722842770823451,
+    "overall_residual": 0.8784070466389271,
+    "first6_energy_r2": 0.2953027392198654,
+    "first6_resid_share": 0.5747275196965184,
+    "first6_flow_share": 0.5919451273535549,
+    "added7_12_energy_r2": 0.6281393041468262,
+    "added7_12_resid_share": 0.4252724803034816,
+    "added7_12_flow_share": 0.408054872646445
+  }
+]

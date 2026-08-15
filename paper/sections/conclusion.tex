@@ -1,0 +1,11 @@
+\section{Conclusion}
+
+A DreamerV3 trained only to predict pendulum video holds a quantity that its own dynamics conserve,
+that disappears when we remove the physics from the training data, and that improves its rollouts
+when we enforce it. The evidence is the separation from three controls, not the correlation itself,
+because an untrained model clears the correlation threshold we had registered.
+
+The result suggests a design question we cannot answer yet. If the model carries a physical quantity
+and lets it drift, and if correcting that drift from outside improves prediction, then we might build a world model
+that preserves it during imagination instead. Whether that helps at a scale where the
+physics is not a single pendulum is the experiment we would run next.

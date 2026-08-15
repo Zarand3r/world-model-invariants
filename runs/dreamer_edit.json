@@ -1,0 +1,1130 @@
+{
+  "A_conservative_own": [
+    {
+      "ckpt": "runs/dreamer_ref_s3.pt",
+      "random_law": false,
+      "draw": null,
+      "pairing_residual": 0.8290861711137004,
+      "rollout_by_alpha": {
+        "0.0": 0.0027289590798318386,
+        "0.05": 0.0027085114270448685,
+        "0.1": 0.0027045898605138063,
+        "0.2": 0.00267673097550869,
+        "0.4": 0.00264906813390553
+      },
+      "baseline": 0.0027289590798318386,
+      "normalised_slope": -0.07079957920925146,
+      "relative_change_at_max_alpha": -0.029275245098666556,
+      "key": "A_conservative_own|runs/dreamer_ref_s3.pt"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s4.pt",
+      "random_law": false,
+      "draw": null,
+      "pairing_residual": 0.8615200421239753,
+      "rollout_by_alpha": {
+        "0.0": 0.0015509412623941898,
+        "0.05": 0.0015547109069302678,
+        "0.1": 0.0015347546432167292,
+        "0.2": 0.001527118030935526,
+        "0.4": 0.0015002245781943202
+      },
+      "baseline": 0.0015509412623941898,
+      "normalised_slope": -0.08664393967371264,
+      "relative_change_at_max_alpha": -0.03270058346476528,
+      "key": "A_conservative_own|runs/dreamer_ref_s4.pt"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s5.pt",
+      "random_law": false,
+      "draw": null,
+      "pairing_residual": 0.8650799635433039,
+      "rollout_by_alpha": {
+        "0.0": 0.0017174039967358112,
+        "0.05": 0.0016918010078370571,
+        "0.1": 0.0016938457265496254,
+        "0.2": 0.001680311281234026,
+        "0.4": 0.001657229382544756
+      },
+      "baseline": 0.0017174039967358112,
+      "normalised_slope": -0.07662772969366094,
+      "relative_change_at_max_alpha": -0.035038123997280984,
+      "key": "A_conservative_own|runs/dreamer_ref_s5.pt"
+    }
+  ],
+  "B_conservative_random": [
+    {
+      "ckpt": "runs/dreamer_ref_s3.pt",
+      "random_law": true,
+      "draw": 0,
+      "pairing_residual": 0.8290861711137004,
+      "rollout_by_alpha": {
+        "0.0": 0.0027289590798318386,
+        "0.05": 0.002721689408645034,
+        "0.1": 0.002808248857036233,
+        "0.2": 0.0030236244201660156,
+        "0.4": 0.003590430598706007
+      },
+      "baseline": 0.0027289590798318386,
+      "normalised_slope": 0.8313192626094305,
+      "relative_change_at_max_alpha": 0.31567769749308705,
+      "key": "B_conservative_random|runs/dreamer_ref_s3.pt|draw0"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s3.pt",
+      "random_law": true,
+      "draw": 1,
+      "pairing_residual": 0.8290861711137004,
+      "rollout_by_alpha": {
+        "0.0": 0.0027289590798318386,
+        "0.05": 0.0022689427714794874,
+        "0.1": 0.002185526769608259,
+        "0.2": 0.002117527648806572,
+        "0.4": 0.002248490462079644
+      },
+      "baseline": 0.0027289590798318386,
+      "normalised_slope": -0.28404779029399907,
+      "relative_change_at_max_alpha": -0.17606296162630675,
+      "key": "B_conservative_random|runs/dreamer_ref_s3.pt|draw1"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s3.pt",
+      "random_law": true,
+      "draw": 2,
+      "pairing_residual": 0.8290861711137004,
+      "rollout_by_alpha": {
+        "0.0": 0.0027289590798318386,
+        "0.05": 0.0022275473456829786,
+        "0.1": 0.002024991437792778,
+        "0.2": 0.0020923863630741835,
+        "0.4": 0.002807225799188018
+      },
+      "baseline": 0.0027289590798318386,
+      "normalised_slope": 0.2677856185461896,
+      "relative_change_at_max_alpha": 0.028680063374567754,
+      "key": "B_conservative_random|runs/dreamer_ref_s3.pt|draw2"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s3.pt",
+      "random_law": true,
+      "draw": 3,
+      "pairing_residual": 0.8290861711137004,
+      "rollout_by_alpha": {
+        "0.0": 0.0027289590798318386,
+        "0.05": 0.0025616735219955444,
+        "0.1": 0.0023941798135638237,
+        "0.2": 0.0022863640915602446,
+        "0.4": 0.002530708210542798
+      },
+      "baseline": 0.0027289590798318386,
+      "normalised_slope": -0.1400715310145488,
+      "relative_change_at_max_alpha": -0.07264706559882056,
+      "key": "B_conservative_random|runs/dreamer_ref_s3.pt|draw3"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s3.pt",
+      "random_law": true,
+      "draw": 4,
+      "pairing_residual": 0.8290861711137004,
+      "rollout_by_alpha": {
+        "0.0": 0.0027289590798318386,
+        "0.05": 0.002377206925302744,
+        "0.1": 0.0022804944310337305,
+        "0.2": 0.002293709432706237,
+        "0.4": 0.002564952941611409
+      },
+      "baseline": 0.0027289590798318386,
+      "normalised_slope": -0.01892871555586286,
+      "relative_change_at_max_alpha": -0.060098423399787895,
+      "key": "B_conservative_random|runs/dreamer_ref_s3.pt|draw4"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s3.pt",
+      "random_law": true,
+      "draw": 5,
+      "pairing_residual": 0.8290861711137004,
+      "rollout_by_alpha": {
+        "0.0": 0.0027289590798318386,
+        "0.05": 0.002509846119210124,
+        "0.1": 0.0022343832533806562,
+        "0.2": 0.0019851848483085632,
+        "0.4": 0.002697991207242012
+      },
+      "baseline": 0.0027289590798318386,
+      "normalised_slope": 0.006263954904062641,
+      "relative_change_at_max_alpha": -0.011347869896141814,
+      "key": "B_conservative_random|runs/dreamer_ref_s3.pt|draw5"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s3.pt",
+      "random_law": true,
+      "draw": 6,
+      "pairing_residual": 0.8290861711137004,
+      "rollout_by_alpha": {
+        "0.0": 0.0027289590798318386,
+        "0.05": 0.00252864183858037,
+        "0.1": 0.0024089713115245104,
+        "0.2": 0.002405475592240691,
+        "0.4": 0.0029477784410119057
+      },
+      "baseline": 0.0027289590798318386,
+      "normalised_slope": 0.2732242451234086,
+      "relative_change_at_max_alpha": 0.08018418553698173,
+      "key": "B_conservative_random|runs/dreamer_ref_s3.pt|draw6"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s3.pt",
+      "random_law": true,
+      "draw": 7,
+      "pairing_residual": 0.8290861711137004,
+      "rollout_by_alpha": {
+        "0.0": 0.0027289590798318386,
+        "0.05": 0.002225009258836508,
+        "0.1": 0.0022465218789875507,
+        "0.2": 0.0027220509946346283,
+        "0.4": 0.0036254040896892548
+      },
+      "baseline": 0.0027289590798318386,
+      "normalised_slope": 1.0930273471327432,
+      "relative_change_at_max_alpha": 0.32849338653793814,
+      "key": "B_conservative_random|runs/dreamer_ref_s3.pt|draw7"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s3.pt",
+      "random_law": true,
+      "draw": 8,
+      "pairing_residual": 0.8290861711137004,
+      "rollout_by_alpha": {
+        "0.0": 0.0027289590798318386,
+        "0.05": 0.002495185239240527,
+        "0.1": 0.0022655290085822344,
+        "0.2": 0.001982121728360653,
+        "0.4": 0.002132066525518894
+      },
+      "baseline": 0.0027289590798318386,
+      "normalised_slope": -0.5130751852050928,
+      "relative_change_at_max_alpha": -0.2187253589561796,
+      "key": "B_conservative_random|runs/dreamer_ref_s3.pt|draw8"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s3.pt",
+      "random_law": true,
+      "draw": 9,
+      "pairing_residual": 0.8290861711137004,
+      "rollout_by_alpha": {
+        "0.0": 0.0027289590798318386,
+        "0.05": 0.0024227905087172985,
+        "0.1": 0.0021931969095021486,
+        "0.2": 0.002286443719640374,
+        "0.4": 0.003062030067667365
+      },
+      "baseline": 0.0027289590798318386,
+      "normalised_slope": 0.43440352570091134,
+      "relative_change_at_max_alpha": 0.12205056143826483,
+      "key": "B_conservative_random|runs/dreamer_ref_s3.pt|draw9"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s3.pt",
+      "random_law": true,
+      "draw": 10,
+      "pairing_residual": 0.8290861711137004,
+      "rollout_by_alpha": {
+        "0.0": 0.0027289590798318386,
+        "0.05": 0.0025528755504637957,
+        "0.1": 0.002463696291670203,
+        "0.2": 0.0027320627123117447,
+        "0.4": 0.0032443113159388304
+      },
+      "baseline": 0.0027289590798318386,
+      "normalised_slope": 0.5858084651290556,
+      "relative_change_at_max_alpha": 0.18884571773745626,
+      "key": "B_conservative_random|runs/dreamer_ref_s3.pt|draw10"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s3.pt",
+      "random_law": true,
+      "draw": 11,
+      "pairing_residual": 0.8290861711137004,
+      "rollout_by_alpha": {
+        "0.0": 0.0027289590798318386,
+        "0.05": 0.0029046903364360332,
+        "0.1": 0.003051851177588105,
+        "0.2": 0.0033131055533885956,
+        "0.4": 0.003634663065895438
+      },
+      "baseline": 0.0027289590798318386,
+      "normalised_slope": 0.8131876776224121,
+      "relative_change_at_max_alpha": 0.33188624657552945,
+      "key": "B_conservative_random|runs/dreamer_ref_s3.pt|draw11"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s3.pt",
+      "random_law": true,
+      "draw": 12,
+      "pairing_residual": 0.8290861711137004,
+      "rollout_by_alpha": {
+        "0.0": 0.0027289590798318386,
+        "0.05": 0.00243384949862957,
+        "0.1": 0.002200368558987975,
+        "0.2": 0.0023806116078048944,
+        "0.4": 0.0033316435292363167
+      },
+      "baseline": 0.0027289590798318386,
+      "normalised_slope": 0.6932834732129819,
+      "relative_change_at_max_alpha": 0.22084774149182776,
+      "key": "B_conservative_random|runs/dreamer_ref_s3.pt|draw12"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s3.pt",
+      "random_law": true,
+      "draw": 13,
+      "pairing_residual": 0.8290861711137004,
+      "rollout_by_alpha": {
+        "0.0": 0.0027289590798318386,
+        "0.05": 0.002425343729555607,
+        "0.1": 0.0022170539014041424,
+        "0.2": 0.0018418641993775964,
+        "0.4": 0.0026879021897912025
+      },
+      "baseline": 0.0027289590798318386,
+      "normalised_slope": 0.004902335934694014,
+      "relative_change_at_max_alpha": -0.015044890318826632,
+      "key": "B_conservative_random|runs/dreamer_ref_s3.pt|draw13"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s3.pt",
+      "random_law": true,
+      "draw": 14,
+      "pairing_residual": 0.8290861711137004,
+      "rollout_by_alpha": {
+        "0.0": 0.0027289590798318386,
+        "0.05": 0.0028616159688681364,
+        "0.1": 0.00296371104195714,
+        "0.2": 0.0031272494234144688,
+        "0.4": 0.0035165853332728148
+      },
+      "baseline": 0.0027289590798318386,
+      "normalised_slope": 0.7028972876401669,
+      "relative_change_at_max_alpha": 0.2886178320744591,
+      "key": "B_conservative_random|runs/dreamer_ref_s3.pt|draw14"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s3.pt",
+      "random_law": true,
+      "draw": 15,
+      "pairing_residual": 0.8290861711137004,
+      "rollout_by_alpha": {
+        "0.0": 0.0027289590798318386,
+        "0.05": 0.0025258506648242474,
+        "0.1": 0.0024927265476435423,
+        "0.2": 0.0027004615403711796,
+        "0.4": 0.003563598496839404
+      },
+      "baseline": 0.0027289590798318386,
+      "normalised_slope": 0.8771016288151219,
+      "relative_change_at_max_alpha": 0.305845339776585,
+      "key": "B_conservative_random|runs/dreamer_ref_s3.pt|draw15"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s3.pt",
+      "random_law": true,
+      "draw": 16,
+      "pairing_residual": 0.8290861711137004,
+      "rollout_by_alpha": {
+        "0.0": 0.0027289590798318386,
+        "0.05": 0.0024717343039810658,
+        "0.1": 0.002636256394907832,
+        "0.2": 0.0031227977015078068,
+        "0.4": 0.0038218102417886257
+      },
+      "baseline": 0.0027289590798318386,
+      "normalised_slope": 1.1845627726458705,
+      "relative_change_at_max_alpha": 0.40046447381106565,
+      "key": "B_conservative_random|runs/dreamer_ref_s3.pt|draw16"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s3.pt",
+      "random_law": true,
+      "draw": 17,
+      "pairing_residual": 0.8290861711137004,
+      "rollout_by_alpha": {
+        "0.0": 0.0027289590798318386,
+        "0.05": 0.0025753704831004143,
+        "0.1": 0.0026361504569649696,
+        "0.2": 0.0026109707541763783,
+        "0.4": 0.0029366796370595694
+      },
+      "baseline": 0.0027289590798318386,
+      "normalised_slope": 0.24196043952668575,
+      "relative_change_at_max_alpha": 0.07611713886180027,
+      "key": "B_conservative_random|runs/dreamer_ref_s3.pt|draw17"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s3.pt",
+      "random_law": true,
+      "draw": 18,
+      "pairing_residual": 0.8290861711137004,
+      "rollout_by_alpha": {
+        "0.0": 0.0027289590798318386,
+        "0.05": 0.002627461450174451,
+        "0.1": 0.00254721543751657,
+        "0.2": 0.0024086502380669117,
+        "0.4": 0.002700124168768525
+      },
+      "baseline": 0.0027289590798318386,
+      "normalised_slope": -0.014610789887030146,
+      "relative_change_at_max_alpha": -0.010566267290856675,
+      "key": "B_conservative_random|runs/dreamer_ref_s3.pt|draw18"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s3.pt",
+      "random_law": true,
+      "draw": 19,
+      "pairing_residual": 0.8290861711137004,
+      "rollout_by_alpha": {
+        "0.0": 0.0027289590798318386,
+        "0.05": 0.002605211455374956,
+        "0.1": 0.002707787323743105,
+        "0.2": 0.002858996856957674,
+        "0.4": 0.003239169018343091
+      },
+      "baseline": 0.0027289590798318386,
+      "normalised_slope": 0.5404541417430039,
+      "relative_change_at_max_alpha": 0.18696137376405517,
+      "key": "B_conservative_random|runs/dreamer_ref_s3.pt|draw19"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s4.pt",
+      "random_law": true,
+      "draw": 0,
+      "pairing_residual": 0.8615200421239753,
+      "rollout_by_alpha": {
+        "0.0": 0.0015509412623941898,
+        "0.05": 0.0014808977721258998,
+        "0.1": 0.0017633289098739624,
+        "0.2": 0.0019528913544490933,
+        "0.4": 0.0025109006091952324
+      },
+      "baseline": 0.0015509412623941898,
+      "normalised_slope": 1.6536558422588437,
+      "relative_change_at_max_alpha": 0.6189527418460401,
+      "key": "B_conservative_random|runs/dreamer_ref_s4.pt|draw0"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s4.pt",
+      "random_law": true,
+      "draw": 1,
+      "pairing_residual": 0.8615200421239753,
+      "rollout_by_alpha": {
+        "0.0": 0.0015509412623941898,
+        "0.05": 0.0016367369098588824,
+        "0.1": 0.0017625258769840002,
+        "0.2": 0.0020462984684854746,
+        "0.4": 0.002747003920376301
+      },
+      "baseline": 0.0015509412623941898,
+      "normalised_slope": 1.964128086023595,
+      "relative_change_at_max_alpha": 0.7711850132452777,
+      "key": "B_conservative_random|runs/dreamer_ref_s4.pt|draw1"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s4.pt",
+      "random_law": true,
+      "draw": 2,
+      "pairing_residual": 0.8615200421239753,
+      "rollout_by_alpha": {
+        "0.0": 0.0015509412623941898,
+        "0.05": 0.001461992971599102,
+        "0.1": 0.0017290300456807017,
+        "0.2": 0.0020515937358140945,
+        "0.4": 0.0028499835170805454
+      },
+      "baseline": 0.0015509412623941898,
+      "normalised_slope": 2.2552986740310574,
+      "relative_change_at_max_alpha": 0.837583141402159,
+      "key": "B_conservative_random|runs/dreamer_ref_s4.pt|draw2"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s4.pt",
+      "random_law": true,
+      "draw": 3,
+      "pairing_residual": 0.8615200421239753,
+      "rollout_by_alpha": {
+        "0.0": 0.0015509412623941898,
+        "0.05": 0.0016434029676020145,
+        "0.1": 0.0018456345424056053,
+        "0.2": 0.002296393970027566,
+        "0.4": 0.00293603609316051
+      },
+      "baseline": 0.0015509412623941898,
+      "normalised_slope": 2.318369607349499,
+      "relative_change_at_max_alpha": 0.8930672388122215,
+      "key": "B_conservative_random|runs/dreamer_ref_s4.pt|draw3"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s4.pt",
+      "random_law": true,
+      "draw": 4,
+      "pairing_residual": 0.8615200421239753,
+      "rollout_by_alpha": {
+        "0.0": 0.0015509412623941898,
+        "0.05": 0.001502038910984993,
+        "0.1": 0.0015750430757179856,
+        "0.2": 0.0016411534743383527,
+        "0.4": 0.0020812610164284706
+      },
+      "baseline": 0.0015509412623941898,
+      "normalised_slope": 0.9076790784661475,
+      "relative_change_at_max_alpha": 0.34193413180304816,
+      "key": "B_conservative_random|runs/dreamer_ref_s4.pt|draw4"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s4.pt",
+      "random_law": true,
+      "draw": 5,
+      "pairing_residual": 0.8615200421239751,
+      "rollout_by_alpha": {
+        "0.0": 0.0015509412623941898,
+        "0.05": 0.0015444387681782246,
+        "0.1": 0.0017003555549308658,
+        "0.2": 0.002234402112662792,
+        "0.4": 0.0028291514609009027
+      },
+      "baseline": 0.0015509412623941898,
+      "normalised_slope": 2.236739297266184,
+      "relative_change_at_max_alpha": 0.8241512618817932,
+      "key": "B_conservative_random|runs/dreamer_ref_s4.pt|draw5"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s4.pt",
+      "random_law": true,
+      "draw": 6,
+      "pairing_residual": 0.8615200421239753,
+      "rollout_by_alpha": {
+        "0.0": 0.0015509412623941898,
+        "0.05": 0.0016322658630087972,
+        "0.1": 0.0020477655343711376,
+        "0.2": 0.002602528315037489,
+        "0.4": 0.0032630411442369223
+      },
+      "baseline": 0.0015509412623941898,
+      "normalised_slope": 2.886186990354049,
+      "relative_change_at_max_alpha": 1.1039102017311486,
+      "key": "B_conservative_random|runs/dreamer_ref_s4.pt|draw6"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s4.pt",
+      "random_law": true,
+      "draw": 7,
+      "pairing_residual": 0.8615200421239751,
+      "rollout_by_alpha": {
+        "0.0": 0.001550941145978868,
+        "0.05": 0.0016035818262025714,
+        "0.1": 0.0018030438804998994,
+        "0.2": 0.0021192359272390604,
+        "0.4": 0.0024326369166374207
+      },
+      "baseline": 0.001550941145978868,
+      "normalised_slope": 1.4892214161579331,
+      "relative_change_at_max_alpha": 0.5684907985996304,
+      "key": "B_conservative_random|runs/dreamer_ref_s4.pt|draw7"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s4.pt",
+      "random_law": true,
+      "draw": 8,
+      "pairing_residual": 0.8615200421239751,
+      "rollout_by_alpha": {
+        "0.0": 0.0015509412623941898,
+        "0.05": 0.0016547468258067966,
+        "0.1": 0.0019062238279730082,
+        "0.2": 0.002268971176818013,
+        "0.4": 0.002822729991748929
+      },
+      "baseline": 0.0015509412623941898,
+      "normalised_slope": 2.1000408032015643,
+      "relative_change_at_max_alpha": 0.820010892863523,
+      "key": "B_conservative_random|runs/dreamer_ref_s4.pt|draw8"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s4.pt",
+      "random_law": true,
+      "draw": 9,
+      "pairing_residual": 0.8615200421239751,
+      "rollout_by_alpha": {
+        "0.0": 0.001550941145978868,
+        "0.05": 0.0014885870041325688,
+        "0.1": 0.001506174448877573,
+        "0.2": 0.0017529241740703583,
+        "0.4": 0.0023162916768342257
+      },
+      "baseline": 0.001550941145978868,
+      "normalised_slope": 1.353439707898293,
+      "relative_change_at_max_alpha": 0.49347490253881354,
+      "key": "B_conservative_random|runs/dreamer_ref_s4.pt|draw9"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s4.pt",
+      "random_law": true,
+      "draw": 10,
+      "pairing_residual": 0.8615200421239753,
+      "rollout_by_alpha": {
+        "0.0": 0.0015509412623941898,
+        "0.05": 0.0016192214097827673,
+        "0.1": 0.0018496463308110833,
+        "0.2": 0.0023903639521449804,
+        "0.4": 0.003072026651352644
+      },
+      "baseline": 0.0015509412623941898,
+      "normalised_slope": 2.5821687982511357,
+      "relative_change_at_max_alpha": 0.9807498361416684,
+      "key": "B_conservative_random|runs/dreamer_ref_s4.pt|draw10"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s4.pt",
+      "random_law": true,
+      "draw": 11,
+      "pairing_residual": 0.8615200421239751,
+      "rollout_by_alpha": {
+        "0.0": 0.0015509412623941898,
+        "0.05": 0.0014659645967185497,
+        "0.1": 0.0016678411047905684,
+        "0.2": 0.00207412033341825,
+        "0.4": 0.002621480030938983
+      },
+      "baseline": 0.0015509412623941898,
+      "normalised_slope": 1.9113961780700948,
+      "relative_change_at_max_alpha": 0.6902510072445949,
+      "key": "B_conservative_random|runs/dreamer_ref_s4.pt|draw11"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s4.pt",
+      "random_law": true,
+      "draw": 12,
+      "pairing_residual": 0.8615200421239753,
+      "rollout_by_alpha": {
+        "0.0": 0.0015509412623941898,
+        "0.05": 0.0016660955734550953,
+        "0.1": 0.0018061250448226929,
+        "0.2": 0.0019616298377513885,
+        "0.4": 0.002407145220786333
+      },
+      "baseline": 0.0015509412623941898,
+      "normalised_slope": 1.3560203937944297,
+      "relative_change_at_max_alpha": 0.5520544066707079,
+      "key": "B_conservative_random|runs/dreamer_ref_s4.pt|draw12"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s4.pt",
+      "random_law": true,
+      "draw": 13,
+      "pairing_residual": 0.8615200421239753,
+      "rollout_by_alpha": {
+        "0.0": 0.0015509412623941898,
+        "0.05": 0.0015735046472400427,
+        "0.1": 0.0017844801768660545,
+        "0.2": 0.0022561370860785246,
+        "0.4": 0.0029030616860836744
+      },
+      "baseline": 0.0015509412623941898,
+      "normalised_slope": 2.3170227113802477,
+      "relative_change_at_max_alpha": 0.8718063388178962,
+      "key": "B_conservative_random|runs/dreamer_ref_s4.pt|draw13"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s4.pt",
+      "random_law": true,
+      "draw": 14,
+      "pairing_residual": 0.8615200421239753,
+      "rollout_by_alpha": {
+        "0.0": 0.0015509412623941898,
+        "0.05": 0.0017693478148430586,
+        "0.1": 0.0021031713113188744,
+        "0.2": 0.002693281276151538,
+        "0.4": 0.0035014874301850796
+      },
+      "baseline": 0.0015509412623941898,
+      "normalised_slope": 3.1935534694580965,
+      "relative_change_at_max_alpha": 1.2576531523700836,
+      "key": "B_conservative_random|runs/dreamer_ref_s4.pt|draw14"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s4.pt",
+      "random_law": true,
+      "draw": 15,
+      "pairing_residual": 0.8615200421239753,
+      "rollout_by_alpha": {
+        "0.0": 0.001550941145978868,
+        "0.05": 0.001608475111424923,
+        "0.1": 0.001735354890115559,
+        "0.2": 0.0019983374513685703,
+        "0.4": 0.002265161368995905
+      },
+      "baseline": 0.001550941145978868,
+      "normalised_slope": 1.1989545042016558,
+      "relative_change_at_max_alpha": 0.4605076245922025,
+      "key": "B_conservative_random|runs/dreamer_ref_s4.pt|draw15"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s4.pt",
+      "random_law": true,
+      "draw": 16,
+      "pairing_residual": 0.8615200421239751,
+      "rollout_by_alpha": {
+        "0.0": 0.0015509412623941898,
+        "0.05": 0.0015875501558184624,
+        "0.1": 0.0016733648953959346,
+        "0.2": 0.0017144429730251431,
+        "0.4": 0.0022076270543038845
+      },
+      "baseline": 0.0015509412623941898,
+      "normalised_slope": 1.048166468055055,
+      "relative_change_at_max_alpha": 0.423411129636185,
+      "key": "B_conservative_random|runs/dreamer_ref_s4.pt|draw16"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s4.pt",
+      "random_law": true,
+      "draw": 17,
+      "pairing_residual": 0.8615200421239753,
+      "rollout_by_alpha": {
+        "0.0": 0.0015509412623941898,
+        "0.05": 0.001582234282977879,
+        "0.1": 0.0017609604401513934,
+        "0.2": 0.002054340671747923,
+        "0.4": 0.0026425961405038834
+      },
+      "baseline": 0.0015509412623941898,
+      "normalised_slope": 1.8340696449701104,
+      "relative_change_at_max_alpha": 0.7038660357933251,
+      "key": "B_conservative_random|runs/dreamer_ref_s4.pt|draw17"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s4.pt",
+      "random_law": true,
+      "draw": 18,
+      "pairing_residual": 0.8615200421239751,
+      "rollout_by_alpha": {
+        "0.0": 0.001550941145978868,
+        "0.05": 0.0016441472107544541,
+        "0.1": 0.0019177916692569852,
+        "0.2": 0.0023717214353382587,
+        "0.4": 0.0029627387411892414
+      },
+      "baseline": 0.001550941145978868,
+      "normalised_slope": 2.361954749726457,
+      "relative_change_at_max_alpha": 0.910284441721562,
+      "key": "B_conservative_random|runs/dreamer_ref_s4.pt|draw18"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s4.pt",
+      "random_law": true,
+      "draw": 19,
+      "pairing_residual": 0.8615200421239753,
+      "rollout_by_alpha": {
+        "0.0": 0.001550941145978868,
+        "0.05": 0.0015576924197375774,
+        "0.1": 0.0018934120889753103,
+        "0.2": 0.00249222363345325,
+        "0.4": 0.003185226581990719
+      },
+      "baseline": 0.001550941145978868,
+      "normalised_slope": 2.823039481454019,
+      "relative_change_at_max_alpha": 1.0537378805437394,
+      "key": "B_conservative_random|runs/dreamer_ref_s4.pt|draw19"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s5.pt",
+      "random_law": true,
+      "draw": 0,
+      "pairing_residual": 0.8650799635433039,
+      "rollout_by_alpha": {
+        "0.0": 0.0017174039967358112,
+        "0.05": 0.0017120145494118333,
+        "0.1": 0.0019517432665452361,
+        "0.2": 0.002460073446854949,
+        "0.4": 0.0029797861352562904
+      },
+      "baseline": 0.0017174039967358112,
+      "normalised_slope": 1.9887632090479177,
+      "relative_change_at_max_alpha": 0.7350525216663227,
+      "key": "B_conservative_random|runs/dreamer_ref_s5.pt|draw0"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s5.pt",
+      "random_law": true,
+      "draw": 1,
+      "pairing_residual": 0.8650799635433039,
+      "rollout_by_alpha": {
+        "0.0": 0.0017174039967358112,
+        "0.05": 0.001508851652033627,
+        "0.1": 0.0015219028573483229,
+        "0.2": 0.0018208613619208336,
+        "0.4": 0.002572625409811735
+      },
+      "baseline": 0.0017174039967358112,
+      "normalised_slope": 1.4534059163845199,
+      "relative_change_at_max_alpha": 0.49797334506115215,
+      "key": "B_conservative_random|runs/dreamer_ref_s5.pt|draw1"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s5.pt",
+      "random_law": true,
+      "draw": 2,
+      "pairing_residual": 0.8650799635433039,
+      "rollout_by_alpha": {
+        "0.0": 0.0017174039967358112,
+        "0.05": 0.0015522598987445235,
+        "0.1": 0.001798483426682651,
+        "0.2": 0.002250846242532134,
+        "0.4": 0.0030092864762991667
+      },
+      "baseline": 0.0017174039967358112,
+      "normalised_slope": 2.1084332583985717,
+      "relative_change_at_max_alpha": 0.7522298084893103,
+      "key": "B_conservative_random|runs/dreamer_ref_s5.pt|draw2"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s5.pt",
+      "random_law": true,
+      "draw": 3,
+      "pairing_residual": 0.8650799635433037,
+      "rollout_by_alpha": {
+        "0.0": 0.0017174039967358112,
+        "0.05": 0.0017440658994019032,
+        "0.1": 0.0019175157649442554,
+        "0.2": 0.0022166818380355835,
+        "0.4": 0.0026919173542410135
+      },
+      "baseline": 0.0017174039967358112,
+      "normalised_slope": 1.4901587119319255,
+      "relative_change_at_max_alpha": 0.5674339639114698,
+      "key": "B_conservative_random|runs/dreamer_ref_s5.pt|draw3"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s5.pt",
+      "random_law": true,
+      "draw": 4,
+      "pairing_residual": 0.8650799635433039,
+      "rollout_by_alpha": {
+        "0.0": 0.0017174039967358112,
+        "0.05": 0.0016332343220710754,
+        "0.1": 0.0017915245844051242,
+        "0.2": 0.002170390449464321,
+        "0.4": 0.002979475073516369
+      },
+      "baseline": 0.0017174039967358112,
+      "normalised_slope": 1.9964902292428846,
+      "relative_change_at_max_alpha": 0.734871398447492,
+      "key": "B_conservative_random|runs/dreamer_ref_s5.pt|draw4"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s5.pt",
+      "random_law": true,
+      "draw": 5,
+      "pairing_residual": 0.8650799635433037,
+      "rollout_by_alpha": {
+        "0.0": 0.0017174039967358112,
+        "0.05": 0.0015862192958593369,
+        "0.1": 0.001662840018980205,
+        "0.2": 0.0019427862716838717,
+        "0.4": 0.0029179644770920277
+      },
+      "baseline": 0.0017174039967358112,
+      "normalised_slope": 1.9055266171144623,
+      "relative_change_at_max_alpha": 0.6990553664938856,
+      "key": "B_conservative_random|runs/dreamer_ref_s5.pt|draw5"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s5.pt",
+      "random_law": true,
+      "draw": 6,
+      "pairing_residual": 0.8650799635433041,
+      "rollout_by_alpha": {
+        "0.0": 0.0017174039967358112,
+        "0.05": 0.001580457086674869,
+        "0.1": 0.0017694078851491213,
+        "0.2": 0.0022065918892621994,
+        "0.4": 0.002990974113345146
+      },
+      "baseline": 0.0017174039967358112,
+      "normalised_slope": 2.060938608718804,
+      "relative_change_at_max_alpha": 0.74156699240828,
+      "key": "B_conservative_random|runs/dreamer_ref_s5.pt|draw6"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s5.pt",
+      "random_law": true,
+      "draw": 7,
+      "pairing_residual": 0.8650799635433037,
+      "rollout_by_alpha": {
+        "0.0": 0.0017174039967358112,
+        "0.05": 0.0016486960230395198,
+        "0.1": 0.0016441221814602613,
+        "0.2": 0.0019455775618553162,
+        "0.4": 0.002542191883549094
+      },
+      "baseline": 0.0017174039967358112,
+      "normalised_slope": 1.3284034422088125,
+      "relative_change_at_max_alpha": 0.48025268858167236,
+      "key": "B_conservative_random|runs/dreamer_ref_s5.pt|draw7"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s5.pt",
+      "random_law": true,
+      "draw": 8,
+      "pairing_residual": 0.8650799635433039,
+      "rollout_by_alpha": {
+        "0.0": 0.0017174039967358112,
+        "0.05": 0.0016108111012727022,
+        "0.1": 0.0016593672335147858,
+        "0.2": 0.0019156014313921332,
+        "0.4": 0.0022872628178447485
+      },
+      "baseline": 0.0017174039967358112,
+      "normalised_slope": 0.9662007601752334,
+      "relative_change_at_max_alpha": 0.3318140764735852,
+      "key": "B_conservative_random|runs/dreamer_ref_s5.pt|draw8"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s5.pt",
+      "random_law": true,
+      "draw": 9,
+      "pairing_residual": 0.8650799635433039,
+      "rollout_by_alpha": {
+        "0.0": 0.0017174039967358112,
+        "0.05": 0.0016193157061934471,
+        "0.1": 0.001734148245304823,
+        "0.2": 0.0021253833547234535,
+        "0.4": 0.0029637101106345654
+      },
+      "baseline": 0.0017174039967358112,
+      "normalised_slope": 1.9852469986554038,
+      "relative_change_at_max_alpha": 0.7256918676488172,
+      "key": "B_conservative_random|runs/dreamer_ref_s5.pt|draw9"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s5.pt",
+      "random_law": true,
+      "draw": 10,
+      "pairing_residual": 0.8650799635433039,
+      "rollout_by_alpha": {
+        "0.0": 0.0017174039967358112,
+        "0.05": 0.001568661886267364,
+        "0.1": 0.0019337248522788286,
+        "0.2": 0.00265610427595675,
+        "0.4": 0.0036192084662616253
+      },
+      "baseline": 0.0017174039967358112,
+      "normalised_slope": 3.065349216682748,
+      "relative_change_at_max_alpha": 1.1073716336636483,
+      "key": "B_conservative_random|runs/dreamer_ref_s5.pt|draw10"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s5.pt",
+      "random_law": true,
+      "draw": 11,
+      "pairing_residual": 0.8650799635433039,
+      "rollout_by_alpha": {
+        "0.0": 0.0017174039967358112,
+        "0.05": 0.0016715232050046325,
+        "0.1": 0.001915181870572269,
+        "0.2": 0.0023177715484052896,
+        "0.4": 0.002677110256627202
+      },
+      "baseline": 0.0017174039967358112,
+      "normalised_slope": 1.5409544203962084,
+      "relative_change_at_max_alpha": 0.5588121733240747,
+      "key": "B_conservative_random|runs/dreamer_ref_s5.pt|draw11"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s5.pt",
+      "random_law": true,
+      "draw": 12,
+      "pairing_residual": 0.8650799635433039,
+      "rollout_by_alpha": {
+        "0.0": 0.0017174039967358112,
+        "0.05": 0.001702102948911488,
+        "0.1": 0.0018033086089417338,
+        "0.2": 0.002079683355987072,
+        "0.4": 0.002596778329461813
+      },
+      "baseline": 0.0017174039967358112,
+      "normalised_slope": 1.3694647605526633,
+      "relative_change_at_max_alpha": 0.5120369664897643,
+      "key": "B_conservative_random|runs/dreamer_ref_s5.pt|draw12"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s5.pt",
+      "random_law": true,
+      "draw": 13,
+      "pairing_residual": 0.8650799635433037,
+      "rollout_by_alpha": {
+        "0.0": 0.0017174039967358112,
+        "0.05": 0.0016044923104345798,
+        "0.1": 0.0018266165861859918,
+        "0.2": 0.0024394849315285683,
+        "0.4": 0.0034809275530278683
+      },
+      "baseline": 0.0017174039967358112,
+      "normalised_slope": 2.8113098367532063,
+      "relative_change_at_max_alpha": 1.026854228617089,
+      "key": "B_conservative_random|runs/dreamer_ref_s5.pt|draw13"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s5.pt",
+      "random_law": true,
+      "draw": 14,
+      "pairing_residual": 0.8650799635433039,
+      "rollout_by_alpha": {
+        "0.0": 0.0017174039967358112,
+        "0.05": 0.0016694053774699569,
+        "0.1": 0.0016814458649605513,
+        "0.2": 0.0018984281923621893,
+        "0.4": 0.0026060885284096003
+      },
+      "baseline": 0.0017174039967358112,
+      "normalised_slope": 1.3847650970134446,
+      "relative_change_at_max_alpha": 0.5174580549264295,
+      "key": "B_conservative_random|runs/dreamer_ref_s5.pt|draw14"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s5.pt",
+      "random_law": true,
+      "draw": 15,
+      "pairing_residual": 0.8650799635433039,
+      "rollout_by_alpha": {
+        "0.0": 0.0017174039967358112,
+        "0.05": 0.0015305066481232643,
+        "0.1": 0.0017525136936455965,
+        "0.2": 0.0023820216301828623,
+        "0.4": 0.0029395988676697016
+      },
+      "baseline": 0.0017174039967358112,
+      "normalised_slope": 2.0712298917300704,
+      "relative_change_at_max_alpha": 0.711652513477818,
+      "key": "B_conservative_random|runs/dreamer_ref_s5.pt|draw15"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s5.pt",
+      "random_law": true,
+      "draw": 16,
+      "pairing_residual": 0.8650799635433039,
+      "rollout_by_alpha": {
+        "0.0": 0.0017174039967358112,
+        "0.05": 0.0016684256261214614,
+        "0.1": 0.0019044395303353667,
+        "0.2": 0.0022117330227047205,
+        "0.4": 0.0030785195995122194
+      },
+      "baseline": 0.0017174039967358112,
+      "normalised_slope": 2.0993395442148057,
+      "relative_change_at_max_alpha": 0.7925424683786788,
+      "key": "B_conservative_random|runs/dreamer_ref_s5.pt|draw16"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s5.pt",
+      "random_law": true,
+      "draw": 17,
+      "pairing_residual": 0.8650799635433037,
+      "rollout_by_alpha": {
+        "0.0": 0.0017174039967358112,
+        "0.05": 0.0016488200053572655,
+        "0.1": 0.0020550324115902185,
+        "0.2": 0.0026309206150472164,
+        "0.4": 0.003309868974611163
+      },
+      "baseline": 0.0017174039967358112,
+      "normalised_slope": 2.5257251910673704,
+      "relative_change_at_max_alpha": 0.9272512355287835,
+      "key": "B_conservative_random|runs/dreamer_ref_s5.pt|draw17"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s5.pt",
+      "random_law": true,
+      "draw": 18,
+      "pairing_residual": 0.8650799635433039,
+      "rollout_by_alpha": {
+        "0.0": 0.0017174039967358112,
+        "0.05": 0.0015642723301425576,
+        "0.1": 0.0015872512012720108,
+        "0.2": 0.001955745741724968,
+        "0.4": 0.002621036721393466
+      },
+      "baseline": 0.0017174039967358112,
+      "normalised_slope": 1.5118520472753272,
+      "relative_change_at_max_alpha": 0.526162001704402,
+      "key": "B_conservative_random|runs/dreamer_ref_s5.pt|draw18"
+    },
+    {
+      "ckpt": "runs/dreamer_ref_s5.pt",
+      "random_law": true,
+      "draw": 19,
+      "pairing_residual": 0.8650799635433039,
+      "rollout_by_alpha": {
+        "0.0": 0.0017174039967358112,
+        "0.05": 0.00165630376432091,
+        "0.1": 0.001737393089570105,
+        "0.2": 0.0021221169736236334,
+        "0.4": 0.0027234067674726248
+      },
+      "baseline": 0.0017174039967358112,
+      "normalised_slope": 1.612008069473226,
+      "relative_change_at_max_alpha": 0.5857694361075644,
+      "key": "B_conservative_random|runs/dreamer_ref_s5.pt|draw19"
+    }
+  ],
+  "C_damped_own": [
+    {
+      "ckpt": "runs/dreamer_damped_s0.pt",
+      "random_law": false,
+      "draw": null,
+      "pairing_residual": 0.9504680822487386,
+      "rollout_by_alpha": {
+        "0.0": 0.0010953887831419706,
+        "0.05": 0.0010963298846036196,
+        "0.1": 0.0011001619277521968,
+        "0.2": 0.0010995296761393547,
+        "0.4": 0.0010971683077514172
+      },
+      "baseline": 0.0010953887831419706,
+      "normalised_slope": 0.002913654315858847,
+      "relative_change_at_max_alpha": 0.0016245598246334113,
+      "key": "C_damped_own|runs/dreamer_damped_s0.pt"
+    },
+    {
+      "ckpt": "runs/dreamer_damped_s1.pt",
+      "random_law": false,
+      "draw": null,
+      "pairing_residual": 0.933673335708396,
+      "rollout_by_alpha": {
+        "0.0": 0.0009293019538745284,
+        "0.05": 0.0009208102710545063,
+        "0.1": 0.0009154981235042214,
+        "0.2": 0.000938202312681824,
+        "0.4": 0.0009334908681921661
+      },
+      "baseline": 0.0009293019538745284,
+      "normalised_slope": 0.0326224033819375,
+      "relative_change_at_max_alpha": 0.004507592284911151,
+      "key": "C_damped_own|runs/dreamer_damped_s1.pt"
+    },
+    {
+      "ckpt": "runs/dreamer_damped_s2.pt",
+      "random_law": false,
+      "draw": null,
+      "pairing_residual": 0.9570617479704583,
+      "rollout_by_alpha": {
+        "0.0": 0.0010063855443149805,
+        "0.05": 0.0010079164057970047,
+        "0.1": 0.0010162345133721828,
+        "0.2": 0.0010127550922334194,
+        "0.4": 0.0010406516958028078
+      },
+      "baseline": 0.0010063855443149805,
+      "normalised_slope": 0.08187200932446442,
+      "relative_change_at_max_alpha": 0.03404873180203651,
+      "key": "C_damped_own|runs/dreamer_damped_s2.pt"
+    }
+  ]
+}

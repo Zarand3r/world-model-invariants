@@ -1,0 +1,126 @@
+\appendix
+\section{The GRU precursor study}
+\label{sec:gru}
+
+The method in this paper was developed on a much smaller recurrent model before it met a pixel
+world model. That study is unpublished and has no separate reference, so we describe it here in
+enough detail to be judged. Its role is not to support the DreamerV3 result. It is where the
+phenomenon first appeared, where several appealing readings of it were killed, and where the
+narrower claim tested in the main text came from.
+
+\paragraph{Setup.} A single-layer GRU of 48--64 hidden units, about 13k parameters, trained on
+next-observation prediction for low-dimensional mechanical systems. The model saw \emph{position
+only}, so any representation of velocity had to be reconstructed internally by the recurrent state.
+We studied two conservative systems, an anharmonic central-force system and a pair of coupled
+anharmonic oscillators, with matched dissipative variants trained as controls. Extraction never used
+a physical label; ground truth entered only when scoring a recovered quantity.
+
+\paragraph{The search.} Writing $z$ for a low-dimensional representation of the hidden state and $f$
+for the latent flow induced by the trained transition, we look jointly for a scalar $C$ and an
+antisymmetric field $B$ with $f \approx B\nabla C$. Antisymmetry gives $\nabla C^\top B \nabla C = 0$,
+so any $C$ satisfying the fit is approximately constant along the flow. We score the fit by the
+normalised residual $R = \|f - B\nabla C\|^2 / \|f\|^2$.
+
+\subsection{What it established}
+
+\paragraph{Conservation alone is not evidence.} A randomly initialised GRU already contained a latent
+scalar correlating with true energy at $|\rho| \approx 0.998$. A high-dimensional random encoding of
+a low-dimensional trajectory retains enough information for a flexible readout to reconstruct energy.
+This is the result that forced every later claim to be a \emph{difference} against a null rather than
+a level, and it is why the main text leads with the same control on DreamerV3.
+
+\paragraph{Flow-based selection separated conservative from dissipative models.} Once candidates were
+selected by the joint criterion, the recovered scalar correlated with true energy at
+$|\rho_E| \ge 0.972$ on conservative models, often approaching $0.999$, and the residual separated the
+two arms strongly ($p = 5.4\times10^{-6}$, $d = 3.10$ on a representative comparison).
+
+\paragraph{Enforcing the recovered quantity improved rollouts.} Correcting the hidden state during
+free rollout so that $C$ stayed near its initial value reduced trajectory error by up to $68\%$ and
+true-energy drift by $69\%$, and \emph{harmed} dissipative models. This is the first version of the
+recover, refuse, intervene chain that the main text retests.
+
+\paragraph{Long-horizon error is mostly phase.} About $77\%$ of rollout error lay along the true
+physical flow and only $14\%$ changed the conserved quantity. The model stayed near the right orbit
+and moved along it at the wrong rate.
+
+\paragraph{The frequency--action mechanism.} In a nonlinear oscillator the frequency depends on the
+conserved quantity, so a small energy error produces a persistent frequency error that accumulates as
+phase. With $\kappa(E) = d\ln\omega/dE$ and $X(t) = \int_0^t \kappa(E_s)\,\Delta E(s)\,ds$, this
+predictor beat generic functions of time on held-out data.
+
+\begin{center}\small
+\begin{tabular}{lcc}
+\toprule
+predictor & central force & coupled oscillators \\
+\midrule
+$a + bt$ & $0.124$ & $-0.028$ \\
+$a + bt^p$ (best $p$) & $0.131$ & $-0.024$ \\
+$a + b\int\kappa\,\Delta E\,ds$ & $\mathbf{0.658}$ & $\mathbf{0.358}$ \\
+\quad with an oscillatory correction & $0.703$ & --- \\
+\quad with an angular-momentum term & $0.657$ & --- \\
+fitted coefficient $b$ & $0.91$ & $0.67$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The coefficient sits near the natural scale the mechanism predicts, and it was never fitted for that
+purpose: $\kappa$ came from the simulator. Adding an oscillatory correction raises the central-force
+fit to $0.703$, while adding an angular-momentum term moves it to $0.657$, slightly worse, and the
+coupled system has no rotational symmetry at all. The scalar-energy account is therefore already
+complete for the errors these models actually make. A one-time intervention on the invariant, after
+which the model ran free, changed later phase drift with the predicted sign in $94\%$ of cases and a
+held-out $R^2$ of $0.887$.
+
+\subsection{What it killed, and why that shapes the main text}
+
+\paragraph{$\nabla C$ is not the physical energy gradient.} Matching perturbation directions so each
+produced the same instantaneous change in true energy did \emph{not} equalise their downstream
+effects. Displacing along $\nabla C$ moved later phase drift most per unit of energy change, a random
+direction less, and a direction tangent to $C$ least, on every seed. The size of the gap depends on
+how the coefficient is estimated, so we report the ordering rather than the digits; what matters is
+that instantaneous $\Delta E$ is not a sufficient mediator. Separately, $\nabla C$ moved true energy
+only $1.08\times$ more per unit displacement than a random direction. A model can hold the right
+scalar while its surrounding latent geometry is wrong.
+
+\paragraph{A symmetry the model gets wrong.} For a rotationally symmetric central force the radial
+frequency must be even in angular momentum, $\omega_r(E, L) = \omega_r(E, -L)$. Measured at fixed
+energy, the simulator obeys this: $|L|$ alone predicts its radial frequency at $R^2 = 0.89$, and
+signed $L$ adds nothing ($R^2 = 0.00$). The learned GRU does not. Signed $L$ predicts its frequency
+at $R^2 = 0.30$, a dependence the physics forbids exactly, and it is the larger of the two effects
+the model shows. Recovering an energy-like scalar is therefore not the same as recovering the law.
+
+\paragraph{Structural readings that failed.} A low-dimensional part of the hidden state carried most
+of the information reaching decoded futures, which suggested a quotient interpretation; the
+corresponding divergence statistic then separated conservative from dissipative systems at only
+$\mathrm{AUC} = 0.68$, so we keep the observation as description rather than explanation. A subspace
+chosen by transition-closure criteria did not beat plain PCA at matched dimension. Extraction was
+also sensitive to representation: whitening the latent could destroy recovery, and keeping only the
+highest-variance directions removed physical information, which is the result that reproduces most
+strongly in the main text.
+
+\subsection{What transferred}
+
+\begin{center}\small
+\begin{tabular}{lll}
+\toprule
+finding & GRU & DreamerV3 (this paper) \\
+\midrule
+energy-like invariant recoverable & $|\rho_E| \ge 0.972$ & replicates, $\approx 0.97$ \\
+untrained nets score high & up to $0.998$ & replicates, up to $0.908$ \\
+conservative vs dissipative separate & $p = 5.4\times10^{-6}$ & replicates, no seed overlap \\
+enforcing it improves rollouts & up to $68\%$ & direction only, $3.3\%$ \\
+residual predicts how physical $C$ is & works & \textbf{does not transfer} \\
+frequency weighting earns its place & $R^2\ 0.658$ vs $0.131$ & \textbf{unresolved} \\
+$\nabla C$ is the physical direction & \textbf{false} & remains unsupported \\
+right scalar implies right geometry & \textbf{false} & motivates the chart reading \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Two rows carry most of the weight. The intervention transfers in direction and specificity but not in
+magnitude, and Section~\ref{sec:intervention} explains why the two percentages are not comparable.
+The flow-generation residual, which was the study's most distinctive instrument, does not transfer at
+all: on DreamerV3 it is mid-pack against random polynomials, and conservation does the work instead.
+The value of the precursor for this paper is that the DreamerV3 result did not come from one
+successful experiment. It came from a programme that first produced the phenomenon and then removed
+several tempting readings of it before the surviving claim was put to a standard pixel world model.

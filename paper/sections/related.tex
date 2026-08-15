@@ -1,0 +1,32 @@
+\section{Related work}
+\label{sec:related}
+
+\paragraph{Probing shows a quantity is present, not that the model uses it.} Linear and nonlinear probes
+read physical or linguistic variables out of hidden states \citep{alain2017probing}, and the
+literature has repeatedly shown that a probe's accuracy confounds what the model encodes with what
+the probe can learn. Control tasks \citep{hewitt2019control} and the surrounding critique
+\citep{belinkov2022probing} formalise that. Our untrained baseline in Section~\ref{sec:recovery} is
+the same discipline applied to invariant search, and it matters more here than usual: four of six
+randomly initialised models cleared our registered threshold. Work on emergent world representations
+in sequence models \citep{li2023othello,nanda2023othello} strengthens probing by intervening on the
+representation, which is the move we make in Section~\ref{sec:intervention}.
+
+\paragraph{Equation discovery fits the data; we read the model.} SINDy \citep{brunton2016sindy}
+recovers governing equations from trajectories, and Hamiltonian and Lagrangian networks
+\citep{greydanus2019hnn,cranmer2020lnn} build conservation into an architecture so that it holds by
+construction. Both target the physical system. We target a model that we never told about physics
+and trained only to predict pixels, and we ask what its transition map preserves. Koopman and
+dynamic-mode methods \citep{schmid2010dmd} share our linear-algebraic machinery, and we use the
+standard version of it rather than proposing a new one.
+
+\paragraph{The field evaluates world models on returns, not on physics.} DreamerV3
+\citep{hafner2023dreamerv3}, its predecessors \citep{ha2018world}, and planning-based learned models
+\citep{schrittwieser2020muzero} report task performance. That leaves open whether a model that
+predicts well has internalised any dynamical structure. The disentanglement literature
+\citep{locatello2019challenging} showed how easily an appealing structural claim about
+representations survives without the right controls, which is the failure mode our dissipative arm
+guards against.
+
+\paragraph{Positioning.} The extraction machinery here is standard. The contribution is the pairing
+of a claim about a modern pixel-trained world model with the three controls that make it
+falsifiable: an untrained model, a dissipative model, and a random law.
