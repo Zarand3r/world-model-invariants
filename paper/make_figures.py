@@ -76,7 +76,7 @@ def fig1_three_claims():
     cons_dr = [r["drift_of_C"] for r in ref["conservative"]]
     damp_dr = [r["drift_of_C"] for r in ref["damped"]]
 
-    fig, ax = plt.subplots(1, 3, figsize=(7.1, 2.15))
+    fig, ax = plt.subplots(1, 3, figsize=(7.1, 2.55))
 
     # (a) recovery against the untrained null
     groups = [("no damping\n(trained)", cons_rho, TRAINED),
@@ -91,7 +91,7 @@ def fig1_three_claims():
     ax[0].set_xticks(range(3)); ax[0].set_xticklabels([g[0] for g in groups])
     ax[0].tick_params(axis="x", labelsize=6.6)
     ax[0].set_ylabel(r"correlation with true energy"); ax[0].set_ylim(-0.05, 1.05)
-    _panel(ax[0], "(a) recover", "trained models agree, untrained ones scatter")
+    _panel(ax[0], "(a) recover", "trained agree, untrained scatter")
 
     # (b) is it actually conserved? four orders of magnitude, so dots on a log axis
     for i, (vals, c) in enumerate([(cons_dr, TRAINED), (damp_dr, DAMPED)]):
@@ -100,7 +100,7 @@ def fig1_three_claims():
     ax[1].set_yscale("log"); ax[1].set_xlim(-.5, 1.5)
     ax[1].set_xticks([0, 1]); ax[1].set_xticklabels(["no damping", "damping"])
     ax[1].tick_params(axis="x", labelsize=6.6)
-    ax[1].set_ylabel("drift of recovered $C$\n(0 = perfectly conserved)")
+    ax[1].set_ylabel("drift of recovered $C$")
     ax[1].annotate("", xy=(1.32, np.median(damp_dr)), xytext=(1.32, np.median(cons_dr)),
                    arrowprops=dict(arrowstyle="<->", lw=.7, color="k"))
     ax[1].text(1.38, 5e-3, r"2400$\times$", fontsize=7, rotation=90, va="center")
@@ -114,8 +114,8 @@ def fig1_three_claims():
     # Arms A and C keep min/max because they are three seeds and every seed should be visible.
     styles = [("A_conservative_own", "recovered law", TRAINED, "-", "o", (-4, -13), "minmax",
                "right"),
-              ("B_conservative_random", "random law (20 draws)", RANDOM, "--", "s", (4, -2),
-               "iqr", "left"),
+              ("B_conservative_random", "random law (20 draws)", RANDOM, "--", "s", (-4, 6),
+               "iqr", "right"),
               ("C_damped_own", "damped model", DAMPED, "-.", "^", (-4, 7), "minmax",
                "right")]
     # log y: the claimed effect is -3.3% and the control is +49%, so on a linear axis the claim is
@@ -139,14 +139,14 @@ def fig1_three_claims():
     ax[2].set_yticks([0.95, 1.0, 1.1, 1.3, 1.6, 2.0])
     ax[2].set_yticklabels(["0.95", "1.0", "1.1", "1.3", "1.6", "2.0"])
     ax[2].yaxis.set_minor_locator(matplotlib.ticker.NullLocator())
-    ax[2].set_xlim(-0.02, 0.52)
+    ax[2].set_xlim(-0.02, 0.44)
     ax[2].set_xlabel(r"projection strength $\alpha$")
     ax[2].set_ylabel("rollout error\n(relative to no edit)")
     ax[2].legend(frameon=False, loc="upper left", handlelength=1.4, borderpad=0.1,
                  labelspacing=0.25, fontsize=6.8)
     _panel(ax[2], "(c) intervene", "enforcing it lowers rollout error")
 
-    fig.tight_layout(w_pad=1.6)
+    fig.tight_layout(w_pad=2.6)
     fig.savefig(OUT / "fig1_three_claims.pdf")
     plt.close(fig)
     return dict(cons_rho=cons_rho, null_rho=null_rho, damp_rho=damp_rho,
@@ -237,7 +237,7 @@ def fig3_low_variance():
 def fig4_leverage():
     """What the correction acts on: prominence rank against consequence rank, per direction."""
     rows = json.load(open(R / "dreamer_leverage.json"))
-    fig, ax = plt.subplots(1, 2, figsize=(6.6, 2.4))
+    fig, ax = plt.subplots(1, 2, figsize=(6.6, 2.65))
     # ONE hue, three marker shapes. The three seeds are the same arm and the message is that they
     # agree in sign, so giving each its own colour spent the categorical channel on a distinction
     # the figure is not making. Shape carries seed identity; colour stays free.
@@ -259,13 +259,14 @@ def fig4_leverage():
     # One shared legend under both panels. With 36 points on a 12x12 rank grid every corner holds
     # data, so an in-axes legend box lands on top of it wherever it goes. The per-seed rho values
     # move to the caption.
-    ax[0].legend(frameon=False, ncol=3, fontsize=6.6, handlelength=.9, columnspacing=1.4,
-                 loc="upper center", bbox_to_anchor=(1.12, -0.30))
+    h, l = ax[0].get_legend_handles_labels()
+    fig.legend(h, l, frameon=False, ncol=3, fontsize=6.6, handlelength=.9, columnspacing=1.8,
+               loc="lower center", bbox_to_anchor=(0.5, -0.02))
     _panel(ax[0], "(a) variance misses what matters",
-           "damage = how much nudging a direction hurts the rollout")
+           "damage = rollout harm from a nudge")
     _panel(ax[1], "(b) the edit finds it anyway",
-           "without being told which directions those are")
-    fig.tight_layout(w_pad=1.6)
+           "not given the damage ranking")
+    fig.tight_layout(w_pad=2.2, rect=(0, 0.06, 1, 1))
     fig.savefig(OUT / "fig4_leverage.pdf"); plt.close(fig)
     return rows
 
