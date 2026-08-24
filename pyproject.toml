@@ -1,5 +1,5 @@
 [project]
-name = "latent-noether-paper1"
+name = "world-model-invariants"
 version = "0.1.0"
 description = "Recover physical laws from the internal dynamics of frozen world models (Phase 1: state-space oscillator kill-test)"
 requires-python = ">=3.12"
@@ -31,7 +31,7 @@ packages = ["latent_noether"]
 torch = [{ index = "pytorch-cu128" }]
 
 [[tool.uv.index]]
-name = "latent-noether-paper1"
+name = "world-model-invariants"
 url = "https://download.pytorch.org/whl/cu128"
 explicit = true
 
