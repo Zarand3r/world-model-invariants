@@ -1,40 +1,50 @@
-\section{The model contains a conserved quantity, and the level alone does not show it}
+\section{Training makes invariant recovery reproducible}
 \label{sec:recovery}
 
-At the extraction dimension we registered in advance, the recovered $C$ correlates with true energy
-at $|\rho|_E = 0.973$, $0.967$, and $0.975$ across three seeds the choice never saw. The recovered
-quantity stays constant along the trajectories the model encodes from held-out video: its
-within-trajectory variance is $1.1\times10^{-4}$ of its total variance, so it is nearly flat along a
-trajectory and varies between trajectories, which is what a conserved quantity does. Two cautions
-about that number. We measure it where an observation corrects each step; under the model's
-own imagination the same $C$ drifts far more, which is what Section~\ref{sec:intervention} exploits.
-And it is a different statistic from the \emph{held-out invariance ratio} of
-Table~\ref{tab:refusal}, which scores the invariance-only candidate rather than the jointly fitted
-$C$; the two are not comparable and we report both.
+At the extraction dimension fixed in advance, the three trained conservative models recover scalars
+with $|\rho|_E = 0.973$, $0.967$, and $0.975$. Along observation-conditioned trajectories, the
+recovered $C$ has within-trajectory variance equal to $1.1\times10^{-4}$ of its total variance. It is
+therefore nearly constant within a trajectory while still varying across trajectories.
+Table~\ref{tab:refusal} reports this quantity as the drift of $C$. The held-out invariance ratio in
+the next row evaluates the invariance-only candidate rather than the jointly fitted $C$, so the two
+statistics should not be compared as if they measured the same object.
 
-That number on its own is close to meaningless, and the reason is the same one that makes probing
-weak evidence \citep{hewitt2019control,belinkov2022probing}. Our search returns functions that stay
-constant within a trajectory and vary between trajectories. On a one-degree-of-freedom conservative
-pendulum, energy is essentially the only such function, so any faithful encoding of $(\theta,
-\dot\theta)$ will yield something correlated with it. A randomly initialised network encodes the
-frame history perfectly well.
+The energy correlation alone is weak evidence \citep{hewitt2019control,belinkov2022probing}. Our
+search favors functions that remain constant within a trajectory and differ across trajectories. For
+a one-degree-of-freedom conservative pendulum, energy is essentially the only nontrivial scalar with
+that property. A latent representation that preserves enough information about
+$(\theta,\dot\theta)$ can therefore produce a strong energy-correlated readout even if the model
+never learned to use energy dynamically.
 
-\paragraph{An untrained model clears the gate we registered.} We ran the identical pipeline on six
-randomly initialised DreamerV3 models. They score $|\rho|_E$ from $0.170$ to $0.908$, and four of
-the six clear the $0.7$ threshold we had registered as the success criterion
-(Figure~\ref{fig:three}a). The threshold measured nothing about learning. We had carried it over
-from an earlier architecture without checking it against this one's null.
+\begin{table}[t]
+\centering\small
+\caption{The same extraction pipeline applied to conservative and damped models. Each range covers
+three seeds. No conservative seed overlaps any damped seed on any row.}
+\label{tab:refusal}
+\begin{tabular}{lccc}
+\toprule
+statistic & conservative & damped & median ratio \\
+\midrule
+$|\rho|_E$ & 0.967--0.975 & 0.018--0.090 & $20\times$ \\
+drift of $C$ & $0.7$--$1.3\times10^{-4}$ & 0.203--0.266 & $2414\times$ \\
+held-out invariance ratio & 0.0027--0.0121 & 0.983--0.994 & $282\times$ \\
+pairing residual & 0.829--0.865 & 0.934--0.957 & n/a \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-The honest comparison is a difference, and it separates cleanly on two statistics at once. Every
-trained seed scores above every untrained draw ($0.967$ against $0.908$), and every trained seed has
-a lower pairing residual than every untrained draw ($0.865$ against $0.912$). Neither range overlaps.
+The untrained baseline confirms this concern. Applying the identical pipeline to six randomly
+initialized DreamerV3 models gives $|\rho|_E$ values from $0.170$ to $0.908$. Four of the six exceed
+the $0.7$ success threshold that we had inherited from the earlier architecture. That threshold
+therefore does not identify learning in DreamerV3.
 
-\paragraph{Consistency separates trained from untrained more sharply than level does.} The three
-trained seeds span $0.008$ in $|\rho|_E$. The six untrained draws span $0.738$, which is $92\times$
-wider. A random network sometimes lands near $0.9$ and sometimes at $0.17$, depending on its
-initialisation. The trained models land at $0.97$ every time.
+The trained and untrained groups still differ in two ways. Every trained model scores above every
+untrained draw in energy correlation ($0.967$ versus $0.908$ at the closest pair), and every trained
+model has a lower pairing residual than every untrained draw ($0.865$ versus $0.912$). With only
+three trained seeds and six random draws, these non-overlaps are suggestive rather than
+statistically decisive, so we do not attach a $p$-value to them.
 
-\paragraph{Takeaway.} Training does not create energy information in the latent, since an untrained
-network often has it. Training makes the recovered structure reproducible across seeds and conserved
-under the model's own transition. That is the claim the evidence supports, and it is narrower than
-the one the raw correlation suggests.
+The more robust difference is reproducibility. The three trained models cluster tightly between
+$0.967$ and $0.975$, whereas the six untrained models span $0.170$--$0.908$. Training therefore
+appears to make the recovered scalar reproducible across independently trained models rather than
+merely making energy decodable.

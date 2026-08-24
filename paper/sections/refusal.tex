@@ -1,44 +1,33 @@
-\section{The method returns nothing when the physics is absent}
+\section{The same search fails under matched damping}
 \label{sec:refusal}
 
-A search that always returns a conserved quantity would explain the previous section without any physics. We
-test that directly by running the identical pipeline on a world model trained on a
-\emph{dissipative} pendulum, where no non-trivial conserved function of the state exists: every
-trajectory spirals into the same fixed point, so any continuous function constant along trajectories
-is constant on the whole basin.
+A search that produces a conserved-looking scalar for almost any latent representation could explain
+Section~\ref{sec:recovery} without telling us anything about the learned dynamics. We test that
+possibility with matched models trained on a damped pendulum.
 
-\paragraph{Choosing the damping without looking at the outcome.} Strong damping collapses the
-trajectories into a small neighbourhood of the fixed point, which makes the latent rank-deficient
-and manufactures directions that are trivially constant. A refusal produced that way would say
-nothing about the method. We therefore fixed a rule before training anything: take the largest
-damping ratio whose late-window spread across trajectories stays above 25\% of the conservative
-reference, measured on simulator states alone with no model involved. The natural choice
-$\zeta = 0.15$ fails that rule outright, leaving 0\% of the reference spread. The rule selects
-$\zeta = 0.03$, which removes 17\% of the energy per period and leaves 34\% of the spread. All three
-dissipative models pass the same training acceptance checks as the conservative ones.
+For the damped system, every trajectory converges to the same fixed point. Any continuous scalar
+that stays constant along all trajectories in the basin must therefore be constant throughout that
+basin, so the state has no nontrivial first integral for our search to recover.
 
-\paragraph{Four statistics separate with no overlap between seeds.} Table~\ref{tab:refusal} reports
-them. The recovered $C$ drifts $2400\times$ more on the dissipative models, and its held-out
-invariance ratio is $0.987$, meaning the model conserves nothing. That is the right answer.
+\paragraph{Choosing the damping level.} Very strong damping creates a separate problem: trajectories
+collapse into a small neighborhood of the fixed point, making the latent representation
+rank-deficient and creating directions that look constant for trivial reasons. We therefore fixed
+the damping level using only simulator states, before training any damped model. We chose the
+largest damping ratio whose late-window spread across trajectories remained above 25\% of the
+conservative reference.
 
-\begin{table}[t]
-\centering\small
-\caption{Handing the pipeline a dissipative model returns nothing conserved. Ranges are the three
-seeds per arm; no seed in one arm overlaps any seed in the other on any row.}
-\label{tab:refusal}
-\begin{tabular}{lccc}
-\toprule
- & conservative & dissipative & median ratio \\
-\midrule
-$|\rho|_E$ & 0.967--0.975 & 0.018--0.090 & $20\times$ \\
-drift of $C$ & $0.7$--$1.3\times10^{-4}$ & 0.203--0.266 & $2414\times$ \\
-held-out invariance ratio & 0.0027--0.0121 & 0.983--0.994 & $282\times$ \\
-pairing residual & 0.829--0.865 & 0.934--0.957 & n/a \\
-\bottomrule
-\end{tabular}
-\end{table}
+A stronger value, $\zeta=0.15$, leaves 0\% of that spread and fails this criterion. The rule selects
+$\zeta=0.03$, which removes 17\% of the energy per period while retaining 34\% of the conservative
+spread. All three damped models pass the same training checks as the conservative models.
 
-\paragraph{Takeaway.} The pipeline discriminates conservative from dissipative dynamics under
-matched architecture, training budget, observation modality, and extraction protocol. The
-correlation in Section~\ref{sec:recovery} is therefore not an artefact of a search that always
-returns something.
+\paragraph{The conservative and damped models separate on all four statistics.}
+Table~\ref{tab:refusal} shows the result. The recovered $C$ varies about $2400\times$ more within
+damped trajectories than within conservative ones. The damped models also have a held-out invariance
+ratio of $0.983$--$0.994$, compared with $0.0027$--$0.0121$ for the conservative models. Within the
+degree-4 family we search, the damped models contain no approximately conserved candidate.
+
+The two arms use the same architecture, training budget, observation modality, and extraction
+procedure. The difference is the dynamics in the training data. This control does not prove that a
+damped model contains no conserved quantity of any possible form; it shows that our pipeline does
+not return an approximately conserved degree-4 scalar when the underlying dynamics remove the
+corresponding conservation law.

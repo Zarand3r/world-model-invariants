@@ -1,71 +1,60 @@
-\section{Enforcing the recovered law improves the model's own predictions}
+\section{Correcting invariant drift improves rollouts}
 \label{sec:intervention}
 
-If $C$ is the quantity the model's dynamics actually respect, then holding it fixed during
-imagination should remove drift that is pure error. If $C$ is something we fitted, holding it fixed
-should damage the rollout. We test that by projecting the latent back onto the level set of $C$ at
-every imagination step,
+The recovered $C$ stays nearly constant along observation-conditioned trajectories, but it drifts
+when the model rolls forward on its own. If that drift reflects a real model error, correcting it
+should improve prediction. If $C$ is only a fitted statistic, enforcing it should simply perturb the
+rollout.
+
+At every imagined step, we project the latent state back toward the level set defined by its initial
+value:
 \begin{equation}
-z \;\leftarrow\; z - \alpha\,\bigl(C(z) - C_0\bigr)\,\frac{\nabla C(z)}{\|\nabla C(z)\|^2},
+z \leftarrow z - \alpha\bigl(C(z)-C_0\bigr)\frac{\nabla C(z)}{\|\nabla C(z)\|^2},
+\label{eq:edit}
 \end{equation}
-and mapping the correction back so the part of $h$ outside the extracted subspace stays untouched.
-We retrain nothing. The model stays frozen and the edit happens at decoding time.
+where $C_0$ is the value at the first encoded state. We map the correction back through $P$, leaving
+the part of $h$ outside the extracted subspace unchanged. The intervention runs inside the
+imagination loop; it does not modify the decoder, and we never retrain the model.
 
-\paragraph{We score the slope over a fixed grid, not the best $\alpha$.} We sweep $\alpha$ over
-$(0, 0.05, 0.1, 0.2, 0.4)$, identical for every arm, and report the whole curve. Taking the minimum
-over a grid once told us an arm had improved by 5.9\% when its curve rose monotonically to twice its
-baseline error. The direction of the curve is the result; the minimum is a selection over five
-chances.
+\paragraph{Scoring.} We use the same fixed grid $\alpha \in \{0, 0.05, 0.1, 0.2, 0.4\}$ for every arm
+and score the slope of rollout error across the full grid. Selecting the best $\alpha$ after seeing
+the curve would give each arm five chances to look good; the slope uses all five points. We measure
+rollout quality by pixel mean squared error against held-out video over 50 imagined steps.
 
-\paragraph{Three arms, and the random one is a distribution.} The first enforces each conservative
-model's own recovered $C$. The second enforces a random polynomial over the same degree-4 basis,
-matched in norm, on the same models. The third enforces each dissipative model's own recovered $C$.
-The random arm is the one that can kill the result: if projection improves rollouts whatever we
-enforce, then the edit shrinks the rollout toward a manifold and has nothing to do with physics.
-That arm is therefore drawn twenty times per model rather than once, and scored as a null
-distribution with the recovered law's percentile inside it. The same twenty polynomials run on
-every model, so a difference between models is the model and not the draw.
+The scalar $C$ is fitted on the same 52 held-out trajectories used to evaluate the edit, so the
+absolute intervention numbers are within-sample for the fitted scalar. The random-constraint arm
+uses the same evaluation setting, so the comparison between recovered and random constraints remains
+matched.
 
-Figure~\ref{fig:three}c shows the outcome. The recovered law reduces rollout error by 2.9\%, 3.3\%
-and 3.5\% at the strongest projection, on all three seeds. Across the sixty random laws the median
-is 53.9\% \emph{worse}, and only 7 of 60 improve the rollout at all. The same edit on the
-dissipative models does nothing, moving error by 0.5\%, which is what should happen when the level
-set we enforce is not a law.
+\paragraph{Controls.} We compare three interventions. First, we enforce each conservative model's own
+recovered $C$. Second, we enforce a random polynomial from the same degree-4 basis, matched in norm.
+Third, we enforce each damped model's own recovered $C$. We draw 20 random polynomials and apply the
+same 20 to each of the three conservative models, giving 60 model--constraint evaluations from 20
+distinct random constraints.
 
-\paragraph{The arms differ more in variance than in median.} The recovered law's per-seed slopes span
-$0.016$. The random draws' slopes span $3.71$, which is $234\times$ wider. Enforcing the recovered law
-does the same small good thing on every seed. Enforcing a random law does something different and
-usually harmful each time.
+Figure~\ref{fig:three}c shows the dose response. At the strongest projection, enforcing the recovered
+constraint lowers rollout error by 2.9\%, 3.3\%, and 3.5\% across the three conservative models.
+Across the 60 random-constraint evaluations, the median change is $+53.9\%$, and only 7 of 60 lower
+the error. Applying the same kind of edit to the damped models changes error by only $+0.5\%$. The
+recovered arm also behaves much more consistently across seeds: its per-model slopes span $0.016$,
+compared with $3.71$ across random evaluations.
 
-\paragraph{The specificity is strong on two seeds and weak on the third.} Per model, the recovered
-law's slope sits at the 0th percentile of that model's own twenty draws on two seeds, better than
-every random law, and at the 15th percentile on the third (Figure~\ref{fig:null}). On that third
-model 7 of 20 random laws improve the rollout, and the best of them reaches $-21.9\%$, seven times
-the improvement the recovered law achieves there. So the claim the evidence supports is that the
-effect is specific to the recovered law on two models of three, and that on the third a projection
-onto almost any smooth level set helps more. We do not know what distinguishes that model.
+The specificity result is not uniform. Figure~\ref{fig:null} compares each model with its own
+20-draw null. For two models, no random constraint performs better than the recovered one. For the
+third, 7 of 20 random constraints also lower error, and the best random draw reaches $-21.9\%$,
+compared with $-2.9\%$ for the recovered constraint. We do not know why this seed behaves
+differently.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.52\textwidth]{figures/fig5_random_null.pdf}
-\caption{Each model against its own null. Twenty random degree-4 polynomials, matched in norm and
-identical across models, give the twenty small marks per row; the diamond is that model's own
-recovered law. On seeds 4 and 5 no random law comes close. On seed 3 seven of them improve the
-rollout and the recovered law ranks 15th of 20, which is the limit of the specificity claim.}
+\caption{Each row compares one model with its own null distribution. The 20 small marks are
+norm-matched random degree-4 constraints, using the same draws across models; the diamond is that
+model's recovered constraint. No random constraint beats the recovered one on seeds 4 and 5. On seed
+3, seven random constraints reduce error and the recovered constraint ranks 15th of 20.}
 \label{fig:null}
 \end{figure}
 
-\paragraph{The scoring rule is why we can say that.} The same seed's best random law is not monotone:
-its error falls to $\alpha = 0.2$ and then rises. A single-$\alpha$ comparison would have reported a
-random law beating the recovered one; the fixed-grid slope rule reports the curve instead. This is
-the second time that rule changed a conclusion for us. It is also why the twenty-draw null was worth
-its cost: the earlier version of this experiment drew one polynomial and reused it on all three
-models, which made a single lucky or unlucky draw look like a three-seed result.
-
-\paragraph{Takeaway.} The recovered quantity is causally load-bearing for the model's own rollouts,
-and the effect is specific to it. The magnitude is small. The GRU study measured 68\% for what is
-procedurally the same edit, but the two numbers are not comparable: it scored error in the
-oscillator's state space, while we score pixel error against held-out video, where most of each
-frame is static background that reconstructs correctly whatever the latent does. Part of the gap is
-therefore definitional. What remains could come from the architecture, the system, or the extraction
-dimension, and we have not separated those.
+The intervention result is therefore narrow but consistent: enforcing the recovered invariant
+improves all three conservative models by 2.9--3.5\%, while matched random constraints usually hurt.
+The improvement is specific to the recovered invariant on two models, but not on the third.

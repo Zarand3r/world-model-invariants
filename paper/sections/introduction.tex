@@ -1,78 +1,62 @@
 \section{Introduction}
 \label{sec:intro}
 
-A world model that predicts video well might have learned physics, or it might have learned to
-interpolate video. Telling those apart matters if we want to plan with such a model, trust it out of
-distribution, or design a better one. The usual evidence is a probe: train a small readout from the
-hidden state to a physical variable, and report its accuracy. That evidence is weak, and its weakness
-has a clean demonstration in our own setting. Six randomly initialised DreamerV3 models, which have
-learned nothing at all, contain a direction correlating with the pendulum's energy at up to $0.908$.
+World models learn to predict future observations and can use those predictions for planning. Good
+video prediction, however, does not by itself show that a model has learned the underlying dynamics
+of the system it observes. That distinction matters most when we ask the model to predict far beyond
+the trajectories it saw during training.
 
-The gap is that decodability says nothing about the model's dynamics. A quantity can be readable
-from the hidden state while the model's own transition map destroys it every step. What we want to
-know is whether the model's dynamics \emph{preserve} the quantity, and whether that preservation
-does any work.
+A common way to look for physical structure is to fit a probe from the hidden state to a physical
+variable. Probe accuracy tells us what information a latent representation retains, but not whether
+the model's transition uses that information. Our own baseline makes this problem concrete. Six
+randomly initialized DreamerV3 models contain polynomial functions of their latent state that
+correlate with pendulum energy at up to $0.908$. A strong correlation can therefore appear even
+before learning.
 
-We look for a \textbf{flow-conserved quantity}: a scalar $C$ of the latent that stays constant under
-the model's own one-step transition, found without ever showing the model a physical label. Three
-properties make it checkable. It should be reproducible across seeds. It should vanish when the
-physics does. And enforcing it should improve the model's predictions rather than damage them.
-
-We test all three on a reference DreamerV3 \citep{hafner2023dreamerv3} trained on $64\times64$ video
-of a gymnasium pendulum, with no actor, no critic, and no physical supervision. After training we
-freeze the model and only read from it.
+We ask a stronger question: does a trained model contain a scalar function of its latent state that
+its own transition approximately preserves, and does preserving that scalar improve prediction? We
+study DreamerV3 \citep{hafner2023dreamerv3} trained on $64\times64$ video from a Gymnasium pendulum,
+with no actor, critic, or physical supervision. After training, we freeze the model and analyze its
+latent dynamics.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/fig1_three_claims.pdf}
-\caption{Each point is one seed. \textbf{(a)} The three trained models all land between $0.967$ and
-$0.975$, while six untrained ones scatter from $0.17$ to $0.91$ and four of them clear the cutoff we
-had fixed in advance. A high score alone therefore proves nothing; the agreement does.
-\textbf{(b)} The recovered quantity stays put on models trained without damping and drifts
-$2400\times$ more on models trained with it; these are the conservative and dissipative arms of
-Section~\ref{sec:refusal}. \textbf{(c)} Enforcing it lowers rollout error; enforcing a random
-polynomial of the same degree raises it by half, and enforcing it on a damped model does nothing.}
+\caption{Each point represents one model. \textbf{(a)} The three trained conservative models recover
+energy correlations between $0.967$ and $0.975$, while six untrained models span $0.17$--$0.91$.
+\textbf{(b)} The recovered scalar changes very little within observation-conditioned trajectories
+for conservative models and much more for damped models. \textbf{(c)} Rollout error as a function of
+projection strength $\alpha$, relative to no edit. Enforcing the recovered constraint lowers error;
+enforcing a matched random polynomial constraint usually raises it; applying the recovered
+constraint to a damped model changes little.}
 \label{fig:three}
 \end{figure}
 
-Our results are the following.
+We test the claim in three ways.
 
 \begin{enumerate}
-\item \textbf{Recovery is reproducible, and the level is not the evidence.} At a pre-registered
-extraction dimension, three unseen seeds recover a quantity correlating with true energy at $0.973$,
-$0.967$, and $0.975$, with a within-trajectory drift of $10^{-4}$. Six untrained models span $0.170$
-to $0.908$. The trained seeds span $0.008$ and the untrained draws span $0.738$, so training buys
-consistency rather than the presence of the information.
+\item \textbf{Recovery.} At an extraction dimension fixed before evaluating these models, three
+independently trained conservative models recover scalars with energy correlations of $0.973$,
+$0.967$, and $0.975$. The recovered scalar has within-trajectory variance equal to
+$1.1\times10^{-4}$ of its total variance along observation-conditioned trajectories. Six untrained
+models span $0.170$--$0.908$. Training therefore makes the recovered structure reproducible; it does
+not simply make energy decodable.
 
-\item \textbf{The method returns nothing when there is nothing to find.} On a matched dissipative
-model, chosen by a damping rule we fixed before training anything, four statistics separate with no
-overlap between seeds, including a $2400\times$ difference in drift.
+\item \textbf{Dissipative control.} We apply the same search to models trained on a damped pendulum,
+with the damping level fixed by a rule chosen before training. Within the same degree-4 polynomial
+family, the search finds no approximately conserved candidate. Four statistics separate the
+conservative and damped models without seed overlap.
 
-\item \textbf{The recovered quantity is causally load-bearing, on two models of three.} Projecting
-the latent onto its level set during imagination lowers rollout error by 2.9--3.5\% on every seed,
-while the same projection with a random polynomial of matched complexity raises it by 53.9\% at the
-median of sixty draws. Against each model's own twenty-draw null the recovered law is better than
-every random law on two seeds and at the 15th percentile on the third, where 7 of 20 random laws
-also improve the rollout. We report that split rather than the median.
-
-\item \textbf{The correction acts on directions the latent does not make prominent, and it
-reproduces functionally without reproducing coordinate-wise.} The projection pushes hardest where a
-displacement most damages the model's own rollout ($+0.29$ to $+0.69$ across seeds), and at a 40-step
-horizon those directions anti-correlate with variance ($-0.36$, $-0.26$, $-0.41$), an effect that
-decays with horizon. Across seeds the basis-free quantities agree closely (recovery to $0.008$, edit
-slope to $0.016$, gradient curvature to $0.046$) while a selector defined on ranked coordinates
-changes sign. Identically trained models implement the same physical structure in different internal
-charts.
-
-\item \textbf{Two things do not carry over, and we report them.} The flow-generation condition that
-motivates our selection rule turns out to buy reproducibility rather than accuracy: an ablation
-holding everything else fixed shows conservation alone recovers the energy nearly as well and edits
-just as effectively, but varies $4.4\times$ more across seeds. And a mechanism we established on a
-much smaller recurrent model (Section~\ref{sec:setup}), which predicts trajectory error from the
-accumulated invariant error weighted by the system's frequency sensitivity, does not separate from
-its unweighted form at this sample size.
+\item \textbf{Intervention.} The recovered scalar drifts when the model imagines forward without new
+observations. Projecting the latent state back onto the initial level set of that scalar lowers
+rollout error by 2.9--3.5\% on all three conservative models. Twenty matched random polynomial
+constraints usually increase error. The recovered constraint beats every random draw on two models;
+on the third, the specificity result is weak.
 \end{enumerate}
 
-We wrote every criterion above down before the run that tested it, including the ones that
-failed. Section~\ref{sec:limits} reports a case where we refuted our own central claim on a bad
-statistic and had to withdraw the refutation.
+Two additional results narrow the interpretation. Basis-independent properties of the recovered
+scalar reproduce across seeds more reliably than selectors tied to individual latent coordinates.
+The flow-generation term in our extraction rule changes average recovery little but reduces
+seed-to-seed variation. We also find that accumulated invariant error predicts rollout degradation,
+but our data do not distinguish a frequency-weighted version of that mechanism from a simpler
+unweighted one.

@@ -1,76 +1,132 @@
-\section{Setup}
+\section{Setup and method}
 \label{sec:setup}
 
-We analyse a DreamerV3 world model \citep{hafner2023dreamerv3} trained on video of a pendulum. The
-model is the reference PyTorch implementation at its published architecture: 13.5M parameters,
-categorical $32\times32$ stochastic latents, a convolutional encoder and decoder, Kullback-Leibler (KL) balancing, and
-unimix. We train the world model alone, with no actor and no critic, because we never need a policy.
+\paragraph{Model and data.} We analyze the published DreamerV3 architecture
+\citep{hafner2023dreamerv3}: 13.5M parameters, categorical $32\times32$ stochastic latents, a
+convolutional encoder and decoder, Kullback--Leibler balancing, and unimix. We train only the world
+model, with no actor or critic.
 
-\paragraph{Relation to our earlier study.} We developed this extraction procedure on a much
-smaller system, and we describe it here in full because there is no separate paper to cite. A gated
-recurrent unit (GRU) of about 13k parameters was trained to predict the next position of a simulated
-oscillator from position alone, so it read the state directly instead of inferring it from pixels.
-On that substrate the same search recovered a quantity correlating with true energy at $0.972$ or
-better, scored close to zero on damped controls, and lowered rollout error by 68\% when enforced.
-That study is also where the three controls in this paper come from: an untrained network, a
-dissipative system, and a random law of matched complexity.
+The data come from Gymnasium's \texttt{Pendulum-v1} \citep{towers2024gymnasium}. Each simulator step
+renders a $500\times500$ frame. We crop it to $448\times448$ and block-average to $64\times64$. We
+set the simulator state directly, sampling $\theta\sim U[-1.8,1.8]$ and
+$\dot\theta\sim U[-2.2,2.2]$. We reject any trajectory that reaches the simulator's $|\dot\theta|=8$
+speed clip because clipping would break conservation. Actions are always zero. A single frame does
+not reveal velocity, so the model must infer $\dot\theta$ from the sequence.
 
-Two of its findings are retested in Section~\ref{sec:limits} and neither survives here. We treat
-everything from it as a hypothesis to retest rather than as support, for two reasons. It is our own
-unpublished work, so a reader cannot check it. And the two substrates do not share an error metric:
-the GRU's rollout error lives in the oscillator's two-dimensional state space, while ours is pixel
-error against held-out video. Percentages from the two are not interchangeable, and
-Section~\ref{sec:intervention} says so where it quotes one.
-Appendix~\ref{sec:gru} describes that study in full, including the results that did not survive it.
+We train on a fixed dataset of 256 trajectories, each 120 frames long, using Adam at $10^{-4}$,
+batch size 16, and sequence length 64. We cap each run at 30 minutes of wall-clock time, which gives
+about 6{,}500 gradient steps. Three independently trained seeds all pass checks fixed before
+analysis: KL divergence above 1 nat, one-step decoding at least $4\times$ better than predicting the
+dataset mean, and finite rollouts. Appendix~\ref{sec:repro} gives the remaining training details.
+Our claims concern a DreamerV3 world model trained on pendulum video, not DreamerV3 as a full
+reinforcement-learning agent.
 
-\paragraph{Code and run logs.} Every experiment in this paper, the run logs its figures are drawn
-from, and the source of the paper itself are at
-\url{https://github.com/Zarand3r/latent-noether-paper1}. The figures regenerate from the committed
-logs with no GPU, so each number can be checked against the run that produced it. Model checkpoints
-and rendered video are too large to commit; the repository pins the upstream commit of the DreamerV3
-implementation our adapter is built against and gives the commands to rebuild both.
+\paragraph{Three kinds of latent trajectories.} We use three different latent trajectories and keep
+them separate throughout the paper.
 
-\paragraph{Data.} We render the video ourselves from gymnasium's \texttt{Pendulum-v1}
-\citep{towers2024gymnasium}. Each step produces a $500\times500$ RGB frame, which we crop to
-$448\times448$ and block-average to $64\times64$. We write initial conditions directly into the
-environment state, sampling $\theta$ uniformly on $[-1.8, 1.8]$ and $\dot\theta$ on $[-2.2, 2.2]$,
-and we reject any trajectory that reaches the simulator's $|\dot\theta| = 8$ speed clip, since that
-clip is a hard nonlinearity that would destroy conservation. Actions are always zero, so the
-pendulum evolves freely.
+An \emph{observation-conditioned} trajectory is the sequence of deterministic recurrent states
+produced when the model receives the next real frame at every step. This is the latent sequence
+returned by the encoder on held-out video.
 
-Velocity never appears in a single frame. There is no motion blur, no trail, and no torque arrow,
-so the model has to infer $\dot\theta$ from the frame sequence on its own. That is what makes the
-latent worth examining.
+The \emph{one-step transition} $T$ is the model's autonomous recurrent update with zero action and
+no new observation. It maps the current recurrent state to the next one.
 
-\paragraph{Training.} We train on a fixed dataset of 256 trajectories of 120 frames, using Adam at
-$10^{-4}$, batch 16, sequence length 64, for a wall-clock budget of half an hour. That budget buys
-about 6{,}500 gradient steps, a small fraction of a standard DreamerV3 run. We set free bits to 0
-rather than the reference default of 1.0; the measured KL settles near 1.8 nats, far from collapse,
-so the floor does no work here. Three seeds train independently and all three pass acceptance
-checks we registered beforehand: KL above 1 nat, one-step decoding at least $4\times$ better than
-predicting the dataset mean, and rollouts that stay finite. A model that failed to train would tell
-us nothing about the analysis, so we discard it rather than report it.
+An \emph{imagination rollout} starts from one encoded state and repeatedly applies $T$ without
+supplying any later frames.
 
-This regime is offline, world-model-only, zero-action, and short. Our claims are about a DreamerV3
-world model fitted to pendulum video, and not about DreamerV3 as a reinforcement learning agent.
+To estimate the latent flow, we apply $T$ once at each state from an observation-conditioned
+trajectory. The transition is therefore autonomous even though the states at which we evaluate it
+come from real video. Sections~\ref{sec:recovery} and~\ref{sec:refusal} measure conservation along
+observation-conditioned trajectories. Section~\ref{sec:intervention} then tests what happens when
+the same scalar drifts during autonomous imagination.
 
-\paragraph{Extraction.} After training we freeze the model. Everything that follows reads the
-hidden state and never updates a weight. We encode the held-out videos, take the deterministic
-recurrent state $h$, and project it onto its top 12 principal directions, dropping any direction the
-data does not occupy. Inside that subspace we take the flow $F$ to be the model's own one-step
-transition displacement, $T(h) - h$, rather than a vector field we fit ourselves. Fitting a field and
-then analysing it would interpret our own regression instead of the model.
+\paragraph{Latent coordinates.} After training, we freeze the model. Let $h$ denote the
+deterministic recurrent state on held-out video and $\bar h$ its mean. We take the top 12 principal
+directions of $h$, remove any direction with no support in the data, and let $P$ denote the
+resulting orthonormal map. All extraction, projection, and perturbation operate on
+\begin{equation}
+z = P^\top(h-\bar h).
+\label{eq:z}
+\end{equation}
+Let $F(z)$ be the projection through $P$ of the model's one-step displacement $T(h)-h$. We use the
+model's own transition displacement directly rather than fitting a separate vector field and
+analyzing that surrogate.
 
-We then search for a degree-4 polynomial $C$ that is constant along the model's trajectories. The
-search is a generalized eigenproblem: the invariance ratio, within-trajectory variance over total
-variance, is a Rayleigh quotient, so one eigendecomposition returns the whole ranked family. We fit
-$C$ jointly with an antisymmetric $B$ satisfying $F \approx B\nabla C$, which is the condition that
-$C$ generates the flow rather than merely staying constant along it \citep{arnold1989mathematical}.
-Section~\ref{sec:limits} reports how much that second condition contributes, which is less than we
-expected.
+\paragraph{The candidate family.} We look for the invariant among degree-4 polynomials in $z$.
+Writing $\varphi(z)$ for the vector of monomials up to degree 4 in the 12 latent coordinates, a
+candidate is $C(z) = a^\top\varphi(z)$, and the search is over the coefficient vector $a$. There are
+1819 such monomials, from $z_1$ through $z_1z_2z_3z_4$; we exclude the constant term, which is
+conserved trivially. Degree 4 is a compromise. The pendulum's energy is quadratic in $\dot\theta$
+and needs polynomial terms to approximate $\cos\theta$, and the latent is some unknown nonlinear
+encoding of $(\theta, \dot\theta)$ rather than those coordinates themselves, so the family has to be
+rich enough to express energy through that distortion while staying small enough to fit.
 
-\paragraph{What we compare against.} We score $C$ against the textbook energy
-$E = \tfrac{1}{6}\dot\theta^2 + 5\cos\theta$. Gymnasium integrates semi-implicitly, so it conserves a
-shadow Hamiltonian $\tilde H = H + O(\Delta t)$ rather than $E$ exactly
-\citep{hairer2006geometric}. We measure about 12\% relative oscillation in $E$ from that mismatch,
-with no secular drift. Ground truth enters only when we score a result, never inside the search.
+\paragraph{The invariance objective.} An invariant is constant along any one trajectory and differs
+between trajectories. We therefore score a candidate by
+\begin{equation}
+\text{ratio}(C) \;=\;
+\frac{\text{mean within-trajectory variance of } C}{\text{total variance of } C},
+\label{eq:ratio}
+\end{equation}
+which is $0$ for a perfectly conserved scalar and near $1$ for one that wanders as much within a
+trajectory as across the dataset. The denominator is what makes the objective non-trivial: without
+it, $C = 0$ would score perfectly while distinguishing nothing.
+
+Both variances are quadratic forms in $a$. With $W$ the mean within-trajectory covariance of the
+features and $T$ their total covariance, Equation~\ref{eq:ratio} is $a^\top W a / a^\top T a$, a
+Rayleigh quotient. Its minimiser is therefore not something we search for iteratively: it is the
+eigenvector of the generalized problem $W a = \lambda\, T a$ with the smallest eigenvalue, and
+$\lambda$ is the invariance ratio itself. One eigendecomposition returns the whole family, ranked
+from most to least conserved.
+
+\paragraph{Requiring the scalar to generate the flow.} Conservation alone does not pick out a unique
+scalar. If $C$ is conserved then so is any function of it, so $E$, $E^2$ and mixtures of $E$ with
+other conserved quantities all sit near the top of the ranking, and the leading eigenvector is
+generally some combination of them rather than energy. We therefore ask $C$ to do more than stay
+constant: we ask it to generate the motion. We fit $C$ jointly with an antisymmetric operator $B$
+such that
+\begin{equation}
+F \approx B\nabla C, \qquad B^\top = -B.
+\label{eq:pair}
+\end{equation}
+This is Hamiltonian mechanics written without coordinates. In $\dot q = \partial H/\partial p$,
+$\dot p = -\partial H/\partial q$, the state moves orthogonally to the energy gradient, and
+multiplication by an antisymmetric matrix is what rotating a gradient that way looks like in matrix
+form. The relevant identity is that $\nabla C^\top B \nabla C = 0$ for any antisymmetric $B$, so if
+$F = B\nabla C$ then $C$ is constant along the flow by construction rather than by fitting. The
+condition also separates candidates that the invariance ratio cannot: $E^2$ is exactly as conserved
+as $E$ but does not pair with the same $B$, so the requirement selects a direction inside the
+conserved family \citep{arnold1989mathematical}.
+
+The fit is bilinear, so fixing either $a$ or $B$ makes the other a least-squares problem and we
+alternate. It searches within the top eight eigenvectors from Equation~\ref{eq:ratio}, so the
+recovered $C$ has eight effective degrees of freedom rather than 1819. That matters for a search run
+on 52 trajectories: a free fit over the full basis could drive the in-sample ratio to zero by
+overfitting. Section~\ref{sec:ablations} tests what the second condition contributes, and the answer
+is less than its prominence here suggests.
+
+\paragraph{What ``no physical labels'' means.} The search sees only latent states and the model's own
+one-step transition. It never sees $\theta$, $\dot\theta$ or the energy $E$, and nothing in
+Equations~\ref{eq:ratio} and~\ref{eq:pair} refers to them. Ground truth enters afterward, when we
+score the recovered $C$ against $E$ to report $|\rho|_E$. One hyperparameter is an exception worth
+stating: the extraction dimension was chosen with reference to energy correlation, on a sweep over
+three models that are not among the three we report. It was then fixed and applied unchanged here,
+which is why Section~\ref{sec:recovery} describes it as fixed before these models were evaluated.
+
+\paragraph{Reference energy.} We compare $C$ with the textbook pendulum energy
+\begin{equation*}
+E = \tfrac{1}{6}\dot\theta^2 + 5\cos\theta.
+\end{equation*}
+Gymnasium uses a semi-implicit integrator, so it conserves a nearby shadow Hamiltonian
+$\tilde H = H + O(\Delta t)$ rather than $E$ itself \citep{hairer2006geometric}. In our trajectories,
+this discretization produces about 12\% relative oscillation in $E$ without secular drift. We treat
+that mismatch as a noise floor.
+
+\paragraph{Earlier recurrent-model study.} We developed the extraction method on a smaller recurrent
+model before applying it to DreamerV3. That work is unpublished, so it does not count as evidence
+for the DreamerV3 results. Appendix~\ref{sec:gru} summarizes it only to document the origin of the
+method and the controls that we retest here.
+
+\paragraph{Code and run logs.} The code, committed run logs used to generate every figure, and the
+paper source are available at \url{https://github.com/Zarand3r/latent-noether-paper1}. The figures
+regenerate from the committed logs without a GPU.

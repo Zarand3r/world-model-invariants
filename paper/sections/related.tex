@@ -1,32 +1,32 @@
 \section{Related work}
 \label{sec:related}
 
-\paragraph{Probing shows a quantity is present, not that the model uses it.} Linear and nonlinear probes
-read physical or linguistic variables out of hidden states \citep{alain2017probing}, and the
-literature has repeatedly shown that a probe's accuracy confounds what the model encodes with what
-the probe can learn. Control tasks \citep{hewitt2019control} and the surrounding critique
-\citep{belinkov2022probing} formalise that. Our untrained baseline in Section~\ref{sec:recovery} is
-the same discipline applied to invariant search, and it matters more here than usual: four of six
-randomly initialised models cleared our registered threshold. Work on emergent world representations
-in sequence models \citep{li2023othello,nanda2023othello} strengthens probing by intervening on the
-representation, which is the move we make in Section~\ref{sec:intervention}.
+\paragraph{Probing.} Linear and nonlinear probes can decode physical or linguistic variables from
+hidden states \citep{alain2017probing}, but probe accuracy mixes information stored by the
+representation with the capacity of the probe itself. Control tasks \citep{hewitt2019control} and
+later critiques \citep{belinkov2022probing} make this limitation explicit. Our untrained DreamerV3
+baseline plays the same role for invariant extraction: four of six randomly initialized models exceed
+the success threshold we had previously used. Work on emergent world representations in sequence
+models \citep{li2023othello,nanda2023othello} goes beyond decoding by intervening on learned
+representations. Our rollout intervention in Section~\ref{sec:intervention} follows that logic.
 
-\paragraph{Equation discovery fits the data; we read the model.} SINDy \citep{brunton2016sindy}
-recovers governing equations from trajectories, and Hamiltonian and Lagrangian networks
-\citep{greydanus2019hnn,cranmer2020lnn} build conservation into an architecture so that it holds by
-construction. Both target the physical system. We target a model that we never told about physics
-and trained only to predict pixels, and we ask what its transition map preserves. Koopman and
-dynamic-mode methods \citep{schmid2010dmd} share our linear-algebraic machinery, and we use the
-standard version of it rather than proposing a new one.
+\paragraph{Equation discovery and structured dynamics models.} Equation-discovery methods such as
+SINDy \citep{brunton2016sindy} infer governing equations directly from observed trajectories.
+Hamiltonian and Lagrangian neural networks \citep{greydanus2019hnn,cranmer2020lnn} instead build
+physical structure into the architecture so that conservation holds by construction. These approaches
+model the physical system itself. We treat an already trained world model as the object of study and
+ask what its learned transition approximately preserves. Our extraction also uses standard
+linear-algebraic ideas related to Koopman and dynamic mode methods \citep{schmid2010dmd}.
 
-\paragraph{The field evaluates world models on returns, not on physics.} DreamerV3
-\citep{hafner2023dreamerv3}, its predecessors \citep{ha2018world}, and planning-based learned models
-\citep{schrittwieser2020muzero} report task performance. That leaves open whether a model that
-predicts well has internalised any dynamical structure. The disentanglement literature
-\citep{locatello2019challenging} showed how easily an appealing structural claim about
-representations survives without the right controls, which is the failure mode our dissipative arm
-guards against.
+\paragraph{Evaluation of world models.} Dreamer-style world models
+\citep{hafner2023dreamerv3,ha2018world} and planning-based learned models
+\citep{schrittwieser2020muzero} are usually evaluated by prediction quality or downstream return.
+Those metrics do not show whether the latent transition preserves physical invariants. The
+disentanglement literature \citep{locatello2019challenging} similarly shows how apparent structure in
+a representation can survive weak controls. Our damped models directly test whether the
+invariant-search procedure still returns a conserved-looking scalar when the training dynamics have
+no nontrivial first integral of the kind we seek.
 
-\paragraph{Positioning.} The extraction machinery here is standard. The contribution is the pairing
-of a claim about a modern pixel-trained world model with the three controls that make it
-falsifiable: an untrained model, a dissipative model, and a random law.
+The dynamical-systems tools we use are standard. The main result is empirical: a pixel-trained
+DreamerV3 develops a reproducible energy-like invariant with measurable dynamical relevance, and
+matched controls rule out simple decodability as the explanation.

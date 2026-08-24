@@ -1,11 +1,16 @@
 \section{Conclusion}
 
-A DreamerV3 trained only to predict pendulum video holds a quantity that its own dynamics conserve,
-that disappears when we remove the physics from the training data, and that improves its rollouts
-when we enforce it. The evidence is the separation from three controls, not the correlation itself,
-because an untrained model clears the correlation threshold we had registered.
+A DreamerV3 trained only on pendulum video develops a reproducible energy-like invariant. Energy
+correlation alone does not establish that result: randomly initialized models can also produce high
+correlations. The stronger evidence comes from three independent tests. The recovered scalar is
+approximately conserved along observation-conditioned trajectories in conservative models; the same
+search finds no approximately conserved degree-4 scalar in matched damped models; and correcting the
+scalar's drift during autonomous imagination improves prediction. The intervention lowers rollout
+error by 2.9--3.5\% on all three trained conservative models, although it beats matched random
+constraints on only two of the three.
 
-The result suggests a design question we cannot answer yet. If the model carries a physical quantity
-and lets it drift, and if correcting that drift from outside improves prediction, then we might build a world model
-that preserves it during imagination instead. Whether that helps at a scale where the
-physics is not a single pendulum is the experiment we would run next.
+The result also exposes a gap between representation and transition. The model learns a scalar that
+behaves like an invariant on real trajectories but does not preserve it perfectly when it imagines
+forward. A natural next question is whether world-model transitions can preserve such learned
+structure by construction, and whether the same effect survives in systems with actions, contacts,
+and multiple interacting objects.

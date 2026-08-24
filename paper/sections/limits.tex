@@ -1,83 +1,50 @@
-\section{What does not transfer}
-\label{sec:limits}
+\section{Ablations and limitations}
+\label{sec:ablations}
 
-\paragraph{The flow-generation condition buys reproducibility, not accuracy.} We select $C$ by asking for two things: that it stay constant along the model's trajectories,
-and that it generate the flow through $F \approx B \nabla C$. The second condition is
-the part that distinguishes this from a generic search for conserved quantities, and on this model it is close to
-inert. We compared the recovered $C$ against 200 random degree-4 polynomials of matched complexity,
-scored on the same latent. The recovered $C$ lands at the 17th to 66th percentile of that null on
-pairing residual, which is mid-pack. The dissipative models' candidates land at the 100th percentile,
-worse than every random polynomial, so the statistic is not vacuous. On this model, conservation does
-the discriminating.
+\paragraph{The flow-generation term mainly reduces seed-to-seed variation.} Our default extraction
+asks $C$ both to remain constant along trajectories and to satisfy $F \approx B\nabla C$ with
+antisymmetric $B$. We isolate the second condition by holding the candidate family, data, dimension,
+polynomial degree, and $\alpha$ grid fixed and selecting $C$ either by conservation alone or by the
+joint criterion.
 
-An ablation isolates what the term contributes. Holding the candidate family, data, dimension,
-degree and $\alpha$ grid fixed, we select $C$ two ways: by conservation alone, taking the
-lowest-ratio eigenvector, and jointly with $B$ as we do throughout. Conservation alone recovers the
-energy at $0.950$ against the joint rule's $0.973$, and it edits marginally better ($-0.087$ against
-$-0.077$, winning on two seeds of three). The one place the two differ is spread: the joint rule's
-recovery varies by $0.008$ across seeds and conservation alone varies by $0.035$, $4.4\times$ wider.
-Flow-generation makes the extraction repeatable rather than more accurate, and it is not what makes
-the intervention work.
+Conservation alone recovers energy at $0.950$, compared with $0.973$ for the joint rule, and gives a
+slightly better average intervention slope ($-0.087$ versus $-0.077$, winning on two of three
+models). The main difference is reproducibility: recovery varies by $0.035$ across seeds under
+conservation alone and by $0.008$ under the joint rule. Conservation drives both recovery and
+intervention performance; the flow-generation criterion contributes little to mean accuracy but
+reduces seed-to-seed variation.
 
-Figure~\ref{fig:ldsweep} sharpens the problem. As the extraction dimension rises from 6 to 12,
-recovery improves from $0.721$ to $0.967$ while the pairing residual gets \emph{worse}, from $0.738$
-to $0.876$. Recovery is already at $0.967$ by dimension 8, where the residual is better ($0.813$), so
-the dimension we registered is not where recovery arrives. It is past it. We registered the
-natural explanation for the anti-correlation, that the added directions carry the energy but
-resist a Hamiltonian fit, and it failed: on two seeds of three those directions carry more than
-twice the energy information of the first six ($2.23\times$ and $2.13\times$), but their share of the
-residual (44.9\%) tracks their share of the flow (43.5\%) almost exactly (Figure~\ref{fig:lowvar}).
-On the third seed the energy relation inverts ($0.91\times$), which does not affect the residual
-result but does bound the claim below it. We cannot
-explain the anti-correlation, and we report the pairing residual as a diagnostic rather than as a
-confidence score.
+\paragraph{The pairing residual is a diagnostic, not a recovery score.} As the extraction dimension
+increases from 6 to 12, energy recovery improves from $0.721$ to $0.967$ while the pairing residual
+worsens from $0.738$ to $0.876$. Recovery already reaches $0.967$ at dimension 8, where the residual
+is lower at $0.813$.
 
-\begin{figure}[t]
-\centering
-\begin{minipage}[t]{0.36\textwidth}
-\centering
-\includegraphics[width=\textwidth]{figures/fig2_ld_sweep.pdf}
-\caption{Recovery and the pairing residual move in opposite directions above dimension 6, so the
-residual cannot be read as a confidence score.}
-\label{fig:ldsweep}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.58\textwidth}
-\centering
-\includegraphics[width=\textwidth]{figures/fig3_low_variance.pdf}
-\caption{Medians over three seeds. The added low-variance directions carry twice the energy
-information of the top six \textbf{(a)} on two seeds of three and $0.91\times$ on the third, but on
-every seed take no more than their share of the misfit \textbf{(b)}, which rules out the explanation
-we had registered for the anti-correlation on the left.}
-\label{fig:lowvar}
-\end{minipage}
-\end{figure}
+The extra dimensions do not explain this pattern by carrying energy while resisting the Hamiltonian
+fit. Directions 7--12 account for 44.9\% of the residual and 43.5\% of the flow, nearly the same
+share. The pairing residual therefore does not track recovery quality across extraction dimension, so
+we use it only as a diagnostic. Appendix~\ref{sec:repro} reports the full sweeps.
 
-\paragraph{Energy lives in the low-variance directions, on two seeds of three.} Principal
-directions 7 through 12 carry $2.23\times$ and $2.13\times$ the energy information of the top six on
-two seeds, and $0.91\times$ on the third, where the relation inverts. We had seen the effect on a
-sharply anisotropic recurrent network, and it reproduces here on a near-isotropic stochastic model
-in two models of three. We state it per seed because a median would hide a sign change. It is the
-information-theoretic counterpart of the causal measurement in Section~\ref{sec:leverage}: variance
-misses the directions that carry the physics, and separately misses the directions whose
-displacement damages the rollout.
+\paragraph{Energy information can lie outside the highest-variance directions.} On two of the three
+models, principal directions 7--12 carry about twice as much energy information as the top six
+directions: $2.23$ times and $2.13$ times as much. On the third model, the ratio reverses to $0.91$.
+We report the three models separately because a median would hide that sign change. This result is
+consistent with the causal analysis in Section~\ref{sec:leverage}, but it is not uniform across
+seeds.
 
-\paragraph{A mechanism from the GRU study does not replicate.} The GRU study showed that phase error accumulates as the time integral of the invariant error weighted by
-frequency sensitivity, $\int \kappa(E_s)\,\Delta E(s)\,ds$ with $\kappa = d\ln\omega/dE$, beating a
-fitted power law on held-out data by $5\times$. Here the weaker part holds: accumulated invariant
-error predicts which rollouts drift most, with rank correlation rising to $0.503$ as the horizon
-grows, and the integral predictor beats a fitted $t^p$ ($R^2$ $0.187$ against $0.021$). Shuffling
-destroys it. The frequency weighting specifically does not separate. Under a nested test with 400
-bootstrap resamples, the weighted term contributes significantly beyond the unweighted integral in 1
-of 9 seed-horizon combinations, and the unweighted beyond the weighted in 0 of 9. The two predictors
-are not distinguishable at $n = 512$.
+\paragraph{The frequency-weighted mechanism remains unresolved.} Accumulated invariant error predicts
+which rollouts degrade most. An integral predictor reaches $R^2 = 0.187$, compared with $0.021$ for a
+fitted power law in time at the horizon where both perform best, and shuffling destroys the relation.
 
-We recorded this as a refutation once and were wrong. We had compared two standalone $R^2$ values
-differing by $0.019$, never checked that gap against its sampling error, and let a three-seed median
-choose the direction while the weighted predictor actually led in 6 of 9 combinations. The verdict is
-unresolved.
+The current sample cannot tell whether the relevant integral needs the frequency weighting found in
+the earlier recurrent model or whether an unweighted integral is enough. In a nested comparison with
+400 bootstrap resamples, the weighted term adds explanatory power beyond the unweighted term in 1 of
+9 seed--horizon combinations; the unweighted term adds beyond the weighted term in 0 of 9. At
+$n = 512$, we therefore treat the mechanism as unresolved. Appendix~\ref{sec:gru} describes the
+stronger result from the earlier recurrent model.
 
-\paragraph{Scope.} One physical system, one degree of freedom, one architecture, and a training run
-far shorter than a standard DreamerV3 schedule. The pendulum straddles its separatrix, so 17\% of
-trajectories rotate rather than oscillate and we restrict the mechanism analysis to the librating
-ones. We have not tested contacts, multiple objects, actions, or any system where the frequency
-varies smoothly enough to identify $\kappa$.
+\paragraph{Scope.} This study covers one physical system, one degree of freedom, one architecture,
+and a much shorter training schedule than standard DreamerV3. The pendulum trajectories cross the
+separatrix: 17\% rotate rather than librate, so we restrict the mechanism analysis to the librating
+trajectories. We have not tested contacts, multiple interacting objects, nonzero actions, or systems
+whose frequency varies enough to identify the frequency-weighting mechanism.
+Sections~\ref{sec:leverage} and~\ref{sec:charts} use only the conservative models.
