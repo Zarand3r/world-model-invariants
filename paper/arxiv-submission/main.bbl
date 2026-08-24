@@ -91,7 +91,7 @@ Peter~J Schmid.
 Julian Schrittwieser et~al.
 \newblock Mastering atari, go, chess and shogi by planning with a learned
   model.
-\newblock volume 588, 2020.
+\newblock \emph{Nature}, 588, 2020.
 
 \bibitem[Towers et~al.(2024)]{towers2024gymnasium}
 Mark Towers et~al.
