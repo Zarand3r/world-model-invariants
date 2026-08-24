@@ -1,0 +1,113 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyperFirstAtBeginDocument{\AtBeginDocument}
+\HyperFirstAtBeginDocument{\ifx\hyper@anchor\@undefined
+\global\let\oldcontentsline\contentsline
+\gdef\contentsline#1#2#3#4{\oldcontentsline{#1}{#2}{#3}}
+\global\let\oldnewlabel\newlabel
+\gdef\newlabel#1#2{\newlabelxx{#1}#2}
+\gdef\newlabelxx#1#2#3#4#5#6{\oldnewlabel{#1}{{#2}{#3}}}
+\AtEndDocument{\ifx\hyper@anchor\@undefined
+\let\contentsline\oldcontentsline
+\let\newlabel\oldnewlabel
+\fi}
+\fi}
+\global\let\hyper@last\relax 
+\gdef\HyperFirstAtBeginDocument#1{#1}
+\providecommand*\HyPL@Entry[1]{}
+\citation{hafner2023dreamerv3}
+\citation{hafner2023dreamerv3}
+\citation{towers2024gymnasium}
+\HyPL@Entry{0<</S/D>>}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
+\newlabel{sec:intro}{{1}{1}{Introduction}{section.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Recovering a latent invariant}{1}{section.2}\protected@file@percent }
+\newlabel{sec:setup}{{2}{1}{Recovering a latent invariant}{section.2}{}}
+\@writefile{toc}{\contentsline {paragraph}{Model and data.}{1}{section*.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Each point represents one model. \textbf  {(a)} The three trained conservative models recover energy correlations between $0.967$ and $0.975$, while six untrained models span $0.17$--$0.91$. \textbf  {(b)} The recovered scalar changes very little within observation-conditioned trajectories for conservative models and much more for damped models. \textbf  {(c)} Rollout error as a function of projection strength $\alpha $, relative to no edit. Enforcing the recovered constraint lowers error; enforcing a matched random polynomial constraint usually raises it; applying the recovered constraint to a damped model changes little.\relax }}{2}{figure.caption.1}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:three}{{1}{2}{Each point represents one model. \textbf {(a)} The three trained conservative models recover energy correlations between $0.967$ and $0.975$, while six untrained models span $0.17$--$0.91$. \textbf {(b)} The recovered scalar changes very little within observation-conditioned trajectories for conservative models and much more for damped models. \textbf {(c)} Rollout error as a function of projection strength $\alpha $, relative to no edit. Enforcing the recovered constraint lowers error; enforcing a matched random polynomial constraint usually raises it; applying the recovered constraint to a damped model changes little.\relax }{figure.caption.1}{}}
+\@writefile{toc}{\contentsline {paragraph}{Three kinds of latent trajectories.}{2}{section*.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Latent coordinates.}{2}{section*.4}\protected@file@percent }
+\newlabel{eq:z}{{1}{2}{Latent coordinates}{equation.2.1}{}}
+\@writefile{toc}{\contentsline {paragraph}{The candidate family.}{2}{section*.5}\protected@file@percent }
+\citation{arnold1989mathematical}
+\citation{hairer2006geometric}
+\@writefile{toc}{\contentsline {paragraph}{The invariance criterion.}{3}{section*.6}\protected@file@percent }
+\newlabel{eq:ratio}{{2}{3}{The invariance criterion}{equation.2.2}{}}
+\@writefile{toc}{\contentsline {paragraph}{Selecting among conserved candidates.}{3}{section*.7}\protected@file@percent }
+\newlabel{eq:pair}{{3}{3}{Selecting among conserved candidates}{equation.2.3}{}}
+\@writefile{toc}{\contentsline {paragraph}{Reference energy.}{3}{section*.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Preliminary experiments.}{3}{section*.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Training makes invariant recovery reproducible}{3}{section.3}\protected@file@percent }
+\newlabel{sec:recovery}{{3}{3}{Training makes invariant recovery reproducible}{section.3}{}}
+\citation{hewitt2019control,belinkov2022probing}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces The same extraction pipeline applied to conservative and damped models. Each range covers three seeds. No conservative seed overlaps any damped seed on any row.\relax }}{4}{table.caption.10}\protected@file@percent }
+\newlabel{tab:refusal}{{1}{4}{The same extraction pipeline applied to conservative and damped models. Each range covers three seeds. No conservative seed overlaps any damped seed on any row.\relax }{table.caption.10}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}The invariant disappears under matched damping}{4}{section.4}\protected@file@percent }
+\newlabel{sec:refusal}{{4}{4}{The invariant disappears under matched damping}{section.4}{}}
+\@writefile{toc}{\contentsline {paragraph}{Choosing the damping level.}{4}{section*.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Four statistics separate without overlap.}{4}{section*.12}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Each row compares one model with its own null distribution. The 20 small marks are norm-matched random degree-4 constraints, using the same draws across models; the diamond is that model's recovered constraint. Labels count the random constraints with a better dose-response slope than the recovered one.\relax }}{5}{figure.caption.15}\protected@file@percent }
+\newlabel{fig:null}{{2}{5}{Each row compares one model with its own null distribution. The 20 small marks are norm-matched random degree-4 constraints, using the same draws across models; the diamond is that model's recovered constraint. Labels count the random constraints with a better dose-response slope than the recovered one.\relax }{figure.caption.15}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Correcting invariant drift improves rollouts}{5}{section.5}\protected@file@percent }
+\newlabel{sec:intervention}{{5}{5}{Correcting invariant drift improves rollouts}{section.5}{}}
+\newlabel{eq:edit}{{4}{5}{Correcting invariant drift improves rollouts}{equation.5.4}{}}
+\@writefile{toc}{\contentsline {paragraph}{Scoring and controls.}{5}{section*.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Specificity is not uniform.}{5}{section*.14}\protected@file@percent }
+\citation{alain2017probing}
+\citation{hewitt2019control}
+\citation{belinkov2022probing}
+\citation{li2023othello,nanda2023othello}
+\citation{brunton2016sindy}
+\citation{greydanus2019hnn,cranmer2020lnn}
+\citation{schmid2010dmd}
+\citation{hafner2023dreamerv3,ha2018world,schrittwieser2020muzero}
+\citation{locatello2019challenging}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Limitations}{6}{section.6}\protected@file@percent }
+\newlabel{sec:limits}{{6}{6}{Limitations}{section.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Related work}{6}{section.7}\protected@file@percent }
+\newlabel{sec:related}{{7}{6}{Related work}{section.7}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{6}{section.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {A}Experimental details and extraction ablations}{7}{appendix.A}\protected@file@percent }
+\newlabel{sec:details}{{A}{7}{Experimental details and extraction ablations}{appendix.A}{}}
+\@writefile{toc}{\contentsline {paragraph}{Training.}{7}{section*.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Data split.}{7}{section*.17}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Scoring the correction over a grid.}{7}{section*.18}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Flow alignment contributes reproducibility.}{7}{section*.19}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{The pairing residual does not track recovery.}{7}{section*.20}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {B}Latent sensitivity analyses}{7}{appendix.B}\protected@file@percent }
+\newlabel{sec:sensitivity}{{B}{7}{Latent sensitivity analyses}{appendix.B}{}}
+\newlabel{eq:leverage}{{5}{7}{Latent sensitivity analyses}{equation.B.5}{}}
+\@writefile{toc}{\contentsline {paragraph}{Calibrating the displacement.}{7}{section*.21}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Variance and sensitivity at different horizons.}{8}{section*.22}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Each point is one of the 12 extracted directions, ranked within its own model; the dotted line marks equal ranks. \textbf  {(a)} Variance rank against damage rank at a 40-step horizon. \textbf  {(b)} Damage rank against the magnitude of the invariant correction along that direction.\relax }}{8}{figure.caption.23}\protected@file@percent }
+\newlabel{fig:leverage}{{3}{8}{Each point is one of the 12 extracted directions, ranked within its own model; the dotted line marks equal ranks. \textbf {(a)} Variance rank against damage rank at a 40-step horizon. \textbf {(b)} Damage rank against the magnitude of the invariant correction along that direction.\relax }{figure.caption.23}{}}
+\@writefile{toc}{\contentsline {paragraph}{Basis-independent properties reproduce better than coordinate selectors.}{8}{section*.24}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {C}Additional sweeps}{8}{appendix.C}\protected@file@percent }
+\newlabel{sec:sweeps}{{C}{8}{Additional sweeps}{appendix.C}{}}
+\@writefile{toc}{\contentsline {paragraph}{Energy outside the highest-variance directions.}{8}{section*.25}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Accumulated invariant error.}{8}{section*.26}\protected@file@percent }
+\bibstyle{plainnat}
+\bibdata{refs}
+\bibcite{alain2017probing}{{1}{2017}{{Alain and Bengio}}{{}}}
+\bibcite{arnold1989mathematical}{{2}{1989}{{Arnold}}{{}}}
+\bibcite{belinkov2022probing}{{3}{2022}{{Belinkov}}{{}}}
+\bibcite{brunton2016sindy}{{4}{2016}{{Brunton et~al.}}{{Brunton, Proctor, and Kutz}}}
+\bibcite{cranmer2020lnn}{{5}{2020}{{Cranmer et~al.}}{{Cranmer, Greydanus, Hoyer, Battaglia, Spergel, and Ho}}}
+\bibcite{greydanus2019hnn}{{6}{2019}{{Greydanus et~al.}}{{Greydanus, Dzamba, and Yosinski}}}
+\bibcite{ha2018world}{{7}{2018}{{Ha and Schmidhuber}}{{}}}
+\bibcite{hafner2023dreamerv3}{{8}{2023}{{Hafner et~al.}}{{Hafner, Pasukonis, Ba, and Lillicrap}}}
+\bibcite{hairer2006geometric}{{9}{2006}{{Hairer et~al.}}{{Hairer, Lubich, and Wanner}}}
+\bibcite{hewitt2019control}{{10}{2019}{{Hewitt and Liang}}{{}}}
+\bibcite{li2023othello}{{11}{2023}{{Li et~al.}}{{Li, Hopkins, Bau, Vi{\'e}gas, Pfister, and Wattenberg}}}
+\bibcite{locatello2019challenging}{{12}{2019}{{Locatello et~al.}}{{Locatello, Bauer, Lucic, R{\"a}tsch, Gelly, Sch{\"o}lkopf, and Bachem}}}
+\bibcite{nanda2023othello}{{13}{2023}{{Nanda et~al.}}{{Nanda, Lee, and Wattenberg}}}
+\bibcite{schmid2010dmd}{{14}{2010}{{Schmid}}{{}}}
+\bibcite{schrittwieser2020muzero}{{15}{2020}{{Schrittwieser et~al.}}{{}}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Energy recovery and pairing residual against extraction dimension. Lines are medians over the three models; points are individual models. Both quantities are dimensionless.\relax }}{9}{figure.caption.27}\protected@file@percent }
+\newlabel{fig:ldsweep}{{4}{9}{Energy recovery and pairing residual against extraction dimension. Lines are medians over the three models; points are individual models. Both quantities are dimensionless.\relax }{figure.caption.27}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces \textbf  {(a)} Energy-probe $R^2$ for the top six principal directions against directions 7--12, per model. \textbf  {(b)} Fraction of latent flow and pairing residual carried by each group, medians over three models.\relax }}{9}{figure.caption.27}\protected@file@percent }
+\newlabel{fig:lowvar}{{5}{9}{\textbf {(a)} Energy-probe $R^2$ for the top six principal directions against directions 7--12, per model. \textbf {(b)} Fraction of latent flow and pairing residual carried by each group, medians over three models.\relax }{figure.caption.27}{}}
+\bibcite{towers2024gymnasium}{{16}{2024}{{Towers et~al.}}{{}}}
+\gdef \@abspage@last{10}

@@ -24,6 +24,8 @@ OUT = pathlib.Path("paper/figures")
 OUT.mkdir(parents=True, exist_ok=True)
 
 plt.rcParams.update({
+    # arXiv flags Type 3 fonts as harming machine readability; 42 embeds TrueType instead.
+    "pdf.fonttype": 42, "ps.fonttype": 42,
     "font.size": 8, "axes.labelsize": 8, "axes.titlesize": 8.5,
     "xtick.labelsize": 7.5, "ytick.labelsize": 7.5, "legend.fontsize": 7.5,
     "axes.spines.top": False, "axes.spines.right": False,
@@ -102,7 +104,7 @@ def fig1_three_claims():
     ax[1].annotate("", xy=(1.32, np.median(damp_dr)), xytext=(1.32, np.median(cons_dr)),
                    arrowprops=dict(arrowstyle="<->", lw=.7, color="k"))
     ax[1].text(1.38, 5e-3, r"2400$\times$", fontsize=7, rotation=90, va="center")
-    _panel(ax[1], "(b) refuse", "with damping, nothing stays constant")
+    _panel(ax[1], "(b) damped control", "damping removes the invariant")
 
     # (c) the edit: error vs alpha, normalised so the three arms are comparable
     # per-arm label offsets: the three end values sit close together at the right edge, so each is
@@ -282,13 +284,14 @@ def fig5_random_null():
     for i, (ck, s_own) in enumerate(sorted(own.items())):
         draws = np.array([r["normalised_slope"] for r in edit["B_conservative_random"]
                           if r["ckpt"] == ck])
-        pct = 100.0 * float((draws < s_own).mean())
+        n_better = int((draws < s_own).sum())
         ax.scatter(draws, np.full(len(draws), i) + rng.uniform(-.13, .13, len(draws)),
                    s=9, color=RANDOM, alpha=.5, linewidth=0, zorder=2)
         ax.scatter([s_own], [i], s=52, marker="D", color=TRAINED, zorder=4,
                    edgecolor="white", linewidth=.7)
-        ax.annotate(f"{pct:.0f}th pct", xy=(s_own, i), xytext=(0, 9), textcoords="offset points",
-                    fontsize=6.5, color=TRAINED, ha="center", fontweight="bold")
+        ax.annotate(f"{n_better} of {len(draws)} better", xy=(s_own, i), xytext=(0, 9),
+                    textcoords="offset points", fontsize=6.5, color=TRAINED, ha="center",
+                    fontweight="bold")
         if i == 2:      # direct labels on the top row only: a legend box lands on seed 3's draws
             ax.annotate("recovered law", xy=(s_own, i), xytext=(0, -12), ha="center", va="top",
                         textcoords="offset points", fontsize=6.5, color=TRAINED)

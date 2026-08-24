@@ -1,0 +1,102 @@
+\begin{thebibliography}{16}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Alain and Bengio(2017)]{alain2017probing}
+Guillaume Alain and Yoshua Bengio.
+\newblock Understanding intermediate layers using linear classifier probes.
+\newblock In \emph{ICLR Workshop}, 2017.
+
+\bibitem[Arnold(1989)]{arnold1989mathematical}
+V.~I. Arnold.
+\newblock \emph{Mathematical Methods of Classical Mechanics}.
+\newblock Springer, 1989.
+
+\bibitem[Belinkov(2022)]{belinkov2022probing}
+Yonatan Belinkov.
+\newblock Probing classifiers: Promises, shortcomings, and advances.
+\newblock \emph{Computational Linguistics}, 48, 2022.
+
+\bibitem[Brunton et~al.(2016)Brunton, Proctor, and Kutz]{brunton2016sindy}
+Steven~L Brunton, Joshua~L Proctor, and J~Nathan Kutz.
+\newblock Discovering governing equations from data by sparse identification of
+  nonlinear dynamical systems.
+\newblock \emph{PNAS}, 113\penalty0 (15), 2016.
+
+\bibitem[Cranmer et~al.(2020)Cranmer, Greydanus, Hoyer, Battaglia, Spergel, and
+  Ho]{cranmer2020lnn}
+Miles Cranmer, Sam Greydanus, Stephan Hoyer, Peter Battaglia, David Spergel,
+  and Shirley Ho.
+\newblock Lagrangian neural networks.
+\newblock In \emph{ICLR Workshop}, 2020.
+
+\bibitem[Greydanus et~al.(2019)Greydanus, Dzamba, and
+  Yosinski]{greydanus2019hnn}
+Samuel Greydanus, Misko Dzamba, and Jason Yosinski.
+\newblock Hamiltonian neural networks.
+\newblock In \emph{NeurIPS}, 2019.
+
+\bibitem[Ha and Schmidhuber(2018)]{ha2018world}
+David Ha and J{\"u}rgen Schmidhuber.
+\newblock Recurrent world models facilitate policy evolution.
+\newblock In \emph{NeurIPS}, 2018.
+
+\bibitem[Hafner et~al.(2023)Hafner, Pasukonis, Ba, and
+  Lillicrap]{hafner2023dreamerv3}
+Danijar Hafner, Jurgis Pasukonis, Jimmy Ba, and Timothy Lillicrap.
+\newblock Mastering diverse domains through world models.
+\newblock \emph{arXiv:2301.04104}, 2023.
+
+\bibitem[Hairer et~al.(2006)Hairer, Lubich, and Wanner]{hairer2006geometric}
+Ernst Hairer, Christian Lubich, and Gerhard Wanner.
+\newblock \emph{Geometric Numerical Integration}.
+\newblock Springer, 2006.
+
+\bibitem[Hewitt and Liang(2019)]{hewitt2019control}
+John Hewitt and Percy Liang.
+\newblock Designing and interpreting probes with control tasks.
+\newblock In \emph{EMNLP}, 2019.
+
+\bibitem[Li et~al.(2023)Li, Hopkins, Bau, Vi{\'e}gas, Pfister, and
+  Wattenberg]{li2023othello}
+Kenneth Li, Aspen~K Hopkins, David Bau, Fernanda Vi{\'e}gas, Hanspeter Pfister,
+  and Martin Wattenberg.
+\newblock Emergent world representations: Exploring a sequence model trained on
+  a synthetic task.
+\newblock In \emph{ICLR}, 2023.
+
+\bibitem[Locatello et~al.(2019)Locatello, Bauer, Lucic, R{\"a}tsch, Gelly,
+  Sch{\"o}lkopf, and Bachem]{locatello2019challenging}
+Francesco Locatello, Stefan Bauer, Mario Lucic, Gunnar R{\"a}tsch, Sylvain
+  Gelly, Bernhard Sch{\"o}lkopf, and Olivier Bachem.
+\newblock Challenging common assumptions in the unsupervised learning of
+  disentangled representations.
+\newblock In \emph{ICML}, 2019.
+
+\bibitem[Nanda et~al.(2023)Nanda, Lee, and Wattenberg]{nanda2023othello}
+Neel Nanda, Andrew Lee, and Martin Wattenberg.
+\newblock Emergent linear representations in world models of self-supervised
+  sequence models.
+\newblock In \emph{BlackboxNLP}, 2023.
+
+\bibitem[Schmid(2010)]{schmid2010dmd}
+Peter~J Schmid.
+\newblock Dynamic mode decomposition of numerical and experimental data.
+\newblock \emph{Journal of Fluid Mechanics}, 656, 2010.
+
+\bibitem[Schrittwieser et~al.(2020)]{schrittwieser2020muzero}
+Julian Schrittwieser et~al.
+\newblock Mastering atari, go, chess and shogi by planning with a learned
+  model.
+\newblock volume 588, 2020.
+
+\bibitem[Towers et~al.(2024)]{towers2024gymnasium}
+Mark Towers et~al.
+\newblock Gymnasium: A standard interface for reinforcement learning
+  environments.
+\newblock \emph{arXiv:2407.17032}, 2024.
+
+\end{thebibliography}
