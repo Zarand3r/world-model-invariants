@@ -66,13 +66,13 @@ def _secular_drift(E, norm):
     return ((E - E.mean(-1, keepdims=True)) @ kc / (kc @ kc)) / norm
 
 
-def run(ckpt, data, random_law=False, draw=0):
+def run(ckpt, data, random_law=False, draw=0, horizon=HORIZON):
     d = np.load(data)
     fr = torch.as_tensor(d["frames"]).float().div_(255.).sub_(0.5).cuda()
     st = d["states"]
     norm = float(energy(st[..., 0], st[..., 1]).mean(-1).std())
-    E_true_window = energy(st[ANALYSIS][:, WARMUP:WARMUP + HORIZON, 0],
-                           st[ANALYSIS][:, WARMUP:WARMUP + HORIZON, 1])
+    E_true_window = energy(st[ANALYSIS][:, WARMUP:WARMUP + horizon, 0],
+                           st[ANALYSIS][:, WARMUP:WARMUP + horizon, 1])
 
     m = DreamerV3Adapter(device="cuda").cuda()
     m.load_state_dict(torch.load(ckpt, map_location="cuda")["model"])
@@ -99,7 +99,7 @@ def run(ckpt, data, random_law=False, draw=0):
 
     P = U @ R
     P_pinv = torch.linalg.pinv(P)
-    ref = fr[ANALYSIS][:, WARMUP: WARMUP + HORIZON]
+    ref = fr[ANALYSIS][:, WARMUP: WARMUP + horizon]
 
     per_alpha = {}
     for alpha in ALPHAS:
@@ -108,7 +108,7 @@ def run(ckpt, data, random_law=False, draw=0):
             z0 = (h - h_mean) @ P
             C0, _ = _C_and_grad(z0, coeffs)
             preds, Cs = [], []
-            for _ in range(HORIZON):
+            for _ in range(horizon):
                 preds.append(m.readout_from_h(h))
                 Cs.append(_C_and_grad((h - h_mean) @ P, coeffs)[0].cpu().numpy())
                 h = m.transition(h)
@@ -133,7 +133,7 @@ def run(ckpt, data, random_law=False, draw=0):
             "D_sec_mean_abs": float(np.nanmean(np.abs(dsec))),
             "E_abs_err_vs_true_median": float(np.nanmedian(np.abs(Ehat - E_true_window)) / norm),
             "theta_abs_err_median": float(np.nanmedian(np.abs(
-                phys["theta"] - st[ANALYSIS][:, WARMUP:WARMUP + HORIZON, 0]))),
+                phys["theta"] - st[ANALYSIS][:, WARMUP:WARMUP + horizon, 0]))),
             "C_drift_median": float(np.median(np.abs(np.asarray(Cs)[-1] - np.asarray(Cs)[0]))),
             "blank_decode_fraction": blank,
         }
@@ -142,7 +142,7 @@ def run(ckpt, data, random_law=False, draw=0):
     dm = np.array([per_alpha[float(x)]["D_sec_median"] for x in ALPHAS])
     pm = np.array([per_alpha[float(x)]["pixel_mse"] for x in ALPHAS])
     return {
-        "ckpt": ckpt, "data": data, "random_law": random_law,
+        "ckpt": ckpt, "data": data, "random_law": random_law, "horizon": horizon,
         "draw": draw if random_law else None,
         "pairing_residual": fit["residual"],
         "across_traj_E_std": norm,
@@ -165,6 +165,7 @@ if __name__ == "__main__":
     p.add_argument("--damped-data", default="runs/pendulum_pixels_damped.npz")
     p.add_argument("--n-random", type=int, default=N_RANDOM_LAWS)
     p.add_argument("--max-models", type=int, default=999)
+    p.add_argument("--horizon", type=int, default=HORIZON)
     p.add_argument("--out", default="runs/e1_physical_energy.json")
     a = p.parse_args()
 
@@ -182,14 +183,14 @@ if __name__ == "__main__":
         if ck in done_A or not pathlib.Path(ck).exists():
             continue
         print(f"[A] {ck}", flush=True)
-        out["A_conservative_own"].append(run(ck, a.conservative_data)); save()
+        out["A_conservative_own"].append(run(ck, a.conservative_data, horizon=a.horizon)); save()
 
     done_C = {r["ckpt"] for r in out["C_damped_own"]}
     for ck in a.damped:
         if ck in done_C or not pathlib.Path(ck).exists():
             continue
         print(f"[C] {ck}", flush=True)
-        out["C_damped_own"].append(run(ck, a.damped_data)); save()
+        out["C_damped_own"].append(run(ck, a.damped_data, horizon=a.horizon)); save()
 
     done_B = {(r["ckpt"], r["draw"]) for r in out["B_conservative_random"]}
     for ck in a.conservative:
@@ -199,7 +200,7 @@ if __name__ == "__main__":
             if (ck, dr) in done_B:
                 continue
             print(f"[B] {ck} draw {dr}", flush=True)
-            out["B_conservative_random"].append(run(ck, a.conservative_data, True, dr)); save()
+            out["B_conservative_random"].append(run(ck, a.conservative_data, True, dr, horizon=a.horizon)); save()
 
     print(f"\nwrote {out_path}  "
           f"A={len(out['A_conservative_own'])} B={len(out['B_conservative_random'])} "

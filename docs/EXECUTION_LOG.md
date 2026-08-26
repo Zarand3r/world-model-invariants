@@ -239,3 +239,89 @@ Cost: ~81 min/model x 6 = ~8.5 h, against ~3 h for the original wall-clock plan.
 ### Status
 
 Training seed 3 of 6, ~8.5 h remaining. No result yet bears on any claim C1–C6.
+
+---
+
+## 2026-08-26 21:10–21:30 UTC — E1 readout arm (b) complete; first E1 signal (PREVIEW, not the result)
+
+Git at `afb99db`. Training: seed 3 of 6, past step 10,000.
+
+### E1 readout validation arm (b) — reconstructions
+
+Required by `docs/E1_PREREG.md` before any intervention number. Run on the s3 milestone sweep.
+
+| source | theta err (deg) | E err / across-traj std | `D_sec` floor |
+|---|---|---|---|
+| real rendered frames | 0.110 | 0.0159 | 9.38e-04 |
+| s3 @ step 1000 | 0.740 | 0.1304 | 1.23e-03 |
+| s3 @ step 3000 | 0.415 | 0.0640 | 9.75e-04 |
+| s3 @ step 6500 | 0.348 | 0.0409 | 9.97e-04 |
+
+Two things fall out.
+
+**The prereg's choice of a slope statistic is vindicated.** Per-frame decoded-energy error on
+reconstructions is 2.6x worse than on rendered frames (0.041 vs 0.016), but the `D_sec` floor is
+essentially unchanged (9.97e-04 vs 9.38e-04) — reconstruction error is close to white and averages
+out of a slope. **Binding floor registered as 1.0e-03.** Blank-decode fraction 0.000 throughout.
+
+**Bonus E8 signal.** Readout error on reconstructions falls monotonically with training. Not an E1
+quantity; recorded because it comes free from the milestone grid.
+
+Gap in my own implementation, found and fixed: `validate_recon` computed error statistics but not
+`D_sec`, so the floor that actually binds E1 (reconstructions, not rendered frames) was unmeasured.
+The prereg asked for the floor on both arms. Patched and re-run.
+
+### E1 arm A, single model — PREVIEW
+
+`runs/e1_preview_s3_step6500.json`, `runs/e1_preview_s3_step6500_H100.json`.
+**Arm A only, one checkpoint, no arm B, no arm C.** Reported as a preview of the pipeline and an
+early signal. It is not the E1 result and does not settle the gate.
+
+| statistic | H = 50 | H = 100 |
+|---|---|---|
+| median abs `D_sec`, alpha 0 -> 0.4 | 2.396e-03 -> 2.189e-03 | 1.279e-03 -> **6.640e-04** |
+| paired change, 95% CI (20k bootstrap over trajectories) | -2.07e-04 [-1.19e-03, **+4.78e-04**] | -6.15e-04 [-1.02e-03, **-1.92e-04**] |
+| P(improve) | 0.747 | 0.998 |
+| trajectories improved | 65% (34/52) | 69% |
+| decoded E error vs true / std | 0.0611 -> 0.0560 | 0.0828 -> 0.0634 |
+| pixel MSE change at max alpha | -1.71% | -10.95% |
+| median abs `C` drift | 0.0462 -> 0.0130 | 0.0716 -> 0.0134 |
+
+At H = 50 — the registered primary horizon, chosen to match the published intervention — the result
+is **ambiguous**: monotone in the right direction, but the CI includes zero and the change is below
+the per-trajectory floor. That is the prereg's registered "ambiguous outcome" case, and its written
+response is to re-run at longer horizon. Followed, without reinterpreting anything.
+
+At H = 100 the effect resolves: secular drift in **true decoded physical energy** falls 48%, the
+paired CI excludes zero, and the pixel effect is 6x larger than at H = 50. This is E6's prediction
+(correction benefit grows with horizon) arriving inside E1.
+
+Note the published comparison is at H = 50 and reports -2.9% pixel; this checkpoint gives -1.71%.
+Different models, and the roadmap already records that Session-1 checkpoints are not the paper's.
+
+### Two flaws in my own preregistration, recorded rather than quietly fixed
+
+**1. Signed vs magnitude, an ambiguity.** `E1_PREREG` says the gate needs "arm A's `D_sec` slope
+versus alpha [to be] negative". `D_sec` has no preferred sign per trajectory, so the physically
+meaningful statistic is `|D_sec|` — drift toward zero. Both are reported, and both agree here
+(`mean|D_sec|` falls monotonically 3.197e-03 -> 2.859e-03 at H = 50), so nothing turns on the
+choice. The wording should be fixed to say magnitude before the real run.
+
+**2. Wrong granularity for the floor — NEEDS RICHARD'S RULING, NOT AMENDED.** The floor was
+registered as a *per-trajectory* median absolute error (1.0e-03). The primary metric is a
+*population median under a paired comparison*, in which systematic readout bias largely cancels and
+resolution is better by roughly sqrt(n). Read literally, the registered rule rejects the H = 100
+result (6.15e-04 < 1.0e-03) even though its paired bootstrap CI excludes zero.
+
+I believe the paired CI is the correct resolution test. **I have not amended the prereg**, because
+relaxing a resolution rule after seeing the result it would have blocked is the specific failure
+preregistration exists to prevent. Flagged for Richard. Until ruled on, the H = 100 preview is
+recorded as **promising but not gate-passing**.
+
+### Status
+
+No claim C1–C6 is yet supported. Arm B is the arm that can kill this: if projection helps regardless
+of which `C` is enforced, the edit is a regulariser and says nothing about physics. Nothing decides
+until arm B runs on all three conservative seeds.
+
+Next: seeds 4 and 5, then damped 0–2 (~7 h), then E1 arms A/B/C at both H = 50 and H = 100.

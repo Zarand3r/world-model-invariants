@@ -104,6 +104,15 @@ def validate_recon(ckpt, data, window):
     out.update(_err_stats("E_err_over_std", (got["energy"] - energy(th_true, thd_true)) / norm))
     out["theta_err_deg_median"] = float(np.degrees(out["theta_err_rad_median"]))
     out["blank_decode_fraction"] = float(np.mean(~np.isfinite(got["theta"])))
+
+    # D_sec on RECONSTRUCTIONS is the floor that actually binds E1: E1 decodes model-generated
+    # frames, not rendered ones. Per-frame reconstruction error is larger than the real-frame floor
+    # AND may be systematic rather than white, in which case it does not average out of a slope.
+    d_hat = secular_drift(got["energy"], norm)
+    d_true = secular_drift(energy(th_true, thd_true), norm)
+    out["D_sec_recon_median"] = float(np.nanmedian(d_hat))
+    out["D_sec_true_median"] = float(np.nanmedian(d_true))
+    out["D_sec_noise_floor_abs_median"] = float(np.nanmedian(np.abs(d_hat - d_true)))
     return out
 
 
