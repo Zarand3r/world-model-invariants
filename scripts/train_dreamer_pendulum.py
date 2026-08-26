@@ -10,8 +10,13 @@ is not evidence about the method):
   3. the model's rollouts conserve the TRUE energy better than a shuffled-frame control; if the
      model has learned no physics there is nothing downstream to recover and S2-S5 are void
 
-Runs are capped by WALL CLOCK, not step count, so the energy bound (<= TDP x wall-clock) holds
-even if throughput degrades. Budget: 0.26 h at 100k steps => <= 0.15 kWh worst case at 600 W.
+Runs are capped by OPTIMIZER STEPS. `--max-hours` remains as a loose energy bound and must be set
+so it never binds -- see M28 on the argument itself. Capping by wall clock makes the step count a
+function of machine load, which silently gave one arm 37% more training than another; models being
+compared must receive equal steps.
+
+`--ckpt-at` saves intermediate checkpoints at named steps, so a single run yields the whole training
+trajectory (E8 in docs/ROADMAP.md) rather than only its endpoint.
 """
 import argparse
 import hashlib
@@ -60,6 +65,18 @@ def main(a):
     t0 = time.time()
     step = 0
     hist = []
+    data_sha = _sha256(a.data)          # hashed once; it is the same file all run
+    ckpt_at = sorted({int(x) for x in str(a.ckpt_at).split(",") if x.strip()})
+    if ckpt_at:
+        print(f"  intermediate checkpoints at steps: {ckpt_at}")
+
+    def _save(path, n_steps):
+        hrs = (time.time() - t0) / 3600
+        pathlib.Path(path).parent.mkdir(parents=True, exist_ok=True)
+        torch.save({"model": model.state_dict(), "steps": n_steps, "hours": hrs,
+                    "hist": list(hist), "seed": a.seed, "data": a.data,
+                    "data_sha256": data_sha, "argv": sys.argv[1:]}, path)
+        return hrs
     while step < a.steps and (time.time() - t0) < a.max_hours * 3600:
         i = torch.randint(0, n_train, (a.batch,), device=dev)
         t = torch.randint(0, train.shape[1] - a.seq, (1,)).item()
@@ -71,6 +88,10 @@ def main(a):
         torch.nn.utils.clip_grad_norm_(model.parameters(), 100.0)
         opt.step()
         step += 1
+        if step in ckpt_at:
+            cp = str(a.out).replace(".pt", f"_step{step}.pt")
+            hrs = _save(cp, step)
+            print(f"  [ckpt] {cp}  step {step}  [{hrs*60:.1f} min]", flush=True)
         if step % 2000 == 0 or step == 1:
             with torch.no_grad():
                 vb = val[torch.randint(0, val.shape[0], (a.batch,), device=dev), :a.seq]
@@ -119,9 +140,7 @@ def main(a):
     # model. That gap is what let D69's step mismatch and a silent wrong-path launch both survive:
     # nothing on disk could contradict what we believed we had run. The content hash is the part
     # that matters -- a path can be reused for a regenerated file.
-    torch.save({"model": model.state_dict(), "steps": step, "hours": hours,
-                "hist": hist, "seed": a.seed,
-                "data": a.data, "data_sha256": _sha256(a.data), "argv": sys.argv[1:]}, a.out)
+    _save(a.out, step)
     json.dump(hist, open(str(a.out).replace(".pt", "_hist.json"), "w"), indent=2)
     print(f"  saved {a.out}")
 
@@ -134,7 +153,12 @@ if __name__ == "__main__":
     # receive equal OPTIMIZER STEPS; leaving wall clock to decide gave the conservative arm 37% more
     # steps than the dissipative one because the machine was busier for the second batch. Set
     # --max-hours loose enough that it never binds, and let --steps define the contract.
-    p.add_argument("--max-hours", type=float, default=0.5)
+    p.add_argument("--max-hours", type=float, default=6.0)
+    # E8 (docs/ROADMAP.md): the training TRAJECTORY, not just its endpoint. Saving milestones from a
+    # single run is far cheaper than retraining per milestone, and guarantees the checkpoints lie on
+    # one optimisation path rather than on several.
+    p.add_argument("--ckpt-at", default="",
+                   help="comma-separated steps at which to save <out>_step<N>.pt")
     p.add_argument("--batch", type=int, default=16)
     p.add_argument("--seq", type=int, default=64)
     p.add_argument("--lr", type=float, default=1e-4)

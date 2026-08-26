@@ -173,3 +173,69 @@ Stage 1 bootstrap still running (damped data, then 6 trainings, ~3 h). Nothing y
 roadmap; no deviation requiring approval.
 
 **Blocked on checkpoints:** E1 readout-validation arm (b) (reconstructions), then E1 arms A–D.
+
+---
+
+## 2026-08-26 20:44–21:00 UTC — Session 1 cont.: **DEVIATION, approved** — training contract
+
+Git at `e0f239d`.
+
+### What was found
+
+`scripts/train_dreamer_pendulum.py` carries an M28 note on its own `--max-hours` argument:
+
+> WALL CLOCK IS AN ENERGY BOUND, NOT A MATCHING VARIABLE (M28). Models being compared must receive
+> equal OPTIMIZER STEPS; leaving wall clock to decide gave the conservative arm 37% more steps than
+> the dissipative one because the machine was busier for the second batch. Set --max-hours loose
+> enough that it never binds, and let --steps define the contract.
+
+`docs/REPRODUCE.md` nonetheless invokes `--max-hours 0.5 --steps 40000`, and the loop is
+`while step < steps AND elapsed < max_hours` — so **wall clock binds**, which is precisely the
+failure M28 forbids. The module docstring also asserted the opposite of M28 ("Runs are capped by
+WALL CLOCK, not step count"); corrected.
+
+Measured on this box: **741 steps/min** (2000 steps in 2.7 min), so `--max-hours 0.5` yields
+**~22,000 steps** against the paper's ~6,500 — a 3.4x difference, and a step count that is a
+function of machine load.
+
+Two consequences: models trained here would not be comparable to the published ones, and
+conservative vs damped arms could silently receive different amounts of training, undermining the
+cross-arm comparisons E1, E2 and E7 all rest on.
+
+### Decision — put to Richard, approved
+
+Training is now capped by **optimizer steps** (`--steps 60000`, `--max-hours 6` as a non-binding
+energy bound), and each run saves the **E8 milestone grid** `{1k, 3k, 6.5k, 15k, 30k, 60k}` via a
+new `--ckpt-at` argument. One run therefore yields the whole training trajectory on a single
+optimisation path, giving both a paper-comparable 6,500-step checkpoint and a saturated one.
+
+**E8 moves from Stage 3 to Stage 1.** `docs/ROADMAP.md` amended in place with the rationale.
+
+Cost: ~81 min/model x 6 = ~8.5 h, against ~3 h for the original wall-clock plan.
+
+### Actions
+
+- `train_dreamer_pendulum.py`: `--ckpt-at`; dataset hash hoisted out of the loop; save routed
+  through one helper so intermediate and final checkpoints carry identical M29 provenance
+  (`steps`, `seed`, `data`, `data_sha256`, `argv`); `--max-hours` default 0.5 -> 6.0; docstring
+  corrected.
+- `run_stage1_bootstrap.sh`: step-capped contract, `STEPS`/`CKPT_AT` overridable from the
+  environment.
+- First bootstrap killed at ~10 min into seed 3; the partial `dreamer_ref_s3.pt` was deleted rather
+  than kept, so no model trained under the old contract survives to be confused with a new one.
+- Relaunched 20:54:34Z. Datasets were skipped as already present (the script is idempotent).
+
+### Also written this session, ahead of the GPU
+
+- `scripts/run_e1_physical_energy.py` — E1 arms A–D. The edit is copied verbatim from
+  `run_dreamer_edit.py`; only the scoring differs. Raw per-trajectory `D_sec` rows are kept.
+  Resumable per model and per random draw. Not yet run: no checkpoints.
+- `docs/E2_PREREG.md` — preregistered while the GPU was busy and **before any E2 quantity existed**.
+  Fixes the local conservation defect `r(z) = C(T(z)) - C(z)`, its normalisation, the three
+  registered outcomes with numeric thresholds, a single preregistered off-support metric, and the
+  result that would falsify the roadmap's target claim. Records explicitly that E2 can establish
+  association between leaving support and defect growth, **not** causation.
+
+### Status
+
+Training seed 3 of 6, ~8.5 h remaining. No result yet bears on any claim C1–C6.

@@ -609,6 +609,16 @@ learned world models more broadly?
 
 ## Stage 1 — Immediate gates, existing checkpoints
 
+> **Amended 2026-08-26, approved by Richard.** The repo carries no checkpoints, so Stage 1 had to
+> retrain. `train_dreamer_pendulum.py`'s own M28 note forbids wall-clock capping for models that will
+> be compared, but `REPRODUCE.md` used it and it binds (741 steps/min on this GPU => ~22k steps vs the
+> paper's ~6.5k, and a step count that varies with machine load). Training is now capped by
+> **optimizer steps**, and each run saves the **E8 milestone grid**
+> `{1k, 3k, 6.5k, 15k, 30k, 60k}` on a single optimisation path. **E8 therefore moves from Stage 3
+> into Stage 1**, at almost no extra GPU cost, and every Stage 1 experiment can be run both at the
+> paper-comparable 6,500-step checkpoint and at saturation.
+
+0. **E8** training-saturation sweep — *now produced as a by-product of Stage 1 training*
 1. **E1** physical-energy readout
 2. **E2** local conservation failure vs rollout depth
 3. **E3** tangent/normal decomposition
