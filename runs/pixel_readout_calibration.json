@@ -1,0 +1,11 @@
+{
+  "pivot": 35.199999999999875,
+  "fitted_on": {
+    "data": "runs/pendulum_pixels.npz",
+    "trajectories": "0:204"
+  },
+  "median_abs_theta_error_rad": 0.0019082622037430606,
+  "median_abs_theta_error_deg": 0.10933537047881098,
+  "geometric_prediction_250_over_7": 35.714285714285715,
+  "note": "sign and angular offset are NOT fitted; the search returned -1 and +0.0003 rad."
+}

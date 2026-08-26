@@ -31,7 +31,7 @@ packages = ["latent_noether"]
 torch = [{ index = "pytorch-cu128" }]
 
 [[tool.uv.index]]
-name = "world-model-invariants"
+name = "pytorch-cu128"
 url = "https://download.pytorch.org/whl/cu128"
 explicit = true
 
