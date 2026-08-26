@@ -325,3 +325,89 @@ of which `C` is enforced, the edit is a regulariser and says nothing about physi
 until arm B runs on all three conservative seeds.
 
 Next: seeds 4 and 5, then damped 0–2 (~7 h), then E1 arms A/B/C at both H = 50 and H = 100.
+
+---
+
+## 2026-08-26 21:40–21:50 UTC — E1 x E8 cross on seed 3 (still arm A only)
+
+Git at `0905409`. Training: seed 3 at step 24,000 of 60,000; `val_recon` 0.18 and still falling, so
+**not yet saturated**. Each E1 run costs ~25 s, which makes arm B affordable.
+
+Arm A at H = 100, across the E8 milestone grid. `runs/e1_milestone_s3_H100.json` (raw rows).
+
+| step | median abs `D_sec` a=0 -> a=0.4 | paired change, 95% CI | P(improve) | pixel % | decoded E err / std |
+|---|---|---|---|---|---|
+| 1,000 | 3.345e-03 -> 2.392e-03 | -9.53e-04 [-2.17e-03, **+5.91e-04**] | 0.886 | -8.04 | 0.3146 -> 0.2444 |
+| 3,000 | 1.271e-03 -> 1.180e-03 | -9.08e-05 [-6.70e-04, **+2.48e-04**] | 0.706 | -5.52 | 0.1055 -> 0.0857 |
+| 6,500 | 1.279e-03 -> 6.640e-04 | -6.15e-04 [-1.02e-03, -1.90e-04] | 0.998 | -10.95 | 0.0828 -> 0.0634 |
+| 15,000 | 1.989e-03 -> 1.549e-03 | -4.40e-04 [-9.22e-04, -1.91e-04] | 0.996 | -7.89 | 0.1108 -> 0.0929 |
+
+### What this does and does not say
+
+**Bearing on E8's critical question.** The effect is still present at step 15,000 — 2.3x the
+published training budget — with a paired CI excluding zero. That is early evidence *against* the
+"you found coarse physics in a half-trained model" reading, which is the strongest objection to the
+current paper. It is one seed and not yet saturated, so it is a hint, not the E8 result.
+
+**Decoded energy improves at every milestone**, including the two where `D_sec` does not resolve:
+0.315->0.244, 0.106->0.086, 0.083->0.063, 0.111->0.093. Consistently 16-22%. Recorded as a secondary
+metric per the prereg; not promoted, because promoting the metric that happens to look best is
+exactly the failure the prereg exists to prevent.
+
+**An anomaly, recorded because it is inconvenient.** Baseline drift is *worse* at step 15,000 than at
+step 6,500 (1.989e-03 vs 1.279e-03), and baseline decoded-E error likewise (0.111 vs 0.083). More
+training produced worse autonomous energy conservation at this milestone. With n = 1 seed this may
+be noise; if it survives E7's seeds it is interesting in its own right and complicates any simple
+"training fixes it" story. Flagged, not explained.
+
+**step 3,000 is the weakest point** (P = 0.706, CI includes zero). No non-monotone story is offered.
+
+### Status
+
+Still arm A only. **Nothing here supports any claim C1-C6**, because a regulariser would reproduce
+all of it. Arm B — 20 norm-matched random constraints on steps 6,500 and 15,000, H = 100 — launched
+and running.
+
+---
+
+## 2026-08-26 21:50–22:00 UTC — **E1 arm B: the killer arm did not kill it** (seed 3 only)
+
+`runs/e1_armB_s3_H100.json` — 40 rows, 20 norm-matched random degree-4 constraints on each of two
+checkpoints, H = 100. Same 20 draws across checkpoints, so the comparison is paired.
+
+| step 6,500 | recovered `C` | null median | draws beating recovered |
+|---|---|---|---|
+| `D_sec` paired change | -6.148e-04 | +3.858e-03 | **0 / 20** |
+| decoded E error change | -0.0194 | +0.2210 | **0 / 20** |
+| pixel MSE change | -10.95% | +88.42% | **0 / 20** |
+
+| step 15,000 | recovered `C` | null median | draws beating recovered |
+|---|---|---|---|
+| `D_sec` paired change | -4.400e-04 | +2.147e-03 | **0 / 20** |
+| decoded E error change | -0.0179 | +0.1387 | **0 / 20** |
+| pixel MSE change | -7.89% | +62.96% | **0 / 20** |
+
+**Zero of twenty random constraints improve any metric, at either checkpoint.** Every draw makes
+secular drift worse, decoded energy error worse, and pixel error worse.
+
+This is the arm the prereg names as the one that can kill the result — "if projection improves
+rollouts regardless of which `C` is enforced, the edit is merely regularising the rollout and says
+nothing about physics". It did not. It also directly answers Gruver et al. (ICLR 2022), whose
+finding — that HNN generalisation comes from modelling acceptance directly rather than from
+conservation structure — licenses exactly the "it's a generic regulariser" objection.
+
+Stronger than the published result, which found specificity on only 2 of 3 seeds. That difference is
+not yet meaningful: this is **one seed**, and the published failure was on a different one.
+
+### Gate status — still not called
+
+`E1_PREREG` requires both a CI excluding zero *and* an extreme percentile in the arm-B null.
+At H = 100, step 6,500, both hold. But:
+
+1. The **registered primary horizon is H = 50**, where arm A's CI includes zero. Arm B at H = 50 is
+   now running, so the registered horizon can be reported completely rather than skipped.
+2. **One model seed.** The roadmap makes model seed the independent unit for model-level claims.
+3. The **floor-granularity question is still open and still Richard's**, not mine to resolve.
+
+So: arm B is a genuinely strong result and the most encouraging thing so far, and it settles nothing
+on its own. Seeds 4 and 5 decide it.
