@@ -411,3 +411,81 @@ At H = 100, step 6,500, both hold. But:
 
 So: arm B is a genuinely strong result and the most encouraging thing so far, and it settles nothing
 on its own. Seeds 4 and 5 decide it.
+
+---
+
+## 2026-08-26 22:00–22:20 UTC — E1 arm B at the registered horizon; **E2 returns Outcome B**
+
+Git at `8781b0c`. Training: seed 3 at step 36,000 of 60,000.
+
+### E1 arm B at H = 50 — the registered primary horizon
+
+| H = 50, step 6,500 | recovered `C` | null median | draws beating recovered |
+|---|---|---|---|
+| `D_sec` paired change | -2.07e-04 (CI includes 0) | +4.96e-03 | **0 / 20** |
+| decoded E error change | -0.0051 | +0.1441 | **0 / 20** |
+| pixel MSE change | -1.71% | **+152.07%** | **0 / 20** |
+
+A distinction worth keeping sharp: at the registered horizon **specificity passes decisively**
+(0/20, no random draw improves anything) while **magnitude does not resolve** (CI includes zero).
+These are different claims and the paper should not blur them. On seed 3 the gate passes at H = 100
+— the escalation the prereg itself registered — and is specific-but-unresolved at H = 50.
+
+### E2 — and it goes against the roadmap's target mechanism
+
+`runs/e2_s3.json` (registered depth 50), `runs/e2_s3_depth100.json` (secondary depth 100, declared).
+Registered thresholds were fixed in `docs/E2_PREREG.md` before any value existed.
+
+| step | rho_obs | rho(0) | rho(end) | ratio | slope, 95% CI | sinusoid var frac | **outcome** |
+|---|---|---|---|---|---|---|---|
+| 6,500 | 6.27e-03 | 1.011e-02 | 1.037e-02 | **1.65** | +1.20e-05 [-8.40e-06, +3.21e-05] **includes 0** | 0.104 | **B** |
+| 30,000 | 1.48e-02 | 3.239e-02 | 1.757e-02 | **1.18** | -3.81e-05 [-7.26e-05, +4.08e-05] **includes 0** | 0.107 | **B** |
+
+Thresholds: A needs ratio >= 3 *and* a slope CI excluding 0; C needs sinusoid variance >= 0.5.
+Neither is met, at either checkpoint, at either depth. **Outcome B: systematic bias.**
+
+The local conservation defect **does not grow with rollout depth**. It sits at a roughly constant
+level from the first imagined step onward. The whitened nearest-neighbour distance does rise
+(0.00 -> 0.15), so the state *does* drift off the observation-conditioned support — but that drift is
+not accompanied by any deterioration in how well the transition conserves `C`.
+
+**This falsifies, on this seed, the central mechanism the roadmap set out to establish**:
+
+> recursive imagination drives the model into states where that structure is no longer respected
+
+It is not what happens. The transition violates `C` by about the same amount everywhere tested, on
+and off the manifold, and long-horizon error accumulates by *integrating a near-constant per-step
+bias*. That is the roadmap's Outcome B, and its decision tree pre-authorises the response
+("accumulated integrator bias rather than loss of physical structure under distribution shift.
+Refocus accordingly").
+
+### What E2 does support, strongly
+
+The controls separate cleanly on `rho_obs` — how well the transition conserves the scalar at real
+encoded states:
+
+| arm | rho_obs | vs trained |
+|---|---|---|
+| trained conservative, recovered `C` | **6.27e-03** | — |
+| untrained model, its own recovered `C` | 4.63e-01 | 74x worse |
+| trained model, 5 random norm-matched `C` | 5.65e-01 – 1.65e+00 | 90–260x worse |
+
+Two orders of magnitude. The trained model's recovered scalar is conserved by its own transition to
+a degree neither a random constraint nor an untrained network comes close to. This is direct
+evidence for C1 and for specificity, measured on the *operator* rather than on decodability — the
+distinction the paper's probe-vs-dynamics thesis rests on.
+
+### The anomaly is now confirmed by a second, independent measurement
+
+`rho_obs` is **worse at step 30,000 than at step 6,500** (1.48e-02 vs 6.27e-03), matching the E1
+finding that baseline drift and baseline decoded-E error are both worse at the later checkpoint.
+Two independent statistics now say conservation *degrades* with further training on this seed. If
+E7's seeds confirm it, that is a finding in its own right and it cuts against any simple "train
+longer and it goes away" reading of E8.
+
+### Status and what needs Richard
+
+Seed 3 only, so none of this is yet a model-level claim. But the E2 outcome changes what the paper
+argues, not merely how strongly, so it is surfaced now rather than at the end of Stage 1.
+Recommended reframing is written up for Richard; **not acted on** beyond continuing Stage 1 as
+planned.
