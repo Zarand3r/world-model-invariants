@@ -2477,3 +2477,71 @@ collapses 29x. That question is untouched by either prediction and would need it
 
 **Prediction B** — 2-DoF seed 4 at step 60,000 showing `|effect| < 15%` — is still pending; that
 checkpoint has not been reached.
+
+---
+
+## 2026-08-27 14:10–14:25 UTC — **The two-invariant degeneracy is confirmed at full convergence**
+
+Git at `f5ab74a`. Central seed 0 trained to step 60,000 and passed acceptance (1-step decode ratio
+0.004, rollout finite, pixel std 0.0456).
+
+### The joint fit never resolves
+
+| step | joint fit \|rho_E\| | joint fit \|rho_L\| | joint fit ratio | best \|rho_E\| in subspace | best \|rho_L\| in subspace |
+|---|---|---|---|---|---|
+| 3,000 | 0.431 | 0.051 | 8.42e-04 | 0.854 (r2) | 0.759 (r0) |
+| 6,500 | 0.085 | 0.364 | 4.37e-04 | 0.745 (r2) | 0.941 (r0) |
+| 15,000 | 0.290 | 0.264 | 6.90e-05 | 0.741 (r1) | 0.950 (r0) |
+| 30,000 | 0.146 | 0.015 | 2.20e-05 | 0.704 (r1) | 0.967 (r0) |
+| **60,000** | **0.064** | **0.163** | **7.64e-06** | **0.929** (r2) | **0.942** (r0) |
+
+At full convergence the conserved subspace contains **energy at 0.929 and angular momentum at 0.942**
+— both invariants, cleanly separated, at different ranks. The jointly-fitted `C` correlates
+**0.064** with energy.
+
+The matched non-central arm — same pipeline, same budget, same architecture, **one parameter
+different** — reached **0.9874** at the same step.
+
+### This is not slow convergence, it is a structural failure
+
+The earlier reading was that the central joint fit might resolve later, as the non-central one did
+between steps 6,500 and 15,000. It does not. Five checkpoints spanning a 20x range of training:
+
+- the **subspace** improves monotonically and ends excellent (`|rho_L|` 0.759 -> 0.942, `|rho_E|`
+  reaching 0.929)
+- the **invariance ratio** of the fitted `C` improves monotonically by two orders of magnitude
+  (8.4e-04 -> 7.6e-06), so the fit is finding something extremely well conserved
+- the **identification** never improves; it ends worse than it started (0.431 -> 0.064)
+
+`fit_hamiltonian_pair` is finding a genuinely conserved direction that is a **mixture** of energy and
+angular momentum. With both exactly conserved and both generating flows, every combination is also
+conserved and pairs with some antisymmetric operator, so the criterion has no unique optimum. More
+training sharpens the subspace and does nothing for the degeneracy, exactly as it should if the
+problem is identifiability rather than estimation.
+
+### The finding, stated completely
+
+Across three converging lines of evidence, all at frozen hyperparameters:
+
+1. **Methodological** — with two independent invariants the flow-alignment criterion has no unique
+   solution, and the joint fit returns a conserved mixture instead of either invariant (this entry,
+   5 checkpoints, matched control).
+2. **Functional** — a model whose invariant is not isolated **cannot be repaired**: +4.6% against the
+   matched arm's -57.6%, despite having 1.56x *more* drift to correct (E8b prediction A, registered
+   in advance).
+3. **Specificity** — and it is not merely ineffective: **10 of 12 random directions beat it**, where
+   every other conservative arm in the project is 0/N.
+
+`fit_hamiltonian_pair`'s docstring presents flow alignment as the **solution** to the
+`E`, `E^2`, `EL`, `L^2` degeneracy at degree 4. On a system with two genuinely independent
+invariants it is instead **subject to** that degeneracy. That is a correction to a documented claim
+in the codebase, established by a matched pair that differs in one parameter.
+
+### Scope and limits
+
+One central seed, five checkpoints, with the non-central arm as a matched control at every step.
+Central seeds 1 and 2 are queued. **No fix is being attempted** — the registered order is to record
+frozen-setting behaviour, and a remedy (for instance, searching a two-dimensional pairing subspace
+rather than a single direction) would be a new method and a separate experiment.
+
+This is invisible on a 1-DoF pendulum, which has only one invariant to find.
