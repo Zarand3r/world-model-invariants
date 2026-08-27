@@ -844,3 +844,79 @@ be relied on.
 ### Status
 
 Damped models still untrained, so arm C remains the one unrun arm of Stage 1.
+
+---
+
+## 2026-08-27 02:10–02:30 UTC — **Arm C, the damped refusal control: decisive on recovery, partial on intervention**
+
+Git at `8fa62df`. Seed 5 trained; damped seed 0 at step 6,500. Last unrun arm of Stage 1.
+
+### A metric correction that had to be made first
+
+The conservative metric cannot be reused unmodified. On a damped pendulum energy **genuinely
+decays**, so a nonzero `D_sec` is *correct physics* there:
+
+| dataset | true median `D_sec` |
+|---|---|
+| conservative | -2.11e-04 |
+| damped, zeta = 0.03 | **-3.93e-02** (186x larger) |
+
+Driving abs `D_sec` toward zero on the damped arm would mean the model **fails to dissipate**. The
+correct arm-C statistic is therefore deviation from correct physics,
+`|D_sec_decoded - D_sec_true|`, and both are reported below. Applying the conservative metric here
+unmodified would have produced a meaningless number.
+
+### Recovery side — decisive refusal
+
+| model | `rho_obs` |
+|---|---|
+| conservative s3 / s4 / s5 | 6.27e-03 / 8.65e-03 / 6.85e-03 |
+| **damped s0** | **3.74e-01** |
+| untrained | 3.87e-01 – 4.96e-01 |
+| random `C` | 7.9e-01 – 1.08e+00 |
+
+The damped model's best recovered scalar is conserved by its own transition **55x worse** than the
+conservative models', and sits in the same range as an untrained network's. The extraction does not
+manufacture a conserved quantity when the underlying dynamics have none. E2's depth ratio on the
+damped model is 1.02 — flat, as everywhere else.
+
+This is the arm that distinguishes "we found the physics" from "our pipeline always finds something",
+and it comes down on the right side.
+
+### Intervention side — partial refusal, weaker than registered
+
+`E1_PREREG` registered arm C as "no improvement, or harm". Measured at eps = 0.02, H = 100:
+
+| statistic | eps 0 -> 0.02 | conservative arm for comparison |
+|---|---|---|
+| pixel MSE | **+0.2%** | -8 to -11% |
+| deviation from true physics | **-11.0%** | -32 to -51% |
+| abs `D_sec` | 3.990e-02 -> 3.975e-02 | — |
+| random draws, deviation | +2.4% | +9.8 to +16.9% |
+
+Pixel MSE meets the registration (no improvement). Deviation from true physics does **not**: it
+improves by 11%, where the registration expected none. The improvement is roughly a quarter of the
+conservative arm's, and it still beats the damped model's own random draws (-11.0% vs +2.4%).
+
+**Reported as a partially met expectation, not as a pass.** The honest reading is that the damped
+model's recovered scalar carries some weak usable structure — unsurprising, since a damped pendulum
+still has a well-defined decaying energy that a latent could track — but nothing resembling a
+conserved quantity, and the intervention benefit is 4x smaller than on conservative models.
+
+### Caveats
+
+- **One damped model.** Seeds 1 and 2 are still training; `E1_PREREG` and `DISSIPATIVE_PREREG` both
+  register the criterion over 3 seeds, so no damped claim is settled yet.
+- 10 random draws and 3 tangent controls on this arm, against 20 and 5 elsewhere, to keep it inside
+  one iteration. Raw rows are in `runs/e1_armC_damped_s0.json`.
+
+### Stage 1 arm status
+
+| arm | status |
+|---|---|
+| A conservative, recovered `C` | complete, n = 3, -32 to -51% |
+| B magnitude-matched random | complete, 0/60 |
+| B' equal-norm tangent | complete, +2.4 to +7.8% |
+| **C damped, its own `C`** | **n = 1, partial** |
+| D untrained | complete, `rho_obs` 57-74x worse |
+| E9 disjoint evaluation | complete, seed 3, -48.2% on 512 unseen trajectories |
