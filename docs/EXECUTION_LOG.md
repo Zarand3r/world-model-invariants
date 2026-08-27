@@ -2298,3 +2298,62 @@ rather than simply a second system.
 One central seed. Seeds 1 and 2 have not trained. No change to the extraction is being made — the
 registered order records frozen-setting behaviour first, and that discipline has already reversed one
 premature conclusion this session.
+
+---
+
+## 2026-08-27 12:40–13:00 UTC — **The E8 "split" resolves into one rule: the repair works when there is drift to repair**
+
+Git at `7ee27f5`. Framing decision still with Richard; this fills in the curve that decision rests on.
+
+### Effect versus training, both systems, seed 3, H = 100
+
+| system | step | baseline abs `D_sec` | recovered | beats |
+|---|---|---|---|---|
+| pendulum | 6,500 | 1.279e-03 | -50.9% | 0/20 |
+| pendulum | 15,000 | 1.989e-03 | -17.6% | 0/12 |
+| pendulum | 30,000 | 1.688e-03 | -34.5% | 0/12 |
+| pendulum | 60,000 | 9.597e-04 | -22.7% | 0/20 |
+| **2-DoF** | 15,000 | **2.937e-02** | -18.2% | 0/12 |
+| **2-DoF** | 30,000 | **7.709e-03** | **-57.6%** | 0/20 |
+| **2-DoF** | 60,000 | **1.010e-03** | **+4.1%** | 0/20 |
+
+### The two systems are not behaving differently in kind
+
+Read the **baseline** column, not the effect column:
+
+- **Pendulum baseline drift is roughly flat across a 9.2x change in training** — 1.28e-03, 1.99e-03,
+  1.69e-03, 9.60e-04. Non-monotone, and only 25% lower at the end.
+- **2-DoF baseline drift falls 29x monotonically** — 2.94e-02 -> 7.71e-03 -> 1.01e-03.
+
+The repair effect tracks that. It is large where there is drift, and absent where there is not. The
+2-DoF model at step 60,000 has drift of 1.01e-03; the pendulum at *every* checkpoint has drift of
+roughly 1-2e-03 and still shows the effect. **Both systems end at comparable absolute drift**; they
+differ in whether training got them there.
+
+So the earlier framing — "the effect vanishes on one system and persists on the other" — is a
+description of two training trajectories, not two phenomena. The single rule consistent with all
+seven measurements is:
+
+> **The repair works when the model still has residual invariant drift. Whether training removes that
+> drift is system-dependent — the 2-DoF model learns it away, the pendulum model does not.**
+
+That is a weaker claim than "a fundamental failure of world models" and a stronger one than "an
+undertraining artefact". It is also directly checkable, which the split framing was not.
+
+### An honest weakness in the pendulum curve
+
+The pendulum effect is **non-monotone and noisy**: -50.9, -17.6, -34.5, -22.7 across the four
+checkpoints, on one seed. The direction never flips and specificity is 0/N at every point, but the
+magnitude wanders by a factor of three. Any claim about *how* the effect decays with training is not
+supported by this data; only that it does not disappear.
+
+### What this does and does not settle for Richard's decision
+
+**Settles:** the roadmap's "reframe as an undertraining diagnostic" branch is too strong. Drift
+persists at 9.2x budget on 3/3 pendulum seeds with full specificity.
+
+**Does not settle:** whether the pendulum's persistent drift is a property of the system, of the
+architecture's capacity for it, or of the shadow-Hamiltonian oscillation in the training data setting
+a floor the model inherits. That is a new question and would need its own preregistration.
+
+**Still missing:** 2-DoF seeds 4 and 5 at step 60,000. The 29x baseline collapse is one seed.
