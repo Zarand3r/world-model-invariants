@@ -1477,3 +1477,93 @@ E10 cannot be settled on a 1-DoF pendulum with a 40-candidate pool. Two follow-u
    matched band needs. This is an independent argument for the 2-DoF work beyond the "energy is the
    only thing to find" objection — the control that most directly tests the paper's central thesis
    may simply not be constructible on a pendulum.
+
+---
+
+## 2026-08-27 06:40–07:15 UTC — E11 passes; **E12's registered test was mis-specified — the third such case**
+
+Git at `b07799d`. Damped seed 2 trained and passed acceptance: **all six models complete**, Stage 1
+training finished.
+
+### E10, final: structurally impossible on this system
+
+Enlarging the candidate pool from 40 to **250** (the prereg fixes band width, not pool size) does not
+help. On seed 3, of 250 eigenfamily candidates, **exactly 1 has `|rho_E|` > 0.3.**
+
+| pool | candidates with \|rho_E\| > 0.9 | > 0.5 | > 0.3 | in +-0.10 band |
+|---|---|---|---|---|
+| 250 | 1 | 1 | 1 | 1 |
+
+E10 requires variation in decodability at matched conservation. This system provides **essentially
+no variation in decodability at all** within the conserved family. E10 is not merely underpowered
+here — it is not constructible. Recorded as such; it is now a 2-DoF experiment.
+
+### E11 step 1 — `D_sec` is phase-invariant, as registered
+
+Time-shifting real rendered trajectories by 1, 2, 5, 10 steps moves median abs `D_sec` by at most
+**1.63e-04**, against the registered readout floor of 1.0e-03. Energy does not depend on phase, and
+the metric behaves accordingly.
+
+### E11 step 2 — the intervention repairs energy, not timing
+
+| seed | energy drift | phase error | lag |
+|---|---|---|---|
+| 3 | 1.28e-03 -> 6.28e-04 (**-50.9%**) | 0.066 -> 0.057 (-13.4%) | 0.00 -> 0.00 |
+| 4 | 1.13e-03 -> 6.53e-04 (**-42.2%**) | 0.068 -> 0.059 (-13.0%) | 1.00 -> 0.00 |
+| 5 | 1.14e-03 -> 7.74e-04 (**-32.2%**) | 0.068 -> 0.054 (-20.5%) | 0.00 -> 0.00 |
+
+Registered prediction met on all three seeds: energy drift falls two to four times more, in relative
+terms, than phase error. **The Samanta & Behera phase rival is answered** — both structurally (step 1)
+and empirically (step 2).
+
+### E12 — registered test FAILED, and the test was the problem
+
+| seed | \|Spearman(C, E)\| on unedited rollouts | registered threshold |
+|---|---|---|
+| 3 | 0.194 | > 0.5 |
+| 4 | 0.121 | > 0.5 |
+| 5 | 0.189 | > 0.5 |
+| random `C` (n = 20) | 0.140 | — |
+
+The recovered `C` scores **0.194 against random `C` at 0.140**. A test in which the treatment barely
+separates from its own null is a test without power, not evidence of a dormant pathway.
+
+**Diagnosis (exploratory, labelled as such).** Within one rollout, `C`'s standard deviation is
+**3-4% of its across-trajectory standard deviation** — which is exactly what "conserved" means. The
+registered test correlates two near-constant quantities within a trajectory, so it correlates noise.
+
+Exploratory diagnostics, reported including the uncomfortable one:
+
+| seed | across-traj Spearman(C_0, E_0) | across-traj Spearman(dC, dE) |
+|---|---|---|
+| 3 | **+0.963** | +0.356 |
+| 4 | **+0.850** | -0.124 |
+| 5 | **+0.978** | +0.167 |
+
+`C` encodes energy very strongly across trajectories. But **how much `C` drifts does not strongly
+predict how much decoded energy drifts** (+0.356, -0.124, +0.167). That is not what a simple
+"C-drift causes E-drift" story predicts, and it is recorded rather than explained. A cleaner version
+would compare secular slopes rather than endpoint differences, since endpoint `dE` mixes drift with
+shadow-Hamiltonian oscillation — but that is a **new test and will be preregistered as E12b**, not
+substituted for the one that failed.
+
+**The Makelov dormant-pathway objection is therefore NOT resolved.** It remains open.
+
+### The pattern, stated plainly: three mis-specified controls
+
+| experiment | registered statistic | why it failed |
+|---|---|---|
+| **E3** | isotropic null `1/LD` | assumed `dz` isotropic; every arm fell below it, so no arm could reach the null |
+| **E2b** | damped models as the `beta ~ 1` positive control | damped recovered `C` is not energy-correlated, so `|dC|` saturates at k=1 |
+| **E12** | within-trajectory Spearman(C, E) | both quantities near-constant within a trajectory, so it correlates noise |
+
+All three share one cause: **a threshold was registered on a statistic without first checking that
+the statistic had the dynamic range to detect anything.** In each case the diagnosis came from the
+arm that was supposed to be easy.
+
+Standing rule adopted for the remainder of the project, and it should be in the paper's methods:
+**before registering a threshold, validate the statistic on a signal with a known answer** — as was
+eventually done for E2b (synthetic random walk 0.473, drift 1.000, saturated noise 0.006) and should
+have been done first.
+
+This costs little when followed and has now cost three experiments when not.
