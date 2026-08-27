@@ -639,3 +639,81 @@ bit-exact claim, and so a future re-run landing on slightly different digits is 
 
 n = 2 conservative seeds. Seed 5 and damped 0-2 still to train (~4 h). Arm C (damped) has not run at
 all yet — it is the refusal control and remains outstanding.
+
+---
+
+## 2026-08-27 00:40–00:55 UTC — **Stage 1 conservative arm complete at n = 3**
+
+Git at `cb0529d`. Seed 4 trained and passed acceptance (raw KL 1.33, decode ratio 0.003, rollout
+finite). Seed 5 is at step 15,000; its step-6,500 checkpoint exists, so all three conservative seeds
+can be compared at the paper-comparable milestone.
+
+### Direction-matched null, all three seeds (step 6,500, H = 100, eps = 0.02)
+
+| seed | baseline abs `D_sec` | recovered | recovered % | random % | tangent % | random beats recovered |
+|---|---|---|---|---|---|---|
+| 3 | 1.279e-03 | 6.282e-04 | **-50.9** | +16.9 | +7.8 | 0/20 |
+| 4 | 1.130e-03 | 6.531e-04 | **-42.2** | -8.0 | -8.7 | 0/20 |
+| 5 | 1.142e-03 | 7.740e-04 | **-32.2** | +10.2 | +2.4 | 0/20 |
+
+- recovered: median **-42.2%**, range [-50.9, -32.2]
+- random: median +10.2%, range [-8.0, +16.9]
+- tangent: median +2.4%, range [-8.7, +7.8]
+- **0 / 60 random directions beat the recovered one**, and the recovered and random ranges **do not
+  overlap across seeds**
+
+With step magnitude held fixed, correcting along the recovered invariant's normal reduces secular
+drift in **true decoded physical energy** by 32–51% on every seed, while random directions of
+identical size and equal-norm tangent steps do not help at all. Model seed is the independent unit
+here, as the roadmap requires, and with n = 3 the honest summary is the range, not a CI.
+
+For comparison, the published paper reports pixel-MSE specificity on **2 of 3** seeds using a
+coefficient-norm-matched null that, as Audit 1 showed, does not control edit magnitude at all. This
+is 3 of 3 on a physical metric with a control that does.
+
+At the smaller step (eps = 0.01) seed 5 shows 3/20 random directions beating the recovered one, so
+the separation is dose-dependent. Recorded rather than smoothed over: the clean claim is at
+eps = 0.02, and the eps = 0.01 column is in the raw rows.
+
+### E2 Outcome B, now 5/5 checkpoints across three seeds
+
+| | rho_obs | ratio | sinusoid frac | outcome |
+|---|---|---|---|---|
+| s3 step 6,500 | 6.27e-03 | 1.65 | 0.104 | B |
+| s3 step 30,000 | 1.49e-02 | 1.18 | 0.107 | B |
+| s4 step 6,500 | 8.65e-03 | 1.47 | 0.101 | B |
+| s4 step 30,000 | 6.61e-03 | 1.64 | 0.098 | B |
+| s5 step 6,500 | 6.85e-03 | 0.92 | 0.103 | B |
+
+Registered thresholds (ratio >= 3 for A, sinusoid >= 0.5 for C) are not approached at any
+checkpoint on any seed. Seed 5's ratio of 0.92 means the defect is *smaller* at depth 100 than at
+observation-conditioned states. The amended C3 stands.
+
+### Operator-level specificity, all three seeds
+
+| seed | trained recovered `C` | untrained | random `C` |
+|---|---|---|---|
+| 3 | 6.27e-03 | 4.63e-01 (74x) | ~7.9e-01 |
+| 4 | 8.65e-03 | 4.96e-01 (57x) | 9.12e-01 (105x) |
+| 5 | 6.85e-03 | 3.87e-01 (57x) | 1.08e+00 (158x) |
+
+Two orders of magnitude on every seed, with no intervention involved — this measurement is immune to
+the edit-magnitude confound that Audit 1 found in the intervention arms.
+
+### Claim status
+
+- **C1 emergence** — supported at n = 3. Every seed recovers a scalar its own transition preserves
+  ~100x better than any matched random constraint or untrained network.
+- **C2 physical validity** — supported at n = 3. Correcting it improves *true decoded physical
+  energy*, not merely pixels, on every seed, with a magnitude-matched null.
+- **C3 failure mechanism (amended)** — supported at 5/5 checkpoints. Depth-independent per-step
+  violation, not loss of support.
+- **C4 causal control** — untested. This is E4 and has not been run.
+- **C5, C6** — untested.
+
+### Outstanding
+
+**Arm C, the damped refusal control, still has not run** — those models train last (~3 h). Until it
+does, the specificity story is one-sided: we have shown the recovered direction beats random
+directions *within* conservative models, but not that the pipeline declines to produce a useful
+direction when the underlying dynamics have no conserved quantity.
