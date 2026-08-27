@@ -2670,3 +2670,64 @@ an argument for building summaries from raw rows rather than from notes.
 
 The first generated table used `|D_sec|` as a column header, whose pipes break markdown tables.
 Renamed to `abs D_sec`. Caught by reading the rendered output rather than the script.
+
+---
+
+## 2026-08-27 15:40–16:00 UTC — Two-factor account tested **within** a checkpoint, with drift controlled
+
+Git at `c7fdd98`. Non-central seed 5 at step 20,000.
+
+### The cleanest available look at the account
+
+Every previous test of the two-factor account compared **across** training steps, where drift and
+identification move together. Step 15,000 on the 2-DoF non-central arm gives three seeds at the
+**same training step with nearly identical baseline drift**, so identification is the only variable.
+
+| seed | baseline drift | \|rho_E\| | repair | random beating it |
+|---|---|---|---|---|
+| 3 | 2.937e-02 | 0.909 | -18.2% | 0/12 |
+| 4 | 2.736e-02 | **0.932** | **-21.0%** | 0/12 |
+| 5 | 2.761e-02 | **0.580** | **-8.8%** | **2/12** |
+
+- baseline spread across seeds: **1.073x** — drift effectively controlled
+- `|rho_E|` spread: 0.580 to 0.932
+- Pearson(`|rho_E|`, magnitude of repair) = **+0.987**
+
+**And the specificity failure lands exactly where the account says it should.** Seed 5 has the worst
+identification and is the **only** conservative arm anywhere in this project to have random
+directions beat the recovered one (2/12). Every other conservative arm — pendulum at every
+checkpoint, 2-DoF seeds 3 and 4, disjoint evaluations — is 0/N.
+
+### Stated at the strength the data supports
+
+**n = 3 is three points.** A Pearson correlation of +0.987 on three points is not statistically
+meaningful; it would not clear any reasonable significance threshold. This is **consistent with** the
+two-factor account, not a test of it, and it is recorded that way.
+
+What is more than a correlation is the **ordering plus the specificity failure**: the weakest-
+identified seed is the weakest repairer *and* the only one whose null overlaps it. That is a
+qualitative prediction of the account, made in `E8B_PREREG` before these seeds were measured
+("the repair needs both a well-identified invariant and residual drift"), and it holds.
+
+### 2-DoF recovery at n = 3
+
+| seed | step 6,500 | step 15,000 | step 60,000 |
+|---|---|---|---|
+| 3 | 0.158 | 0.909 | **0.9874** |
+| 4 | 0.376 | 0.932 | **0.9874** |
+| 5 | 0.283 | 0.580 | pending |
+
+All three seeds show the early-checkpoint failure at step 6,500 (joint fit below the best raw
+eigenvector on every seed), and the two that have reached step 60,000 land on **0.9874 to four
+decimal places**. Seed 5 lags at step 15,000, which is what makes the within-checkpoint comparison
+above possible at all.
+
+### Also this iteration
+
+`docs/E14_PREREG.md` written before any OOD data exists — the out-of-distribution energy test that
+answers the case-based-retrieval objection (Kang et al., ICML 2025). It records explicitly that **E9
+does not answer this**: E9 scored unseen trajectories from the *same* initial-condition
+distribution, which is trajectory disjointness, not distribution shift. The prereg fixes the two
+energy bands, requires the readout floor to be re-measured **on the OOD band at the horizon in
+use** — the 2026-08-27 floor correction applies — and states the falsifier for our own claim as
+plainly as the one for the rival.
