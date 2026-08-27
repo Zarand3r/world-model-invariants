@@ -2731,3 +2731,84 @@ distribution, which is trajectory disjointness, not distribution shift. The prer
 energy bands, requires the readout floor to be re-measured **on the OOD band at the horizon in
 use** — the 2026-08-27 floor correction applies — and states the falsifier for our own claim as
 plainly as the one for the rival.
+
+---
+
+## 2026-08-27 16:00–16:30 UTC — **E14: the frozen invariant does not transfer out of distribution** (registered falsifier fired)
+
+Git at `e9f16bd`. Preregistered in `docs/E14_PREREG.md` before any OOD data existed.
+
+### Two structural findings before any result
+
+**1. The HIGH band is impossible on the pendulum.** With the `|thetadot| = 8` clip, the maximum
+attainable energy is `(1/6)(64) + 5cos(pi) = 5.667`. The training distribution already reaches
+**5.607** — **99% of the simulator's ceiling**. Higher-energy trajectories necessarily hit the clip
+and are rejected. Only the LOW band is constructible here. (The 2-DoF system has no such clip, so it
+could test HIGH — another capability the pendulum lacks.)
+
+**2. The repair arm is not resolvable on the OOD band.** The prereg required the readout floor to be
+measured on the OOD band before quoting any effect. Measured:
+
+| | rendered-frame floor | **reconstruction floor** |
+|---|---|---|
+| in-distribution | 2.31e-04 | **2.26e-04** |
+| **OOD LOW** | 2.18e-05 | **6.54e-03** (29x worse) |
+
+The readout itself works **better** on OOD rendered frames. The *model* reconstructs them 29x worse,
+putting the floor above typical baseline drift (~1e-03). The repair test cannot be run at the
+required resolution and is **not reported** rather than reported weakly.
+
+### E14 prediction 1: FAILED
+
+Registered: `|rho_E|` on the OOD band stays above 0.7. Frozen `C`, `h_mean`, `U`, `R`, no refitting:
+
+| seed | \|rho_E\| in-distribution | \|rho_E\| OOD LOW | retained |
+|---|---|---|---|
+| 3 | 0.9730 | **0.0319** | 0.03x |
+| 4 | 0.9299 | **0.2025** | 0.22x |
+| 5 | 0.9657 | **0.3076** | 0.32x |
+
+**The registered falsifier for our own claim has fired**: "if the effect vanishes or reverses on
+either band, the repair is confined to the training distribution and every claim in the project must
+be qualified as in-distribution."
+
+### The diagnostic that says what actually failed
+
+Two readings were possible and they mean very different things, so both were tested rather than one
+assumed. A **fresh** polynomial probe fitted on the OOD latents:
+
+| seed | frozen `C` on OOD | **fresh probe on OOD** | fresh probe in-distribution |
+|---|---|---|---|
+| 3 | 0.032 | **0.9991** | 1.0000 |
+| 4 | 0.203 | **0.9984** | 0.9999 |
+| 5 | 0.308 | **0.9990** | 0.9999 |
+
+**The latent encodes out-of-distribution energy essentially perfectly.** The encoder generalises. What
+fails is the **frozen degree-4 polynomial**, which was fitted on one energy band and does not
+extrapolate to another.
+
+That is a much more specific statement than "the model does case-based retrieval", and it points the
+other way on the question that motivated E14. Kang et al.'s reading is that the *model* fails OOD;
+here the model's representation is fine (probe 0.999) and the **extraction method's function class**
+is what fails to transfer. A degree-4 polynomial fitted on a bounded region extrapolating badly is
+unsurprising in hindsight; it had not been tested.
+
+### What must now be qualified
+
+Every claim in this project about the recovered invariant is **in-distribution**. Specifically:
+
+- `C` tracks true energy at 0.93-0.99 **on the distribution it was fitted on**, and at 0.03-0.31
+  outside it.
+- Whether the *repair* transfers OOD is **untested and currently untestable on this system**, because
+  the model's reconstruction floor exceeds the signal.
+- E9's disjoint result stands, and its scope is unchanged: unseen **trajectories**, same
+  distribution.
+
+This does **not** retract the in-distribution results — E9, E4, E6 and the direction-matched nulls
+are all unaffected. It bounds them.
+
+### Open, and worth doing
+
+Whether **refitting** `C` on OOD latents recovers a scalar that is again conserved and repairs there
+would separate "the invariant is local" from "the method needs refitting per region". That is a new
+experiment and would need its own registration.

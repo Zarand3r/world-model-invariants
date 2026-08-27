@@ -69,7 +69,9 @@ def damped_step(state, zeta: float, dt: float = 0.05, g: float = 10.0, l: float 
     return np.array([th + thd * dt, thd])
 
 
-def main(n_traj: int, n_steps: int, seed: int, out: str, zeta: float = 0.0):
+def main(n_traj: int, n_steps: int, seed: int, out: str, zeta: float = 0.0,
+         th_lo: float = 0.0, th_hi: float = TH_MAX,
+         thd_lo: float = 0.0, thd_hi: float = THD_MAX):
     env = gym.make("Pendulum-v1", render_mode="rgb_array")
     u = env.unwrapped
     rng = np.random.default_rng(seed)
@@ -82,7 +84,19 @@ def main(n_traj: int, n_steps: int, seed: int, out: str, zeta: float = 0.0):
     while kept < n_traj and attempts < n_traj * 4:
         attempts += 1
         env.reset(seed=int(rng.integers(0, 2 ** 31)))
-        u.state = np.array([rng.uniform(-TH_MAX, TH_MAX), rng.uniform(-THD_MAX, THD_MAX)])
+        # E14 (docs/E14_PREREG.md) needs initial conditions OUTSIDE the training band. The
+        # defaults reproduce the training distribution exactly; the --th-lo/--thd-lo arguments let
+        # an out-of-distribution energy band be generated with everything else identical.
+        if th_lo == 0.0 and thd_lo == 0.0:
+            # EXACT original sampling. `uniform(0, hi) * choice(+-1)` is distributionally identical
+            # to `uniform(-hi, hi)` but consumes the RNG differently, so regenerating the training
+            # dataset through the new branch would produce DIFFERENT trajectories and break the
+            # data_sha256 provenance chain the checkpoints record (M29). Defaults stay bit-exact.
+            th, thd = rng.uniform(-th_hi, th_hi), rng.uniform(-thd_hi, thd_hi)
+        else:
+            th = rng.uniform(th_lo, th_hi) * rng.choice([-1.0, 1.0])
+            thd = rng.uniform(thd_lo, thd_hi) * rng.choice([-1.0, 1.0])
+        u.state = np.array([th, thd])
         st, fr = [], []
         clipped = False
         for _ in range(n_steps):
@@ -123,6 +137,10 @@ def main(n_traj: int, n_steps: int, seed: int, out: str, zeta: float = 0.0):
 
 if __name__ == "__main__":
     a = argparse.ArgumentParser()
+    a.add_argument("--th-lo", type=float, default=0.0)
+    a.add_argument("--th-hi", type=float, default=TH_MAX)
+    a.add_argument("--thd-lo", type=float, default=0.0)
+    a.add_argument("--thd-hi", type=float, default=THD_MAX)
     a.add_argument("--n-traj", type=int, default=256)
     a.add_argument("--n-steps", type=int, default=120)
     a.add_argument("--seed", type=int, default=0)
@@ -131,4 +149,5 @@ if __name__ == "__main__":
                    help="linear damping; 0 is the conservative dataset, 0.15 the GRU control value")
     a = a.parse_args()
     print("Building a PIXEL dataset from gymnasium Pendulum-v1 (real third-party simulator).")
-    main(a.n_traj, a.n_steps, a.seed, a.out, zeta=a.zeta)
+    main(a.n_traj, a.n_steps, a.seed, a.out, zeta=a.zeta,
+         th_lo=a.th_lo, th_hi=a.th_hi, thd_lo=a.thd_lo, thd_hi=a.thd_hi)
