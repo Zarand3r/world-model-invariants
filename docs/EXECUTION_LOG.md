@@ -2231,3 +2231,70 @@ and is now recorded as wrong.
 
 **Paused for Richard.** This bears directly on how the paper frames its central claim, and the
 roadmap's own decision tree does not adjudicate a split result.
+
+---
+
+## 2026-08-27 12:10–12:30 UTC — **E8 pendulum at n=3: effect survives 9.2x training on 3/3 seeds.** Central degeneracy confirmed
+
+Git at `c3c1e23`. Framing question remains with Richard; this iteration gathers the evidence that
+decision rests on, without pre-empting it.
+
+### E8 on the pendulum, now n = 3
+
+| seed | step 6,500 baseline | rec % | beats | step 60,000 baseline | rec % | beats |
+|---|---|---|---|---|---|---|
+| 3 | 1.279e-03 | -50.9 | 0/20 | 9.597e-04 | **-22.7** | 0/20 |
+| 4 | 1.130e-03 | -42.2 | 0/20 | 1.436e-03 | **-32.9** | 0/20 |
+| 5 | 1.142e-03 | -32.2 | 0/20 | 9.978e-04 | **-26.8** | 0/20 |
+
+- step 6,500: median **-42.2%**, range [-50.9, -32.2]
+- step 60,000: median **-26.8%**, range [-32.9, -22.7]
+- **3 of 3 seeds retain the effect at 9.2x the published training budget**
+- **0/60 random directions beat the recovered one at either checkpoint**
+- Baselines do **not** systematically fall: seed 4's *rises* (1.13e-03 -> 1.44e-03)
+
+The pendulum half of the E8 split is now solid at n = 3. The effect weakens with training —
+roughly -42% to -27% — but it does not vanish, it stays specific on every seed, and the underlying
+drift does not disappear.
+
+**This changes the balance of the split.** The pendulum "persists" result is n = 3 with full control
+arms; the 2-DoF "vanishes" result is **n = 1**. The split is currently strong evidence on one side
+and a single observation on the other, and should be described that way until 2-DoF seeds 4 and 5
+reach step 60,000.
+
+### Central arm: the two-invariant degeneracy is confirmed
+
+| step | recovered `C` \|rho_E\| | recovered `C` \|rho_L\| | best \|rho_E\| in pool | best \|rho_L\| in pool |
+|---|---|---|---|---|
+| 3,000 | 0.431 | 0.051 | 0.854 (r2) | 0.759 (r0) |
+| 6,500 | 0.085 | 0.364 | 0.745 (r2) | 0.941 (r0) |
+| 15,000 | 0.290 | 0.264 | 0.741 (r1) | 0.950 (r0) |
+| **30,000** | **0.146** | **0.015** | 0.704 (r1) | **0.967** (r0) |
+
+The subspace gets **monotonically better** at isolating angular momentum (0.759 -> 0.967) while the
+joint fit gets **worse** (0.431 -> 0.146 on energy, and 0.015 on angular momentum at step 30,000).
+At the same checkpoint the matched non-central arm's joint fit reached **0.966**.
+
+That is the controlled comparison the matched pair was built for: **same pipeline, same training
+budget, same architecture, one parameter different — and the joint fit works with one invariant and
+fails with two.**
+
+`fit_hamiltonian_pair` searches for a single direction pairing with an antisymmetric operator via
+`F ~ B grad C`. With two exactly-conserved invariants that both generate flows, and every combination
+of them also conserved, the criterion has no unique solution. The function's docstring treats flow
+alignment as the **solution** to the `E`, `E^2`, `EL`, `L^2` degeneracy; on a system with two
+genuinely independent invariants it is instead **subject to** it.
+
+**Registered outcome:** `E17_PREREG` prediction 2 required a two-dimensional conserved subspace with
+a second direction at `|rho_L| > 0.8`. **The subspace delivers it** (0.967). **The extraction
+procedure does not isolate it.** Both halves are reported.
+
+This is a limitation of the **method**, not of the model under study, and it is structurally
+invisible on a pendulum. It is the clearest scientific return so far from having built a matched pair
+rather than simply a second system.
+
+### Not concluded
+
+One central seed. Seeds 1 and 2 have not trained. No change to the extraction is being made — the
+registered order records frozen-setting behaviour first, and that discipline has already reversed one
+premature conclusion this session.
