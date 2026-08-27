@@ -1409,3 +1409,71 @@ the effect should *persist* at saturation, which is E8's question and is not yet
 prediction, not a result.
 
 Sub-diffusive `beta` on two of three seeds is not explained and is not being explained here.
+
+---
+
+## 2026-08-27 06:35–07:00 UTC — **E10 inconclusive as registered; the reason is itself informative**
+
+Git at `f4bce31`. Richard approved the order E10 -> E11 -> E12 -> 2-DoF system.
+
+Preregistered in `docs/E10_PREREG.md` before any E10 quantity existed. Candidates come from the
+existing eigenfamily (`polynomial_invariants`), each carrying its invariance ratio; no new fitting.
+
+### The registered primary could not be computed
+
+`E10_PREREG` requires >= 8 candidates whose `|rho_E|` is within +-0.05 of the recovered `C`'s,
+widening once to +-0.10, and otherwise reporting **inconclusive for lack of matched candidates,
+not re-tuned further**.
+
+With a 40-candidate pool, **exactly 1 candidate** falls inside +-0.10 on every seed. The guard
+fires. Reported inconclusive, band not widened again.
+
+### Why the band is empty — not the reason the prereg predicted
+
+The prereg anticipated a narrow band on the grounds that "the best-conserved scalars *are* the
+energy-like ones". The measured structure is different and more interesting:
+
+| seed | candidates with `|rho_E|` > 0.8 | > 0.5 | ratio range |
+|---|---|---|---|
+| 3 | 1/40 | 1/40 | 5.3e-05 – 4.1e-01 |
+| 4 | 1/40 | 1/40 | 1.0e-04 – 4.2e-01 |
+| 5 | 1/40 | 1/40 | 8.0e-05 – 4.5e-01 |
+
+The family contains **many** well-conserved candidates but only **one** that is linearly
+energy-correlated. The likely reason is that any function of `E` is also conserved — `E^2`, `E^3`,
+mixtures — and those decorrelate *linearly* with `E` while remaining perfectly conserved. So the pool
+is bimodal in `|rho_E|`: one high member and a long low tail, with nothing in between to match
+against.
+
+### Registered secondary — reported regardless, and it points the right way
+
+| seed | Spearman(ratio, improvement) | Spearman(\|rho_E\|, improvement) | Spearman(ratio, \|rho_E\|) | best eigen improvement | recovered |
+|---|---|---|---|---|---|
+| 3 | **-0.223** | +0.283 | -0.052 | +33.3% | +50.9% |
+| 4 | **-0.482** | +0.396 | -0.310 | +41.4% | +42.2% |
+| 5 | **-0.187** | +0.135 | -0.330 | +35.7% | +32.2% |
+
+Both predictors move as expected — better conservation (lower ratio) and higher decodability each
+associate with more benefit — and **the two are only weakly correlated with each other**
+(-0.05 to -0.33). That is the opposite of the tight confound the prereg feared, and it means a
+properly powered matched-band test is feasible in principle; it just needs a pool containing more
+high-`rho` members.
+
+Also worth recording: the recovered `C` beats **every** one of the 40 eigenfamily candidates on two
+of three seeds (+50.9 vs +33.3, +32.2 vs +35.7 on seed 5 where one candidate edges it, +42.2 vs
++41.4 on seed 4). The jointly-fitted `C` is not simply the best eigenvector — consistent with
+`fit_hamiltonian_pair`'s own docstring, which says the answer is "a direction inside the conserved
+subspace that no single eigenvector isolates".
+
+### What this changes
+
+E10 cannot be settled on a 1-DoF pendulum with a 40-candidate pool. Two follow-ups, in order:
+
+1. **Enlarge the pool, not the band.** The prereg fixes the band width; pool size is unconstrained
+   and a larger pool is strictly more information. Running seed 3 at 250 candidates to see whether
+   the matched band populates.
+2. **If it does not, E10 is a 2-DoF experiment.** A system with 4-dimensional state has a far richer
+   family of scalars at varying (conservation, decodability) combinations, which is exactly what the
+   matched band needs. This is an independent argument for the 2-DoF work beyond the "energy is the
+   only thing to find" objection — the control that most directly tests the paper's central thesis
+   may simply not be constructible on a pendulum.
