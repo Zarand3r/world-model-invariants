@@ -2095,3 +2095,67 @@ helps, and actively hurts before that point.
 C6 rests on three transfers on the non-central arm (recovery 0.966, in-sample repair -57.6%,
 disjoint repair -62.6%), all one seed. Prediction 2 has its first supporting evidence at an early
 checkpoint. Non-central seeds 4/5 and central seeds 1/2 still to train.
+
+---
+
+## 2026-08-27 11:10–11:25 UTC — Non-central converges to 0.987; **the central arm exposes a single-invariant assumption**
+
+Git at `4421b75`. Non-central seed 3 complete through step 60,000; seed 4 started. Central seed 0 at
+step 15,000, running concurrently.
+
+### Non-central at convergence: recovery matches the pendulum
+
+| step | invariance ratio | **\|rho_E\|** |
+|---|---|---|
+| 15,000 | 6.62e-05 | 0.909 |
+| 30,000 | 1.64e-05 | 0.966 |
+| **60,000** | **5.71e-06** | **0.987** |
+
+Monotone in both, ending above the pendulum's 0.967-0.975. Recovery on a 4-dimensional state is not
+merely possible at frozen hyperparameters — it converges to a **better** energy correlation than the
+1-DoF case, given enough training.
+
+### Central arm: the subspace has both invariants, the joint fit isolates neither
+
+| step | recovered `C` \|rho_E\| | recovered `C` \|rho_L\| | best \|rho_E\| in pool | best \|rho_L\| in pool |
+|---|---|---|---|---|
+| 3,000 | 0.431 | 0.051 | 0.854 (rank 2) | 0.759 (rank 0) |
+| 6,500 | 0.085 | 0.364 | 0.745 (rank 2) | **0.941** (rank 0) |
+| 15,000 | 0.290 | 0.264 | 0.741 (rank 1) | **0.950** (rank 0) |
+
+The **conserved subspace cleanly contains both invariants**, separated by rank: rank 0 tracks
+angular momentum at 0.950, a lower rank tracks energy at 0.741. Prediction 2's registered bar — a
+second direction with `|rho_L| > 0.8` — is **met**.
+
+But the jointly-fitted `C` lands on a **mixture of the two** (`|rho_E|` 0.290, `|rho_L|` 0.264) and
+isolates neither, at a checkpoint where the non-central arm had already reached 0.909.
+
+### The likely cause, and why it is a finding rather than a bug
+
+`fit_hamiltonian_pair` searches for **one** direction inside the conserved subspace that pairs with
+an antisymmetric operator via `F ~ B grad C`. With a **single** invariant that direction is
+essentially unique. With **two** — energy and angular momentum, both exactly conserved, both
+generating flows, and every combination of them also conserved — the criterion has **no unique
+solution**, and a mixture can pair as well as either pure invariant.
+
+This is the same structural problem the function's own docstring describes for `E`, `E^2`, `EL`,
+`L^2` at degree 4, but the docstring treats it as something flow alignment *solves*. On a system
+that genuinely has two independent invariants, it appears not to.
+
+**This is exactly the outcome `E17_PREREG` registered as informative rather than fatal:** "Prediction
+2 failing while 1 holds would say the method finds *an* invariant but not the full conserved
+structure — also a result."
+
+It is also the first finding in the project that is a limitation of **the method** rather than of the
+model under study, and it would have been invisible on a pendulum, which has only one invariant to
+find. That is an argument for the 2-DoF arm independent of C6.
+
+### Held open, not concluded
+
+The central arm is at step 15,000 and the non-central arm needed 15,000-30,000 before its joint fit
+converged. **The central joint fit may yet resolve at 30,000 or 60,000**, and the single-invariant
+degeneracy hypothesis will only be worth stating if it does not. No conclusion is drawn yet, and no
+change to the method is being made — the registered order is to record the frozen-setting behaviour
+first.
+
+Non-central seeds 4/5 and central seeds 1/2 still to train.
