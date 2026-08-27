@@ -988,3 +988,64 @@ answer to "the effect is too small to matter".
   0/20 and 0/5 beating. With all five tangent controls in, the tangent arm sits at essentially zero,
   which is what an equal-norm step along the level set should do.
 - Arm C relaunched at 20 random draws for parity with the other arms.
+
+---
+
+## 2026-08-27 03:10–03:25 UTC — Final numbers, and a **correction to arm C**
+
+Git at `30369ef`. Damped seed 0 at step 30,000; seeds 1 and 2 not started.
+
+### E9 / E6 at H = 190, all arms complete
+
+| arm | change in median abs `D_sec` |
+|---|---|
+| **recovered** | **-75.9%** |
+| random median (n = 20) | +8.8% |
+| random best of 20 | -16.3% |
+| tangent median (n = 5) | +2.7% |
+| random beating recovered | **0/20** |
+| tangent beating recovered | **0/5** |
+
+Unchanged from the 12-draw reading. The best of twenty random directions reaches -16.3%, still less
+than a quarter of the recovered direction's effect.
+
+### **Correction: arm C, with 20 draws instead of 10**
+
+Last iteration reported arm C as "-11.0% recovered vs +2.4% random" on 10 draws and called it a
+partially met expectation. With the full 20 draws the picture is different:
+
+| damped s0, deviation from true physics | 10 draws (reported) | **20 draws (final)** |
+|---|---|---|
+| recovered | -11.0% | -11.0% |
+| random median | +2.4% | **-3.5%** |
+| tangent median | — | **-8.5%** |
+| random beating recovered | — | **4/20** |
+| pixel MSE | +0.2% | +0.2% |
+
+The recovered number is unchanged; the **null** moved. With twenty draws, random directions improve
+by 3.5%, equal-norm tangent steps improve by 8.5% — nearly as much as the recovered direction's
+11.0% — and **4 of 20 random directions beat the recovered one**.
+
+**This reads better as refusal, not worse.** The right axis is specificity, not absolute
+improvement:
+
+| | recovered | tangent | random beating recovered |
+|---|---|---|---|
+| conservative (n = 3 seeds) | -32 to -51% | ~0 to +7.8% | **0/60** |
+| damped (n = 1 seed) | -11.0% | -8.5% | **4/20** |
+
+On conservative models the recovered direction is sharply distinguished from every control. On the
+damped model it is not: tangent steps do nearly as well and a fifth of random directions do better.
+The small absolute improvement on the damped model is **non-specific**, which is exactly what should
+happen when the extraction is run on dynamics with no conserved quantity to find. Combined with the
+recovery-side result — `rho_obs` 55x worse than conservative, in the untrained range — arm C is a
+pass on the axis that matters.
+
+The earlier "partially met" framing was drawn from an underpowered null and is withdrawn. It is a
+reminder that a 10-draw null was enough to make a control look decisive when it was not; the other
+arms were run at 20 and should have been matched from the start.
+
+### Launched
+
+Seeds 4 and 5 at H = 190 on the disjoint eval set, to close the "seed 3 only at long horizon" caveat
+on the -75.9% headline.
