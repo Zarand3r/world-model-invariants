@@ -791,3 +791,56 @@ of the underlying quantity were checked against each other and agree to 2.4e-07,
 float64 gradients agree to a ratio of 1.000 — the maths was right, the summary was not. The script
 now stores per-trajectory medians and means separately, under distinct keys. The conclusion is
 unchanged and in fact stronger: 0.24x the null rather than 0.63x.
+
+---
+
+## 2026-08-27 01:40–02:05 UTC — **E9: the effect survives truly disjoint evaluation**
+
+Git at `2432f15`. Seed 5 at step 50,000; damped models still not started.
+
+Preregistered in `docs/E9_PREREG.md` before any E9 quantity existed. Only the trajectories being
+scored change — metric, `eps` grid, arms and specificity count are all unchanged from E1.
+
+### Design
+
+`C`, `h_mean`, the PCA basis `U` and the rank basis `R` are all fitted on the analysis split
+`204:` of `runs/pendulum_pixels.npz` and **frozen**. The whole coordinate frame is part of `C` as a
+function of `h`, so re-deriving any of it on the eval set would leak.
+
+Scoring moves to `runs/pendulum_pixels_eval.npz` — **512 trajectories x 200 frames, generator seed
+777**, never used for training, fitting, calibration, or any analysis to this point.
+
+### Result, seed 3 / step 6,500 / H = 100
+
+| arm | out-of-sample (n = 512) | in-sample (n = 52) |
+|---|---|---|
+| baseline abs `D_sec` | 1.363e-03 | 1.279e-03 |
+| **recovered** | 7.053e-04 (**-48.2%**) | 6.282e-04 (-50.9%) |
+| random median | 1.496e-03 (+9.8%) | (+16.9%) |
+| random best | 1.291e-03 | — |
+| tangent median | 1.400e-03 (+2.8%) | (+7.8%) |
+| random beating recovered | **0/20** | 0/20 |
+
+**The effect does not shrink out-of-sample**: -48.2% against -50.9% in-sample, on ten times as many
+trajectories, none of which the invariant or the coordinate frame ever saw. The registered falsifier
+— "the effect vanishes or reverses out-of-sample, and every absolute number reported so far must be
+restated as in-sample only" — did not fire.
+
+This closes the weakness the published paper discloses and leaves open ("the absolute effect is
+in-sample with respect to invariant fitting"). It is also worth noting against an unverified claim
+in the review that prompted this roadmap, which asserted a disjoint evaluation gave -3.0% / +2.6% /
+-4.1%. No such run exists anywhere in the repository, and this measurement — different models,
+different metric, ten times the trajectories — does not reproduce that pattern. The claim should not
+be relied on.
+
+### Caveats, stated plainly
+
+- **One seed and one checkpoint.** Seeds 4 and 5 have not been run out-of-sample yet.
+- The eval set is drawn from the same generator and initial-condition distribution as the training
+  data. E9 tests disjointness of *trajectories*, not distribution shift. Out-of-distribution energies
+  are E14 and remain untested.
+- H = 200 is running; it is E6's first test point beyond H = 100 and is not yet available.
+
+### Status
+
+Damped models still untrained, so arm C remains the one unrun arm of Stage 1.

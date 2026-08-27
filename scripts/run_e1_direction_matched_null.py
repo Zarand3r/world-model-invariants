@@ -56,7 +56,12 @@ def _secular(E, norm):
     return ((E - E.mean(-1, keepdims=True)) @ kc / (kc @ kc)) / norm
 
 
-def run(ckpt, data, horizon, random_law=False, draw=0, tangent=False):
+def run(ckpt, data, horizon, random_law=False, draw=0, tangent=False, eval_data=None):
+    """`eval_data` is E9: fit C and the whole coordinate frame on `data`, score on `eval_data`.
+
+    h_mean, U and R are frozen along with the coefficients -- they were derived from the fit data and
+    are part of C as a function of h. Re-deriving any of them on the eval set would leak.
+    """
     d = np.load(data)
     fr = torch.as_tensor(d["frames"]).float().div_(255.).sub_(0.5).cuda()
     st = d["states"]; norm = float(energy(st[..., 0], st[..., 1]).mean(-1).std())
@@ -74,7 +79,18 @@ def run(ckpt, data, horizon, random_law=False, draw=0, tangent=False):
         rc = torch.randn(coeffs.shape[0], generator=g, dtype=torch.float64)
         coeffs = (rc / rc.norm() * coeffs.norm().cpu()).to(Z.dtype).to(Z.device)
     P = U @ R; Ppinv = torch.linalg.pinv(P)
-    ref = fr[ANALYSIS][:, WARMUP:WARMUP + horizon]
+
+    if eval_data is not None:                      # E9: score on trajectories never seen
+        de = np.load(eval_data)
+        fre = torch.as_tensor(de["frames"]).float().div_(255.).sub_(0.5).cuda()
+        ste = de["states"]
+        norm = float(energy(ste[..., 0], ste[..., 1]).mean(-1).std())
+        with torch.no_grad():
+            hs = m.encode(fre).detach()
+        fr = fre
+        ref = fr[:, WARMUP:WARMUP + horizon]
+    else:
+        ref = fr[ANALYSIS][:, WARMUP:WARMUP + horizon]
 
     by_eps = {}
     for eps in EPS_GRID:
@@ -104,7 +120,7 @@ def run(ckpt, data, horizon, random_law=False, draw=0, tangent=False):
         ds = _secular(ph["energy"], norm)
         by_eps[float(eps)] = {"pixel_mse": pmse, "D_sec_per_traj": np.where(np.isfinite(ds), ds, np.nan).tolist(),
                               "D_sec_median_abs": float(np.nanmedian(np.abs(ds)))}
-    return {"ckpt": ckpt, "random_law": random_law, "tangent": tangent,
+    return {"ckpt": ckpt, "random_law": random_law, "tangent": tangent, "eval_data": eval_data,
             "draw": draw if random_law else None, "horizon": horizon, "by_eps": by_eps}
 
 
@@ -115,20 +131,21 @@ if __name__ == "__main__":
     p.add_argument("--horizon", type=int, default=100)
     p.add_argument("--n-random", type=int, default=20)
     p.add_argument("--n-tangent", type=int, default=5)
+    p.add_argument("--eval-data", default=None, help="E9: score on these trajectories instead")
     p.add_argument("--out", default="runs/e1_direction_matched.json")
     a = p.parse_args()
     op = pathlib.Path(a.out)
     out = json.loads(op.read_text()) if op.exists() else {"recovered": [], "random": [], "tangent": []}
     save = lambda: op.write_text(json.dumps(out, indent=1) + "\n")
     if not out["recovered"]:
-        print("[recovered]", flush=True); out["recovered"].append(run(a.ckpt, a.data, a.horizon)); save()
+        print("[recovered]", flush=True); out["recovered"].append(run(a.ckpt, a.data, a.horizon, eval_data=a.eval_data)); save()
     done = {r["draw"] for r in out["random"]}
     for dr in range(a.n_random):
         if dr in done: continue
-        print(f"[random {dr}]", flush=True); out["random"].append(run(a.ckpt, a.data, a.horizon, True, dr)); save()
+        print(f"[random {dr}]", flush=True); out["random"].append(run(a.ckpt, a.data, a.horizon, True, dr, eval_data=a.eval_data)); save()
     doneT = {r["draw"] for r in out["tangent"]}
     for dr in range(a.n_tangent):
         if dr in doneT: continue
         print(f"[tangent {dr}]", flush=True)
-        out["tangent"].append(run(a.ckpt, a.data, a.horizon, False, dr, tangent=True)); save()
+        out["tangent"].append(run(a.ckpt, a.data, a.horizon, False, dr, tangent=True, eval_data=a.eval_data)); save()
     print(f"wrote {op}")
