@@ -1097,3 +1097,66 @@ Both will be restated when the run finishes.
 
 Stage 1 is substantively complete apart from damped seeds 1 and 2. Next in the roadmap's order is
 Stage 2: **E4** (preregistered in `docs/E4_PREREG.md`), then E5, then E13.
+
+---
+
+## 2026-08-27 04:10–04:35 UTC — **E4 passes: the invariant is a control variable** (seed 3)
+
+Git at `c56407f`. Damped seed 1 training. H = 190 finalised on all three seeds and all arms:
+recovered -75.9 / -54.6 / -58.8%, random +7.5 to +9.7%, tangent -3.6 to +2.7%,
+**0/60 random and 0/15 tangent** beating the recovered direction.
+
+`scripts/run_e4_dialing.py` written and run per `docs/E4_PREREG.md`. The edit is applied **once** at
+the start of the rollout, which then runs free — so the test includes whether the changed regime
+persists without further forcing.
+
+### E4a, donor-level — the registered primary
+
+Target is `C(z_donor)` from an independent trajectory, read off the model's own latent. **The
+intervention never sees true energy**; ground truth enters only when the decoded rollout is compared
+with the donor's.
+
+| statistic | value |
+|---|---|
+| trajectories kept | 51/52 (registered exclusion: edit norm <= 5x median) |
+| **Spearman(intended dC, realised dE)** | **+0.916**, 95% CI [+0.819, +0.960] |
+| verdict | **PASS** — CI excludes 0 |
+| Spearman(realised dE, **true** donor dE) | **+0.914** |
+| Spearman(intended dC, true donor dE) | +0.995 |
+| random controls (n = 8) | median **-0.050**, range [-0.667, +0.335], 0/8 beating |
+| tangent controls (n = 3) | median **-0.065**, range [-0.119, +0.058], 0/3 beating |
+
+Setting the latent scalar to another trajectory's value moves the imagined world's **true decoded
+physical energy** toward that trajectory's **actual** energy, with rank correlation 0.914. Random
+constraints dialed by the same protocol produce no coherent energy change, and equal-norm tangent
+edits produce none either.
+
+### E4b, synthetic sweep — the registered offset grid
+
+| offset (units of std_traj `C`) | -1.00 | -0.50 | -0.25 | 0 | +0.25 | +0.50 | +1.00 |
+|---|---|---|---|---|---|---|---|
+| median realised dE | -0.398 | -0.146 | -0.074 | 0 | +0.044 | +0.175 | +0.344 |
+
+**Spearman(offset, realised dE) = +1.000.** Perfectly monotone across the preregistered grid, in both
+directions.
+
+### Directional asymmetry, registered as secondary
+
+Lowering `C` moves energy slightly further than raising it (-0.398 at -1.0 sigma against +0.344 at
++1.0). The prereg registered this comparison in advance because Spies et al. (arXiv:2412.11867)
+report activation is easier than suppression in world models; here the asymmetry runs the other way
+and is mild. Reported, not interpreted.
+
+### What this does and does not establish
+
+C4 as registered is **supported on seed 3**: the recovered scalar is not merely worth restoring, it
+is a control variable, and the imagined physics follows it quantitatively.
+
+The prereg's interpretation rule applies and is not being set aside: moving along the `C`-normal
+changes the latent microstate, not only `C`. This is evidence that the recovered **subspace** is
+causally deployed for physical energy, **not** proof that the model maintains an internal energy
+register.
+
+**One seed.** Seeds 4 and 5 launched. Controls are 8 random and 3 tangent draws against 20 and 5
+elsewhere — chosen to fit the iteration, and to be brought to parity before this is reported
+anywhere, given that the arm-C correction two iterations ago was caused by exactly that shortcut.
