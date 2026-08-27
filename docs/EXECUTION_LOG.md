@@ -2621,3 +2621,52 @@ quietly absorbed. Prediction B had a written falsifier; it fired; the claim came
 E8b prediction A passed, prediction B failed. The two-factor account stands, having survived a real
 test and correctly explained the failure of the other. Non-central seed 5 and central seeds 1-2
 remain.
+
+---
+
+## 2026-08-27 15:10–15:30 UTC — `docs/RESULTS.md`: every headline number regenerated from raw rows
+
+Git at `fab6dd4`. Non-central seed 5 at step 10,000; nothing new to analyse there.
+
+### Why this exists
+
+78 run records have accumulated and the execution log is prose, which drifts. Richard's instruction
+was to collect results so the paper can be updated later, and the discipline that makes that safe is
+that **numbers are re-derived from run records, never copied from a summary**.
+
+`scripts/make_results_summary.py` reads `runs/*.json` and emits `docs/RESULTS.md`. The output is
+**generated, never edited** — the header says so — and every section names the files it derives
+from. Prose interpretation stays in this log; numbers live there.
+
+Regenerate with:
+
+    uv run python scripts/make_results_summary.py > docs/RESULTS.md
+
+### What it covers
+
+Pendulum direction-matched repair (n = 3) · pendulum disjoint evaluation at H = 190 (n = 3) ·
+the full E8 repair-versus-training curve on both systems (13 rows) · E17 recovery across all
+checkpoints and arms (13 rows) · E2 operator-level `rho_obs` including untrained and damped controls
+· E4 transfer correlation (n = 3).
+
+### A replication the summary surfaced that had not been analysed
+
+Building the table pulled in a checkpoint I had generated but not read:
+
+| arm | step | invariance ratio | \|rho_E\| |
+|---|---|---|---|
+| non-central s3 | 60,000 | 5.71e-06 | **0.9874** |
+| **non-central s4** | **60,000** | **6.04e-06** | **0.9874** |
+
+**2-DoF recovery replicates at n = 2**, to four decimal places on `|rho_E|` and within 6% on the
+invariance ratio. Seed 4 also reproduces the early-checkpoint pattern (step 6,500: joint fit 0.3758
+against a best eigenvector of 0.7309 — the joint fit worse than the raw eigenvector, exactly as
+seed 3 showed).
+
+That C6 now rests on two seeds rather than one was not the reason for building the summary, and is
+an argument for building summaries from raw rows rather than from notes.
+
+### One defect fixed
+
+The first generated table used `|D_sec|` as a column header, whose pipes break markdown tables.
+Renamed to `abs D_sec`. Caught by reading the rendered output rather than the script.
