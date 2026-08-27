@@ -920,3 +920,71 @@ conserved quantity, and the intervention benefit is 4x smaller than on conservat
 | **C damped, its own `C`** | **n = 1, partial** |
 | D untrained | complete, `rho_obs` 57-74x worse |
 | E9 disjoint evaluation | complete, seed 3, -48.2% on 512 unseen trajectories |
+
+---
+
+## 2026-08-27 02:40–03:05 UTC — **E6 confirmed: benefit grows with horizon, reaching -75.9% at H = 190**
+
+Git at `1bd4f51`. Damped seed 0 at step 30,000; seeds 1 and 2 not started.
+
+### A bug that crashed loudly rather than lying
+
+E9 at H = 200 failed: a 200-frame eval set supplies only `T - WARMUP = 190` reference frames, and
+`mse_loss` hit a 200-vs-190 shape mismatch. It crashed rather than silently truncating, which is the
+right failure. The script now clamps the horizon to what the data supports, prints that it did, and
+records `horizon_used` in every row so a requested horizon can never differ silently from the
+reported one.
+
+### E6: correction benefit versus horizon (seed 3, step 6,500, recovered arm, eps = 0.02)
+
+| H | evaluation set | benefit |
+|---|---|---|
+| 50 | in-sample, n = 52 | CI included zero (ambiguous, per E1) |
+| 100 | in-sample, n = 52 | -48.1% |
+| 100 | disjoint, n = 512 | -48.2% |
+| **190** | **disjoint, n = 512** | **-75.9%** |
+
+Monotone in horizon, and the two H = 100 numbers agree to 0.1 percentage points across a tenfold
+change in trajectory count and a complete change of trajectories.
+
+### Dose-response at H = 190, on 512 never-seen trajectories
+
+| eps | recovered | random median |
+|---|---|---|
+| 0.005 | -32.6% | +3.0% |
+| 0.01 | -61.4% | +4.3% |
+| 0.02 | **-75.9%** | +9.1% |
+
+Monotone in step size, random directions worsen drift monotonically, and **0/12 random directions
+beat the recovered one** (the random arm is still filling; 12 of 20 draws at time of writing).
+
+### Why this matters to the argument
+
+E6 was registered in the roadmap as the experiment that would turn a modest effect size into a
+mechanism claim. It has. The published paper reports **-2.9% pixel MSE at H = 50**, a number small
+enough that reviewers quote it back. The same intervention, measured on **true decoded physical
+energy** rather than pixels, on trajectories the invariant never saw, reduces secular drift by
+**76%** at H = 190.
+
+The reading this supports: invariant violation is not a one-step defect but an accumulating one, so
+the correction buys progressively more the longer the model imagines. That is consistent with E2's
+Outcome B — a near-constant per-step violation that integrates — and it is the strongest available
+answer to "the effect is too small to matter".
+
+### Caveats
+
+- **Seed 3 only** at long horizon. Seeds 4 and 5 have not been run at H = 190.
+- One checkpoint (step 6,500).
+- The random arm at H = 190 is 12/20 complete; the number will be restated when it finishes.
+- H = 190 is the maximum the 200-frame eval set supports. Testing further would need a new dataset.
+
+### Also this iteration
+
+- `docs/E4_PREREG.md` written, before any E4 quantity exists. Fixes the offset grid, the primary
+  metric (transfer correlation between intended change in `C` and realised change in decoded
+  physical energy), the falsifier, the controls, and the rule that any `C`-to-`E` calibration is
+  fitted only on the training split and frozen. Records that `C` is not assumed to be energy.
+- E9 H = 100 completed on all arms: recovered **-48.2%**, random +9.8%, **tangent -0.4%**,
+  0/20 and 0/5 beating. With all five tangent controls in, the tangent arm sits at essentially zero,
+  which is what an equal-norm step along the level set should do.
+- Arm C relaunched at 20 random draws for parity with the other arms.
