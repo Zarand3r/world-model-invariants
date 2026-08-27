@@ -1160,3 +1160,59 @@ register.
 **One seed.** Seeds 4 and 5 launched. Controls are 8 random and 3 tangent draws against 20 and 5
 elsewhere — chosen to fit the iteration, and to be brought to parity before this is reported
 anywhere, given that the arm-C correction two iterations ago was caused by exactly that shortcut.
+
+---
+
+## 2026-08-27 04:40–04:55 UTC — **E4 replicates on all three seeds: C4 supported at n = 3**
+
+Git at `ec87029`. Damped seed 1 still training.
+
+### E4a donor-level, registered primary
+
+| seed | kept | Spearman(intended dC, realised dE) | 95% CI | Spearman(realised dE, **true** donor dE) | random median | tangent median | controls beating |
+|---|---|---|---|---|---|---|---|
+| 3 | 51/52 | **+0.916** | [+0.817, +0.959] | +0.914 | -0.050 | -0.065 | 0/11 |
+| 4 | 50/52 | **+0.838** | [+0.699, +0.919] | +0.805 | -0.034 | -0.059 | 0/11 |
+| 5 | 49/52 | **+0.808** | [+0.647, +0.904] | +0.802 | -0.030 | -0.270 | 0/11 |
+
+Transfer correlation median **+0.838**, range [+0.808, +0.916]. Every CI excludes zero; **0/33
+controls beat the recovered direction on any seed**.
+
+### E4b synthetic sweep, registered offset grid
+
+| seed | -1.00 | -0.50 | -0.25 | 0 | +0.25 | +0.50 | +1.00 | Spearman |
+|---|---|---|---|---|---|---|---|---|
+| 3 | -0.398 | -0.146 | -0.074 | 0 | +0.044 | +0.175 | +0.344 | **+1.000** |
+| 4 | -0.060 | -0.014 | -0.000 | 0 | +0.007 | +0.052 | +0.130 | **+1.000** |
+| 5 | -0.211 | -0.116 | -0.033 | 0 | +0.027 | +0.067 | +0.209 | **+1.000** |
+
+Perfectly monotone on every seed, in both directions.
+
+### The prereg's metric choice was load-bearing
+
+Sweep **magnitudes** differ ~3x across seeds (seed 3 spans +-0.4, seed 4 only +-0.13) while
+**monotonicity is exact on all three**. `E4_PREREG` registered monotonicity and transfer correlation
+as the evidence, explicitly *not* slope-1 agreement, on the grounds that `C` may be a monotone
+nonlinear function of energy. Had slope been the registered statistic, seed 4 would have looked like
+a failure and seed 3 like a success, and the honest reading is that all three behave identically in
+the property that matters.
+
+### Claim status
+
+| claim | status |
+|---|---|
+| **C1 emergence** | supported, n = 3 |
+| **C2 physical validity** | supported, n = 3, out of sample, magnitude-matched |
+| **C3 failure mechanism (amended)** | supported, Outcome B at 6/6 checkpoints |
+| **C4 causal control** | **supported, n = 3** |
+| C5 predictive utility | untested |
+| C6 generality | untested |
+
+The prereg's interpretation rule continues to apply: this is evidence the recovered **subspace** is
+causally deployed for physical energy, not proof of an internal energy register.
+
+### Follow-through on the control-parity flag
+
+Last iteration ran 8 random and 3 tangent draws against 20 and 5 elsewhere, and flagged that as a
+shortcut to be corrected before reporting — the same shortcut that produced the arm-C correction.
+Relaunched at 20 and 5 on all three seeds; numbers above will be restated when it completes.
