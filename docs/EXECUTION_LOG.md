@@ -2945,3 +2945,58 @@ checkpoint (step 30,000 versus the pendulum's 6,500), or the band construction i
 
 A cleaner 2-DoF LOW band with preserved energy spread would be needed before the LOW comparison means
 anything, and that is a new dataset rather than a reanalysis.
+
+---
+
+## 2026-08-27 17:40–18:00 UTC — Checkpoint vs system: **both matter, and "indistinguishable from random" was checkpoint-specific**
+
+Git at `385f067`. Central seed 1 training (step 2,000).
+
+E14b ran the pendulum at step 6,500 and the 2-DoF system at step 30,000. That confound was flagged
+when the comparison was made; this resolves it by matching checkpoints.
+
+### Pendulum OOD conservation across training, n = 3
+
+| seed | step | in-dist `rho_obs` | OOD `rho_obs` | random OOD | degradation |
+|---|---|---|---|---|---|
+| 3 | 6,500 | 6.27e-03 | 1.677 | 1.737 | **267x** |
+| 3 | 30,000 | 1.49e-02 | 0.918 | 1.691 | **62x** |
+| 4 | 6,500 | 8.65e-03 | 1.343 | 2.855 | **155x** |
+| 4 | 30,000 | 6.61e-03 | 0.367 | 2.120 | **55x** |
+| 5 | 6,500 | 6.85e-03 | 1.711 | 1.858 | **250x** |
+| 5 | 30,000 | 6.24e-03 | 0.870 | 2.691 | **139x** |
+
+| 2-DoF HIGH, step 30,000 | 4.9e-03 | 5.2e-02 – 8.7e-02 | 3.6e-01 | **10-18x** |
+
+### Two effects, both real
+
+**Training improves OOD conservation.** Degradation roughly halves from step 6,500 to step 30,000 on
+every seed (267→62, 155→55, 250→139). The model does learn to conserve energy somewhat beyond its
+training distribution, given more training.
+
+**The system difference survives checkpoint matching.** At the *same* step 30,000, the pendulum
+degrades **55-139x** against the 2-DoF system's **10-18x** — still 3-6x more. The difference is not
+purely the confound.
+
+### A claim from two iterations ago must be narrowed
+
+E14b reported OOD conservation as "statistically indistinguishable from a random constraint". That is
+true **at step 6,500** (1.677 vs 1.737, 1.343 vs 2.855, 1.711 vs 1.858) and **false at step 30,000**,
+where OOD conservation is 2-6x better than random (0.918 vs 1.691, 0.367 vs 2.120, 0.870 vs 2.691).
+
+The dissociation itself is robust — a 55-267x degradation in conservation while decodability is
+retained at 0.92-0.96 — but the strongest phrasing of it was an artefact of the checkpoint I happened
+to test first, which is the same error pattern this session has now recorded five times.
+
+### Where the E14b claim actually stands
+
+**Robust:** out of distribution, energy remains decodable (refit `|rho_E|` 0.92-0.96, free probe
+0.999) while the transition conserves it far worse (55-267x on the pendulum, 10-18x on the 2-DoF
+system). That is the decodability-vs-dynamics dissociation, in one trained model, split by region of
+state space, on two systems and three checkpoints.
+
+**Not robust:** the specific claim that OOD conservation reaches random-constraint levels. That holds
+only at the earliest checkpoint tested.
+
+**Untested:** whether the pendulum/2-DoF gap at matched checkpoints reflects the systems, the
+respective difficulty of their OOD bands, or the band-construction defect recorded last iteration.
