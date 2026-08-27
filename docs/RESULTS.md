@@ -60,6 +60,7 @@ Source: `e17_recovery_nc.json`, `e17_recovery_nc_s4.json`, `e17_recovery_ce.json
 | non-central s3 | 30000 | 1.64e-05 | 0.9659 | 0.3549 | 0.8010 | 0.7692 |
 | non-central s3 | 60000 | 5.71e-06 | 0.9874 | 0.3846 | 0.7449 | 0.8133 |
 | non-central s4 | 6500 | 2.30e-04 | 0.3758 | 0.0036 | 0.7309 | 0.7951 |
+| non-central s4 | 15000 | 6.39e-05 | 0.9318 | 0.1506 | 0.8787 | 0.7275 |
 | non-central s4 | 60000 | 6.04e-06 | 0.9874 | 0.3941 | 0.8642 | 0.7217 |
 | central s0 | 3000 | 8.42e-04 | 0.4313 | 0.0511 | 0.8542 | 0.7586 |
 | central s0 | 6500 | 4.37e-04 | 0.0848 | 0.3643 | 0.7454 | 0.9407 |
@@ -93,6 +94,23 @@ Source: `e4_s{3,4,5}.json`
 | 3 | +0.916 | +0.914 | 0/25 |
 | 4 | +0.838 | +0.805 | 0/25 |
 | 5 | +0.808 | +0.802 | 0/25 |
+
+## Evidence base per claim (mechanical n-check)
+
+This session recorded **five retractions**, every one from generalising an n = 1 observation.
+This table is generated from the run records so the evidence base behind each claim cannot
+drift out of the prose. A claim resting on n = 1 is flagged, not omitted.
+
+| claim | independent units | n | status |
+| --- | --- | --- | --- |
+| Pendulum repair, direction-matched (H=100) | model seeds | 3 | n>=3 |
+| Pendulum repair, disjoint (H=190) | model seeds | 3 | n>=3 |
+| Pendulum repair at step 60,000 (E8) | model seeds | 3 | n>=3 |
+| E4 causal dialing | model seeds | 3 | n>=3 |
+| Damped refusal (arm C) | model seeds | 3 | n>=3 |
+| 2-DoF recovery (E17) | model seeds | 3 | n>=3 |
+| 2-DoF repair at convergence | model seeds | 2 | n=2 — provisional |
+| Two-invariant degeneracy (central arm) | model seeds | 1 | **n=1 — DO NOT GENERALISE** |
 
 ---
 

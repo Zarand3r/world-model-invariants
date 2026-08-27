@@ -3000,3 +3000,70 @@ only at the earliest checkpoint tested.
 
 **Untested:** whether the pendulum/2-DoF gap at matched checkpoints reflects the systems, the
 respective difficulty of their OOD bands, or the band-construction defect recorded last iteration.
+
+---
+
+## 2026-08-27 18:10–18:25 UTC — **Two execution defects caught, one of them destructive**
+
+Git at `f2f6705`.
+
+### Defect 1: the central arm was silently retraining seed 0, overwriting analysed checkpoints
+
+The 2-DoF training was launched as an **inline bash loop with no existence check**, unlike
+`run_stage1_bootstrap.sh`, whose `step()` function skips outputs that already exist. Central seed 0
+had been trained concurrently earlier and completed at 07:04. When the queued loop reached the
+central arm it **retrained seed 0 from scratch** and began overwriting its milestone checkpoints:
+
+| checkpoint | mtime | status |
+|---|---|---|
+| `ce_s0_step1000.pt` | 10:36 | **overwritten** |
+| `ce_s0_step3000.pt` | 10:42 | **overwritten** |
+| `ce_s0_step6500.pt` | 10:53 | **overwritten** |
+| `ce_s0_step15000.pt` | 04:10 | original, preserved |
+| `ce_s0_step30000.pt` | 05:08 | original, preserved |
+| `ce_s0_step60000.pt` | 07:04 | original, preserved |
+
+Caught at step 12,000 of the retrain, **minutes before step 15,000 would have been overwritten**.
+Killed immediately.
+
+**Scientific impact: small but real.** The two-invariant degeneracy result used step 3,000 and 6,500,
+whose files are now from a second training run. Same seed, same data, same step count, so they should
+be near-identical up to GPU nondeterminism — which this project measured at 9.0e-06 relative — but
+they are **not the exact files the reported numbers came from**. The conclusion rests on step 15,000
+/ 30,000 / 60,000, all preserved, and on the monotone trend across all five, so it stands. Recorded
+because "the numbers came from these files" has to remain true, and for two checkpoints it no longer
+is.
+
+### Defect 2: a race, created by my own fix
+
+The relaunch for seeds 1 and 2 was started **while the original loop was still alive**, so for about
+40 seconds **two processes were training seed 1 into the same output paths**. No checkpoint had been
+written yet (`ls runs/osc2d_ce_s1*` returned 0), so nothing was corrupted, but the window existed.
+
+Both the original loop and its seed-1 child were killed; the relaunch — which **does** carry an
+existence check — continues alone.
+
+### The lesson, and it is not about physics
+
+`run_stage1_bootstrap.sh` was written on 2026-08-26 with an idempotent `step()` guard precisely so
+that re-invocation could never duplicate or clobber work. Every 2-DoF training launched since has
+been an **inline loop that reimplemented the same logic without the guard**, because it was quicker
+to type. That is how both defects arose.
+
+**Rule adopted:** long-running jobs go through `run_stage1_bootstrap.sh`-style guarded steps, never
+an ad-hoc inline loop. The guard is three lines and it has now cost roughly 35 GPU-minutes and two
+checkpoint files by its absence.
+
+### Also this iteration
+
+- **Evidence-base guard added to `scripts/make_results_summary.py`.** It counts independent model
+  seeds per claim from the run records and flags anything at n = 1 as **DO NOT GENERALISE**. It
+  immediately flagged the two-invariant degeneracy, which I have been describing as an established
+  finding on the strength of five checkpoints from **one seed**. Five retractions this session all
+  came from exactly that error, and the check is now mechanical rather than a matter of my
+  remembering.
+- Non-central seed 5 completed; its step-30,000 and step-60,000 interventions are running, which will
+  bring the 2-DoF E8 curve to n = 3.
+- Noted for the record: an unrelated job (`train_dreamer_pokedrag --seed 2`) has been sharing this
+  GPU for 3.5 hours. It is not part of this project and has not been touched; it explains some of the
+  contention in wall-clock timings, which the step-capped contract makes irrelevant to results.

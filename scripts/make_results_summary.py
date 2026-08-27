@@ -151,5 +151,39 @@ for s in (3, 4, 5):
     ctl = np.array(ctl)
     row(s, f"{rho:+.3f}", f"{_sp(dE, dT):+.3f}", f"{int((ctl > rho).sum())}/{len(ctl)}")
 
+# ---- evidence-base guard ----
+section("Evidence base per claim (mechanical n-check)")
+print("This session recorded **five retractions**, every one from generalising an n = 1 observation.")
+print("This table is generated from the run records so the evidence base behind each claim cannot")
+print("drift out of the prose. A claim resting on n = 1 is flagged, not omitted.\n")
+row("claim", "independent units", "n", "status")
+row("---", "---", "---", "---")
+
+def _n_seeds(files):
+    return sum(1 for f in files if (RUNS / f).exists())
+
+CLAIMS = [
+    ("Pendulum repair, direction-matched (H=100)", "model seeds",
+     ["e1_direction_matched.json", "e1_direction_matched_s4.json", "e1_direction_matched_s5.json"]),
+    ("Pendulum repair, disjoint (H=190)", "model seeds",
+     [f"e9_disjoint_s{s}_H190.json" for s in (3, 4, 5)]),
+    ("Pendulum repair at step 60,000 (E8)", "model seeds",
+     [f"e8_pendulum_s{s}_step60000.json" for s in (3, 4, 5)]),
+    ("E4 causal dialing", "model seeds", [f"e4_s{s}.json" for s in (3, 4, 5)]),
+    ("Damped refusal (arm C)", "model seeds",
+     [f"e1_armC_damped_s{s}.json" for s in (0, 1, 2)]),
+    ("2-DoF recovery (E17)", "model seeds",
+     ["e17_recovery_nc.json", "e17_recovery_nc_s4.json", "e17_recovery_nc_s5.json"]),
+    ("2-DoF repair at convergence", "model seeds",
+     ["e17_intervention_nc_s3_step60000.json", "e8b_predB_nc_s4_step60000.json",
+      "e8_curve_osc_s5_step60000.json"]),
+    ("Two-invariant degeneracy (central arm)", "model seeds",
+     ["e17_recovery_ce.json"]),
+]
+for name, unit, files in CLAIMS:
+    n = _n_seeds(files)
+    status = "**n=1 — DO NOT GENERALISE**" if n <= 1 else ("n=2 — provisional" if n == 2 else "n>=3")
+    row(name, unit, n, status)
+
 print("\n---\n")
 print("Regenerate with: `uv run python scripts/make_results_summary.py > docs/RESULTS.md`")
