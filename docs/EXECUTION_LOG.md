@@ -3252,3 +3252,60 @@ the eval sets have 512 — rather than only on the analysis split.
 Three statements of this claim in three iterations, each narrower than the last, each forced by a
 test rather than by reflection. The claim that survives is the one about **outcomes**, not about
 mechanism.
+
+---
+
+## 2026-08-27 23:30–23:55 UTC — **The sample-size concern was my own methodological error; it is withdrawn**
+
+Git at `7c1cee9`. Session had been interrupted; central seed 1's training was killed at ~step 54,000
+(checkpoints through step 30,000 survive and were **not** overwritten — seed 2 was launched instead,
+deliberately, to avoid repeating the 18:10 destructive-retrain defect). Central seed 2 training now.
+
+### The test
+
+E17b bootstrap-resampled the 52 analysis trajectories **with replacement** and found `rho_E` swinging
+0.07-0.97 (median 0.613, IQR 0.613). I reported that as a possible small-sample sensitivity affecting
+every number in the project.
+
+Re-run using **disjoint subsamples without replacement**, drawn from the 512-trajectory eval set, at
+the same checkpoint:
+
+| sampling | n | median `rho_E` | **IQR** |
+|---|---|---|---|
+| bootstrap, **with** replacement (E17b) | 52 | 0.613 | **0.613** |
+| disjoint, **without** replacement | 52 | **0.959** | **0.017** |
+| disjoint, **without** replacement | 128 | **0.964** | **0.011** |
+
+The fit is **stable**, and its spread **shrinks with n** as a well-behaved estimator should.
+
+### Why bootstrap was invalid here, specifically
+
+The invariance ratio is a **within- versus across-trajectory variance decomposition** — `W a = lambda T a`
+with `W` the mean within-trajectory covariance and `T` the total. Sampling with replacement
+duplicates whole trajectories. Duplicate copies contribute **zero** within-trajectory variance
+between them while counting as **separate** trajectories in the total covariance, which corrupts
+exactly the quantity the eigenproblem optimises.
+
+Bootstrap is not a valid resampling scheme for this statistic. That is a property of the estimator,
+not of the data, and I should have checked it before drawing a conclusion from it — the standing
+rule adopted after E3/E2b/E12 says to validate a statistic on a known-answer signal first, and I
+applied a resampling scheme without asking whether it was admissible.
+
+### What this withdraws
+
+**The sample-size sensitivity flag is withdrawn.** The reported numbers are not fragile to sample
+size. The specific claim that "removing a third of the trajectories materially changes the answer"
+was an artefact of duplicating trajectories, not of removing them.
+
+**E17b's falsification of the ill-posedness account still stands** — that comparison was
+between-arms under the *same* (invalid) scheme, so the relative result is unaffected even though
+both absolute numbers were corrupted. The degeneracy claim remains at its third statement: the joint
+fit usually fails to isolate either invariant on a two-invariant system while the subspace reliably
+contains both, with the mechanism untested.
+
+### Count
+
+This is the sixth retraction of the session and the first that **removes** a concern rather than
+narrowing a claim. The pattern is consistent and worth stating plainly: outcome claims measured
+against preregistered controls have survived; my explanations and my ad-hoc statistical choices have
+not.
