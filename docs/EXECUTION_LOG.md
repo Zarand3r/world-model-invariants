@@ -3134,3 +3134,55 @@ at those steps do reproduce within 0.16.
 
 And it remains **n = 1 seed**, as the new evidence-base guard flags. Central seeds 1 and 2 are
 training.
+
+---
+
+## 2026-08-27 19:10–19:25 UTC — **Degeneracy replicates on seed 1, but as instability rather than uniform failure**
+
+Git at `2f79f84`. Prompted directly by the evidence-base guard, which flagged this as the one claim
+resting on n = 1.
+
+### All joint-fit measurements on the central (two-invariant) arm
+
+| seed | step | joint `rho_E` | joint `rho_L` | best `rho_E` | best `rho_L` | isolates? |
+|---|---|---|---|---|---|---|
+| 0 | 6,500 | 0.085 | 0.364 | 0.745 | 0.941 | no |
+| 0 | 15,000 | 0.290 | 0.264 | 0.741 | 0.950 | no |
+| 0 | 30,000 | 0.146 | 0.015 | 0.704 | 0.967 | no |
+| 0 | 60,000 | 0.064 | 0.163 | 0.929 | 0.942 | no |
+| 0 (retrain) | 6,500 | 0.420 | 0.157 | 0.632 | 0.995 | no |
+| **1** | **6,500** | **0.904** | 0.236 | 0.787 | 0.962 | **partial** |
+| 1 | 15,000 | 0.061 | 0.177 | 0.778 | 0.978 | no |
+
+Non-central (one invariant) for contrast: **0.909, 0.966, 0.987** at steps 15k/30k/60k — monotone
+and reliable.
+
+### The claim must be restated
+
+I described this as "the joint fit **never** resolves". Seed 1 at step 6,500 resolves it well
+(0.904). The accurate statement is:
+
+> On a two-invariant system the flow-alignment fit is **unstable**: across seven measurements it
+> spans `rho_E` 0.06 to 0.90, with no trend in training and a 0.37 swing between two trainings of the
+> *same* seed. On a one-invariant system it converges reliably and monotonically to the invariant.
+
+That is a **better** description of an ill-posed optimisation than "always fails" — a criterion with
+no unique optimum does not fail uniformly, it lands wherever initialisation and noise put it.
+"Never resolves" was the strongest reading of seed 0 and was wrong.
+
+The **subspace** remains stable throughout: `best rho_L` is 0.941-0.995 across every measurement, and
+a separate energy-aligned direction is always present. What varies is only which direction inside
+that subspace the fit selects.
+
+### Status of the claim
+
+**n = 2 seeds** plus one retraining, seven measurements. Still flagged provisional by the guard until
+seed 2. What replicates is the *instability and the failure to reliably isolate*; what does not
+replicate is uniform failure.
+
+### The guard did its job on its first use
+
+The evidence-base check added last iteration flagged this claim as n = 1, which is why it was tested
+this iteration rather than carried forward. It immediately produced a correction to a claim I had
+stated three times in strong terms. That is the intended function, and it worked on the first
+opportunity.
