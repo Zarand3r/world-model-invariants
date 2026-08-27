@@ -1,0 +1,48 @@
+{
+ "non-central_T100": {
+  "lamT_p95": 0.40441660139433283,
+  "frac_below_1": 1.0,
+  "pass": true
+ },
+ "central_T100": {
+  "lamT_p95": 0.13175026832876047,
+  "frac_below_1": 1.0,
+  "pass": true
+ },
+ "non-central_T190": {
+  "lamT_p95": 0.815865164759427,
+  "frac_below_1": 0.9765625,
+  "pass": true
+ },
+ "central_T190": {
+  "lamT_p95": 0.17994220523886795,
+  "frac_below_1": 1.0,
+  "pass": true
+ },
+ "non-central_T200": {
+  "lamT_p95": 0.8183560531097409,
+  "frac_below_1": 0.98046875,
+  "pass": true
+ },
+ "central_T200": {
+  "lamT_p95": 0.22098777398660316,
+  "frac_below_1": 1.0,
+  "pass": true
+ },
+ "non-central_invariance": {
+  "E": 0.029027204477481368,
+  "L": 0.10063113386646205
+ },
+ "central_invariance": {
+  "E": 0.028271190000915325,
+  "L": 2.9634555781813334e-16
+ },
+ "frozen": {
+  "w1": 1.0,
+  "w2": 1.0,
+  "a": 0.05,
+  "b_noncentral": 0.4,
+  "b_central": 0.05,
+  "dt": 0.05
+ }
+}

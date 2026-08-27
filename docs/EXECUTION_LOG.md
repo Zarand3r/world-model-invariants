@@ -1638,3 +1638,66 @@ is now **substantially addressed but not eliminated**, and should be stated that
 Stage 1 complete. Stage 3 controls: E10 **not constructible** on this system, E11 **passed**, E12
 **failed as registered**, E12b **partial pass**. Next per Richard's approved order: the 2-DoF system,
 which now carries E10 as well as the generality question.
+
+---
+
+## 2026-08-27 07:45–08:20 UTC — **E17 chaos gate: it changed the design twice, before any data was generated**
+
+Git at `dd2a5a2`. Preregistered in `docs/E17_PREREG.md`, approved by Richard. The gate is the whole
+point of running simulation before rendering, and it earned its place.
+
+### Failure 1 — weak coupling leaves extra invariants
+
+At `w1 = 1.0, w2 = 1.3, a = b = 0.20` the **per-mode energies are conserved almost as well as the
+total** (invariance ratio 0.052 against 0.033). The "non-central" arm would have had **three**
+approximate invariants, not one, silently defeating the design. KAM tori survive a ~10% perturbation.
+
+Strengthening to `a = b = 0.50` broke the mode energies but **failed the chaos gate** (frac 0.832
+against a registered 0.95).
+
+### Failure 2 — symmetry-breaking trades off directly against chaos
+
+Holding `a = 0.30` and raising `b` to break the rotational symmetry: `b = 0.60` already fails
+(lambda*T = 1.369), and it gets worse from there. Sixteen parameter sets recorded in
+`runs/e17_chaos_gate_search.json`, per the prereg's requirement to record every set tried.
+
+### The design correction that fell out of it
+
+At `w1 = w2` the central potential expands **exactly**:
+
+    1/4 a r^4  =  1/4 a (q1^4 + q2^4) + 1/2 a q1^2 q2^2
+
+So **central is just `b = a`**. The two arms collapse into one system with **one parameter**
+changed — strictly cleaner than the two separately-specified potentials in the original prereg, and
+a matched pair in the same sense as conservative/damped. The prereg was amended in place, before any
+data existed.
+
+### Frozen parameters
+
+    w1 = w2 = 1.0     a = 0.05     dt = 0.05
+    non-central b = 0.40      central b = 0.05
+
+| arm | H=100 | H=190 | H=200 | E invariance | L invariance |
+|---|---|---|---|---|---|
+| non-central | 1.000 PASS | 0.977 PASS | 0.980 PASS | 0.0290 | **0.1006** broken |
+| central | 1.000 PASS | 1.000 PASS | 1.000 PASS | 0.0283 | **0.0000** exact |
+
+Total energy is equally well conserved in both arms; angular momentum is exact in one and 3.5x worse
+in the other. That is the contrast the experiment turns on, and it now exists by construction.
+
+Integrator is **semi-implicit (symplectic) Euler**, deliberately matching gymnasium's pendulum
+convention so `p_k = (q_k - q_{k-1})/dt` holds exactly and the geometric readout's
+backward-difference convention transfers unchanged. Choosing a "better" integrator here would have
+silently broken a readout that already cost one iteration to get right.
+
+### What this cost and saved
+
+Roughly half an hour of pure simulation. It caught a design that would have produced a
+three-invariant "one-invariant" arm, and would not have been detectable from the pixel results
+without a great deal of confusion. Nothing was rendered or trained under the broken design.
+
+### Next
+
+Renderer, then dataset, then training under the frozen step-capped contract. The extraction runs at
+**frozen hyperparameters first** (LD = 12, degree 4, n_basis = 8) with any adaptation recorded as a
+separate experiment, per the roadmap.
