@@ -2159,3 +2159,75 @@ change to the method is being made — the registered order is to record the fro
 first.
 
 Non-central seeds 4/5 and central seeds 1/2 still to train.
+
+---
+
+## 2026-08-27 11:40–12:10 UTC — **E8 ANSWERED, AND IT SPLITS BY SYSTEM** — needs Richard's judgment
+
+Git at `fe1bbe7`. This is the roadmap's E8 decision branch firing, and it fires differently on the
+two systems.
+
+### The finding
+
+| system | step | baseline abs `D_sec` | recovered | random | beats |
+|---|---|---|---|---|---|
+| **2-DoF non-central** s3 | 30,000 | 7.71e-03 | **-57.6%** | -17.2% | 0/20 |
+| **2-DoF non-central** s3 | **60,000** | **1.01e-03** | **+4.1%** | +30.5% | 0/20 |
+| **pendulum** s3 | 6,500 | 1.28e-03 | **-50.9%** | +16.9% | 0/20 |
+| **pendulum** s3 | **60,000** | **9.60e-04** | **-22.7%** | +4.3% | 0/11 |
+
+**On the 2-DoF system the effect vanishes at convergence.** Baseline drift falls 7.6x and the repair
+does nothing (+4.1%).
+
+**On the pendulum it survives.** At step 60,000 — **9.2x the published training budget** — baseline
+drift has fallen only 25% and the repair still gives -22.7%, with no random direction beating it.
+
+### Floor check, because the conclusion depends on it
+
+Both step-60,000 baselines are ~1e-03 and could have been at the readout floor, in which case
+"no drift left to repair" would be unmeasurable rather than true. Measured **at each checkpoint**:
+
+| | floor at H=100 | step-60,000 baseline | ratio |
+|---|---|---|---|
+| pendulum | 2.22e-04 | 9.60e-04 | 4.3x |
+| 2-DoF | 2.86e-04 | 1.01e-03 | 3.5x |
+
+Both comfortably above floor. The measurements are valid and the difference between systems is real.
+
+**A correction to my own registered number.** `E1_PREREG` registered the `D_sec` floor as
+**1.0e-03**, measured at **H = 50**. At H = 100 the true floor is **2.2e-04** — a slope statistic
+over twice as many points resolves better. Every H = 100 result has therefore been judged against a
+floor 4.5x too strict. This made the project **under-claim**, never over-claim, and the H = 100 and
+H = 190 conclusions all stand with more margin than reported. The registered floor should be stated
+per horizon in any writeup, not as a single number.
+
+### What this does to the central claim
+
+The roadmap's decision tree is explicit: *"If E8 shows drift vanishes with adequate training, do not
+claim a fundamental world-model failure. Reframe as an undertraining diagnostic."*
+
+That branch **fires for the 2-DoF system and not for the pendulum**, so the tree does not resolve it.
+The honest statement of what is now known:
+
+1. The phenomenon is **not merely an undertraining artefact** — it persists on the pendulum at 9.2x
+   the published budget, still specific.
+2. It **is strongly training-sensitive**, and on a system where the model eventually learns the
+   dynamics well, it largely disappears.
+3. The 2-DoF model at step 60,000 reaches roughly the **same absolute drift** as the pendulum
+   (1.01e-03 vs 9.60e-04). The difference is where each started: the 2-DoF model began at 7.71e-03
+   and had far more to lose.
+
+This also **falsifies a prediction I made from E2b**. I argued that diffusive accumulation is "closer
+to irreducible — training reduces noise but does not eliminate it," and predicted the effect would
+persist at saturation. On the 2-DoF system it does not. That prediction was recorded as a prediction
+and is now recorded as wrong.
+
+### Not concluded, and why
+
+- **One seed per system** at step 60,000. Pendulum seeds 4 and 5 are running; the 2-DoF arm has one.
+- The pendulum's step-60,000 random arm is 11/20.
+- Whether the pendulum effect would also vanish given *more* than 60,000 steps is untested, and
+  60,000 was chosen as "saturation" from validation loss, not proven to be saturation.
+
+**Paused for Richard.** This bears directly on how the paper frames its central claim, and the
+roadmap's own decision tree does not adjudicate a split result.
