@@ -1986,3 +1986,43 @@ the first time that decision has paid off in a way that was not the reason for m
 
 Memory is not a constraint (15.8 GB of 96 GB before the second job). Nothing was interrupted and no
 partial checkpoint was discarded.
+
+---
+
+## 2026-08-27 10:10–10:45 UTC — **2-DoF result survives disjoint evaluation**
+
+Git at `56e28a4`. Non-central seed 3 finishing; central seed 0 training concurrently.
+
+`C`, `h_mean`, `U` and `R` frozen from the analysis split of `osc2d_noncentral.npz`; scored on
+`osc2d_noncentral_eval.npz` — **512 trajectories x 200 frames, generator seed 777**, never used for
+training, fitting or any prior analysis. Horizon clamped to 190 by the recorded rule.
+
+| eps | recovered | random median | random beating recovered |
+|---|---|---|---|
+| 0.005 | -13.5% | -2.5% | 0/12 |
+| 0.01 | -32.1% | -4.1% | 0/12 |
+| 0.02 | **-62.6%** | -10.0% | **0/12** |
+
+Monotone dose-response, and the effect is **larger out of sample at H = 190 (-62.6%) than in sample
+at H = 100 (-57.6%)** — the same horizon scaling E6 found on the pendulum, now reproduced on a
+different system.
+
+Side-by-side at H = 190 on disjoint data:
+
+| system | recovered | random |
+|---|---|---|
+| pendulum, 3 seeds | -54.6 to -75.9% | +7.4 to +9.7% |
+| **2-DoF non-central, 1 seed** | **-62.6%** | -10.0% |
+
+The random arm is still filling (12 of 20); the number will be restated when it completes.
+
+### What C6 now rests on
+
+Claim C6 (generality) is supported by three independent transfers, all at frozen hyperparameters:
+
+1. **Recovery** — `|rho_E|` 0.966 at step 30,000, matching the pendulum's 0.967-0.975
+2. **Repair** — -57.6% in sample, 0/20 random
+3. **Out-of-sample repair** — -62.6% on 512 unseen trajectories, 0/12 random, with the same
+   horizon scaling
+
+One seed, non-central arm only. The two-invariant central test remains the sharpest thing untested.
