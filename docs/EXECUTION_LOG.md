@@ -1216,3 +1216,41 @@ causally deployed for physical energy, not proof of an internal energy register.
 Last iteration ran 8 random and 3 tangent draws against 20 and 5 elsewhere, and flagged that as a
 shortcut to be corrected before reporting — the same shortcut that produced the arm-C correction.
 Relaunched at 20 and 5 on all three seeds; numbers above will be restated when it completes.
+
+---
+
+## 2026-08-27 05:10–05:20 UTC — E4 controls at parity; arm C launched at n = 3
+
+Git at `7c64dfd`. Damped seed 1 trained; damped seed 2 training and already past step 6,500, so all
+three damped models have the checkpoint arm C needs.
+
+### E4a with controls at parity (20 random, 5 tangent per seed)
+
+| seed | recovered rho | random median | **random max** | tangent median | **tangent max** | controls beating |
+|---|---|---|---|---|---|---|
+| 3 | **+0.916** | -0.078 | +0.582 | -0.065 | +0.058 | 0/25 |
+| 4 | **+0.838** | -0.116 | +0.266 | -0.059 | +0.338 | 0/25 |
+| 5 | **+0.808** | +0.005 | +0.538 | +0.052 | +0.165 | 0/25 |
+
+**0/75 controls across all three seeds.** The transfer correlations are unchanged from the 8-draw
+reading, so unlike arm C the E4 conclusion did not move when the null was properly powered.
+
+**The maxima are worth stating and were not visible at 8 draws.** Random constraints are not at
+zero: the best random draw reaches **+0.582** on seed 3 and +0.538 on seed 5. Medians are near zero
+(-0.116 to +0.005), but the tail is real. The honest separation is recovered [+0.808, +0.916] against
+best-of-twenty random [+0.266, +0.582] — clear, and not the "controls do nothing" picture the
+medians alone would suggest. Any writeup should quote the maxima alongside the medians.
+
+That a random degree-4 polynomial of the latent sometimes correlates with energy is unsurprising and
+is the same phenomenon as the untrained-model result the paper already reports (rho_E up to 0.908):
+on a 1-DoF conservative system, energy is close to the only trajectory-constant scalar, so anything
+tracking the latent state at all will partly track it. E4's claim is comparative, not absolute.
+
+### Launched
+
+- Arm C on damped seeds 1 and 2, 20 random / 5 tangent, matching seed 0.
+- E2 on damped seeds 1 and 2.
+
+Together these complete the three-seed refusal criterion that `E1_PREREG` and the repo's existing
+`docs/DISSIPATIVE_PREREG.md` both require, and which has been the outstanding gap in Stage 1 since
+the start.
