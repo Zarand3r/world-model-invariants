@@ -89,7 +89,7 @@ def summary(b: Bundle) -> dict:
             "n_monomials": int(b.basis_coeffs.shape[1])}
 
 
-def build(model_key: str, ld: int, degree: int, progress=lambda s: None) -> Bundle:
+def build(model_key: str, ld: int, degree: int, progress=lambda _: None) -> Bundle:
     """Compute and cache. Holds the GPU lock across the encode and the transition sweep."""
     k = key(model_key, ld, degree)
     if cached(k):

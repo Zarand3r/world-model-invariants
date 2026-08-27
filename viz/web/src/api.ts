@@ -39,8 +39,24 @@ export type Leverage = {
   rho_V_D: number; rho_D_edit: number; damage_ratio: number;
 };
 
+/** What the committed run logs say about one model. Every field is optional: a ladder checkpoint
+ *  has no published counterpart, and not every arm reports every statistic. */
+export type Published = {
+  arm?: string;
+  rho_energy?: number;
+  drift_of_C?: number;
+  pairing_residual?: number;
+  heldout_invariance_ratio?: number;
+  participation_ratio?: number;
+  rho_V_D?: number;
+  rho_D_edit?: number;
+  dose?: Record<string, number>;
+  normalised_slope?: number;
+  relative_change_at_max_alpha?: number;
+};
+
 export type PaperRefs = {
-  per_model: Record<string, Record<string, number | string | Record<string, number>>>;
+  per_model: Record<string, Published | undefined>;
   untrained_rho: number[];
   random_null: { n: number; median: number; improving: number; values: number[]; slopes: number[] };
   damped_dose: number[];

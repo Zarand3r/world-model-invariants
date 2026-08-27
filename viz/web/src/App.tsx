@@ -124,8 +124,7 @@ export default function App() {
     for (const m of models) (g[m.arm] ??= []).push(m);
     return g;
   }, [models]);
-  const modelKey = info?.ckpt.split("/").pop()?.replace(".pt", "");
-  const published = paper && modelKey ? paper.per_model[modelKey] : undefined;
+  const published = paper && info ? paper.per_model[info.model_key] : undefined;
 
   return (
     <div className="app">
@@ -180,7 +179,7 @@ export default function App() {
           <span>rank {info.retained_rank} of {info.ld} · {info.n_monomials.toLocaleString()} monomials
             · {info.n_basis} basis invariants · degree {info.degree}</span>
           {published?.rho_energy !== undefined &&
-            <span className="pub">published |ρ|<sub>E</sub> {(published.rho_energy as number).toFixed(3)}</span>}
+            <span className="pub">published |ρ|<sub>E</sub> {published.rho_energy.toFixed(3)}</span>}
         </div>
       )}
 
@@ -188,7 +187,7 @@ export default function App() {
         <div className="main-col">
           <Theatre roll={roll} frame={frame} onFrame={(f) => { setPlaying(false); setFrame(f); }}
                    alpha={cfg.alpha} />
-          <Directions lev={lev} published={published as { rho_V_D?: number; rho_D_edit?: number }} />
+          <Directions lev={lev} published={published} />
         </div>
         <div className="side">
           <InvariantPanel law={law} roll={roll} />

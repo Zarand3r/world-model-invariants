@@ -7,7 +7,7 @@ The edit is the paper's, unchanged:
 mapped back through `pinv(P)` so the part of `h` outside the extracted subspace is untouched. It
 runs at decode time; the model is never adapted and the decoder is never involved.
 
-**One alpha per forward pass, and that is a correctness requirement rather than a style choice.**
+**One alpha per forward pass — a correctness requirement, not a style choice.**
 Batching the five alphas together is the obvious optimisation and it changes the answer. Measured on
 seed 3: rolling alpha = 0.1 alone over the 52 analysis trajectories gives a rollout MSE of
 2.70458893e-03, matching `run_dreamer_edit.py`; rolling it inside a five-alpha batch gives
@@ -36,10 +36,10 @@ differ merely in extraction dimension share one entry instead of each storing a 
 a CUDA device-side assert, which is not a recoverable error: it poisons the process's CUDA context,
 so every later request failed until the server was restarted while the page kept serving 200s.
 """
-import threading
 import base64
 import collections
 import io
+import threading
 
 import numpy as np
 import torch
@@ -47,7 +47,6 @@ from PIL import Image
 
 from latent_noether.extraction import Bundle
 from latent_noether.polynomial import monomial_features
-
 
 _STARTS: collections.OrderedDict[str, torch.Tensor] = collections.OrderedDict()
 _STARTS_LOCK = threading.Lock()
@@ -167,8 +166,8 @@ def imagine(model, b: Bundle, trajs, horizon: int, alphas, weights=None,
     out = {
         "alphas": [float(x) for x in al],
         "trajs": idx,
-        "mse": mse.cpu().numpy(),                                    # per alpha, per traj, per step
-        "mse_by_alpha": mse.mean(dim=(1, 2)).cpu().numpy(),          # the script's scoring statistic
+        "mse": mse.cpu().numpy(),                             # (alpha, traj, step)
+        "mse_by_alpha": mse.mean(dim=(1, 2)).cpu().numpy(),   # what the scripts score
         "C": torch.stack(Cs, 0).cpu().numpy(),
         "C0": torch.stack(C0s, 0).cpu().numpy(),
     }
@@ -178,14 +177,10 @@ def imagine(model, b: Bundle, trajs, horizon: int, alphas, weights=None,
     return out
 
 
-def sheet_png(frames: np.ndarray) -> bytes:
-    """(T, 64, 64, 3) in [-0.5, 0.5] -> one vertical sprite sheet, PNG bytes."""
+def sheet_data_uri(frames: np.ndarray) -> str:
+    """(T, 64, 64, 3) in [-0.5, 0.5] -> one vertical sprite sheet, as a data URI."""
     a = np.clip((np.asarray(frames) + 0.5) * 255.0, 0, 255).astype(np.uint8)
     t, h, w, _ = a.shape
     buf = io.BytesIO()
     Image.fromarray(a.reshape(t * h, w, 3)).save(buf, format="PNG", compress_level=1)
-    return buf.getvalue()
-
-
-def sheet_data_uri(frames: np.ndarray) -> str:
-    return "data:image/png;base64," + base64.b64encode(sheet_png(frames)).decode()
+    return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()

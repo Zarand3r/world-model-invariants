@@ -2,8 +2,8 @@
 
 Five scripts each carried their own copy of this sequence — `run_dreamer_extraction`,
 `run_dreamer_edit`, `run_dreamer_leverage`, `run_dreamer_residual_decomp`, `run_edit_compactness` —
-and the copies had already drifted on which split they took and whether the warmup was dropped before
-or after the PCA. A probe UI that recomputes it a sixth way would make its numbers unreviewable
+and the copies had drifted on which split they took and whether the warmup was dropped before or
+after the PCA. A probe UI that recomputes it a sixth way would make its numbers unreviewable
 against the paper, so the sequence lives here and every caller gets the same one.
 
 **What a `Bundle` is.** Everything downstream of one (checkpoint, extraction dimension, degree)
@@ -47,7 +47,7 @@ def true_energy(states: np.ndarray) -> np.ndarray:
 @dataclasses.dataclass
 class Bundle:
     """One extraction. Arrays are numpy so this serialises to a plain .npz."""
-    model_key: str              # the registry key; `ckpt` is an absolute path and moves with the repo
+    model_key: str              # registry key; `ckpt` is an absolute path, so it moves
     ckpt: str
     ld: int
     degree: int
@@ -84,12 +84,6 @@ class Bundle:
         return (self.G @ w).reshape(self.Z.shape[:2])
 
 
-def encode_split(model, frames: torch.Tensor, warmup: int) -> torch.Tensor:
-    """Teacher-forced latents with the warmup dropped. frames: (n, T, 64, 64, 3) in [-0.5, 0.5]."""
-    with torch.no_grad():
-        return model.encode(frames)[:, warmup:].detach()
-
-
 def build_bundle(model, frames: torch.Tensor, states: np.ndarray, *, ckpt: str = "",
                  model_key: str = "", ld: int = 12, degree: int = 4, warmup: int = 10,
                  split_start: int = 204, n_basis: int = 8) -> Bundle:
@@ -104,7 +98,8 @@ def build_bundle(model, frames: torch.Tensor, states: np.ndarray, *, ckpt: str =
     if frames.shape[0] != states.shape[0]:
         raise ValueError(f"frames and states disagree on trajectory count: "
                          f"{frames.shape[0]} vs {states.shape[0]}")
-    H = encode_split(model, frames, warmup)                           # (n, T, D)
+    with torch.no_grad():                                # teacher-forced, warmup dropped
+        H = model.encode(frames)[:, warmup:].detach()    # (n, T, D)
     h_mean = H.reshape(-1, H.shape[-1]).mean(0)
 
     U = pca_subspace(H, ld)

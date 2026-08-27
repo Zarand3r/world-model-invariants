@@ -5,11 +5,11 @@ the weights is `G @ a` — so every score here is a few matrix products on an (N
 microseconds. This is the file that makes hand-steering the invariant feel like a slider rather than
 a job.
 
-**The pairing residual is the expensive one and still cheap.** Given weights it solves the same
-least squares the fit's B-step solves, over the antisymmetric basis of the extracted subspace: at
-r = 12 that is a (N*r, 66) system, tens of milliseconds. It is included because |rho|_E alone cannot
-tell a conserved quantity from one that merely tracks energy — the paper's damped models score
-|rho|_E up to 0.09 while their drift is three orders of magnitude worse.
+**The pairing residual is the expensive one and still cheap**: the same least squares the fit's
+B-step solves, over the antisymmetric basis of the extracted subspace — at r = 12 a (N*r, 66)
+system, tens of milliseconds. It is here because |rho|_E alone cannot tell a conserved quantity
+from one that merely tracks energy: the damped models reach |rho|_E 0.09 with drift three orders
+of magnitude worse.
 """
 import numpy as np
 import torch
@@ -39,11 +39,8 @@ def basis_grads(b: Bundle) -> np.ndarray:
 
 
 def pairing_residual(b: Bundle, weights: np.ndarray) -> float:
-    """min_B ||f - B grad C||^2 / ||f||^2 over antisymmetric B. 0 = the flow is exactly Hamiltonian."""
+    """min_B ||f - B grad C||^2 / ||f||^2 over antisymmetric B. 0 = the flow is Hamiltonian."""
     r = b.Z.shape[-1]
-    Zt = torch.as_tensor(b.Z, dtype=torch.float64)
-    # the flow is not stored; it is recoverable only from the model, so score against the *fitted*
-    # displacement implied by the bundle's own basis — see note in `scores`.
     gradC = torch.as_tensor(np.einsum("k,knd->nd", weights, basis_grads(b)))
     basis = _antisym_basis(r, torch.float64)
     A = torch.stack([gradC @ bb.T for bb in basis], dim=-1)

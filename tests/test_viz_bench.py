@@ -106,7 +106,7 @@ def test_bench_reproduces_the_published_dose_response():
     with registry.GPU:
         r = rollout.imagine(m, b, None, 50, alphas, keep_frames=False)
     got = np.asarray(r["mse_by_alpha"], dtype=np.float64)
-    for a, v in zip(alphas, got):
+    for a, v in zip(alphas, got, strict=True):
         assert v == pytest.approx(want["rollout_by_alpha"][str(a)], rel=1e-4), f"alpha {a}"
     change = float((got[-1] - got[0]) / got[0])
     assert change == pytest.approx(want["relative_change_at_max_alpha"], rel=1e-3)
