@@ -2026,3 +2026,72 @@ Claim C6 (generality) is supported by three independent transfers, all at frozen
    horizon scaling
 
 One seed, non-central arm only. The two-invariant central test remains the sharpest thing untested.
+
+---
+
+## 2026-08-27 10:40–11:00 UTC — Disjoint 2-DoF final; **first evidence for the two-invariant prediction**
+
+Git at `a22f8e8`. Non-central seed 3 at step 54,000; central seed 0 at step 6,500 and **KL recovered**
+(rawKL 1.74 at step 6,000 against a 1-nat acceptance floor — the step-2,000 reading of 0.38 was
+transient, not posterior collapse).
+
+### E17 disjoint, final on all arms
+
+512 never-seen trajectories, H = 190, non-central seed 3 at step 30,000:
+
+| eps | recovered | random median | tangent median | beats |
+|---|---|---|---|---|
+| 0.005 | -13.5% | -2.3% | +0.1% | 0/20 rand, 0/5 tan |
+| 0.01 | -32.1% | -4.1% | +0.4% | 0/20 rand, 0/5 tan |
+| 0.02 | **-62.6%** | -9.1% | +2.5% | **0/20 rand, 0/5 tan** |
+
+Unchanged from the 12-draw reading. Tangent controls sit at zero, as on the pendulum.
+
+### Prediction 2 — early but structurally clear
+
+Registered: the central arm yields a **two-dimensional** conserved subspace whose second direction
+correlates with angular momentum at `|rho_L| > 0.8`.
+
+**Central arm, step 6,500** (top candidates by invariance ratio):
+
+| rank | ratio | \|rho_E\| | \|rho_L\| |
+|---|---|---|---|
+| **0** | 1.46e-04 | 0.245 | **0.941** |
+| 1 | 1.54e-04 | 0.525 | 0.311 |
+| **2** | 2.55e-04 | **0.745** | 0.030 |
+
+**Two distinct, separately-identifiable well-conserved directions**: rank 0 tracks angular momentum
+at 0.941, rank 2 tracks energy at 0.745, and they are nearly orthogonal in what they encode
+(rank 0's `|rho_E|` is 0.245, rank 2's `|rho_L|` is 0.030). The same structure is present at step
+3,000 (`|rho_L|` 0.759 at rank 0, `|rho_E|` 0.854 at rank 2).
+
+**The registered `|rho_L| > 0.8` bar is met at step 6,500.**
+
+Comparison at the matched checkpoint, which is the point of the matched pair:
+
+| arm at step 6,500 | best \|rho_L\| in pool | true L invariance ratio in data |
+|---|---|---|
+| central | **0.941** | **0.0000** (exact) |
+| non-central | 0.818 | 0.0638 (broken) |
+
+The arm where angular momentum is exactly conserved yields a better angular-momentum direction. The
+difference is real but not yet dramatic at this checkpoint, and the non-central arm's 0.818 was
+itself a reading from an undertrained model that fell to 0.355 by step 30,000. The comparison should
+be redone at matched, adequate training before being reported.
+
+### The same selection failure, reproduced
+
+The jointly-fitted `C` on the central arm is poor at step 6,500 (`|rho_E|` 0.085, `|rho_L|` 0.364)
+while the subspace plainly contains both invariants. This is **exactly** the pattern the non-central
+arm showed at the same checkpoint — the conserved subspace is right early, and flow alignment does
+not isolate a direction inside it until roughly step 15,000-30,000.
+
+Two independent arms now show it, which upgrades it from an observation to a **reproducible property
+of the method**: the pairing criterion requires an adequately converged conserved subspace before it
+helps, and actively hurts before that point.
+
+### Status
+
+C6 rests on three transfers on the non-central arm (recovery 0.966, in-sample repair -57.6%,
+disjoint repair -62.6%), all one seed. Prediction 2 has its first supporting evidence at an early
+checkpoint. Non-central seeds 4/5 and central seeds 1/2 still to train.
