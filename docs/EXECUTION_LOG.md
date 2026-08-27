@@ -2545,3 +2545,79 @@ frozen-setting behaviour, and a remedy (for instance, searching a two-dimensiona
 rather than a single direction) would be a new method and a separate experiment.
 
 This is invisible on a 1-DoF pendulum, which has only one invariant to find.
+
+---
+
+## 2026-08-27 14:40–15:00 UTC — **E8b prediction B FAILS: the 2-DoF "vanishing" was one seed**
+
+Git at `5f1889d`. Non-central seed 4 trained to step 60,000; seed 5 started.
+
+### The registered falsifier fired
+
+`E8B_PREREG` predicted 2-DoF seed 4 at step 60,000 would show `|effect| < 15%`, with the falsifier
+stated as: *"`|effect| >= 15%` in either direction, which would mean the step-60,000 vanishing on
+seed 3 was seed-specific rather than a property of the converged model."*
+
+| 2-DoF, step 60,000 | baseline abs `D_sec` | \|rho_E\| | effect | beats |
+|---|---|---|---|---|
+| seed 3 | 1.010e-03 | 0.987 | **+4.1%** | 0/20 |
+| **seed 4** | **3.273e-03** | **0.987** | **-42.7%** | **0/20** |
+
+**PREDICTION B: FAIL.** The vanishing was seed-specific.
+
+Both seeds have **identical identification** (`|rho_E|` 0.987). They differ only in **residual
+drift**: seed 4 retained 3.2x more. The full seed-4 curve is -21.0%, -54.4%, -42.7% across
+15k/30k/60k — the effect peaks and then *partially* declines, rather than disappearing.
+
+### What survives, and what does not
+
+**The two-factor account survives and is in fact supported.** It says the repair needs good
+identification *and* residual drift. Seed 4 has both at step 60,000 (`|rho_E|` 0.987, drift
+3.27e-03) and repairs at -42.7%, exactly as the account requires. Prediction B failed not because
+the account is wrong but because I **assumed both seeds would converge to the same baseline drift**,
+and they do not.
+
+**"Training removes the drift" does not survive.** That claim rested entirely on seed 3.
+
+### The E8 picture, corrected for the third time
+
+Counting every converged model measured at step 60,000:
+
+| system | seed | baseline drift | effect |
+|---|---|---|---|
+| pendulum | 3 | 9.60e-04 | -22.7% |
+| pendulum | 4 | 1.436e-03 | -32.9% |
+| pendulum | 5 | 9.978e-04 | -26.8% |
+| 2-DoF | 3 | 1.010e-03 | **+4.1%** |
+| 2-DoF | 4 | 3.273e-03 | -42.7% |
+
+**4 of 5 fully-converged models retain enough residual drift for the repair to work**, across two
+different physical systems. Seed 3 of the 2-DoF arm is the single exception, and it is the one that
+happened to be measured first.
+
+### The recurring lesson, recorded because it has now happened four times
+
+The E8 story has been revised three times, and every revision came from generalising an n = 1
+observation:
+
+1. "drift vanishes on 2-DoF, persists on pendulum" — one seed each
+2. "one rule: the repair works when there is drift" — refuted by the step-15,000 point in the very
+   curve that generated it
+3. "the 2-DoF vanishing is a property of the converged model" — one seed, now falsified
+
+The same pattern produced the arm-C correction (10 draws), the E17 step-6,500 "failure of
+generality" (one early checkpoint), and the angular-momentum reading that did not survive training.
+
+**Standing rule, added alongside the statistic-validation rule:** no claim of the form "X happens at
+convergence" or "X is a property of the system" is stated, even provisionally, from a single seed.
+The roadmap said this from the start — *model seed is the independent experimental unit* — and the
+cost of ignoring it has been four retractions in one session.
+
+What preregistration bought here is that each retraction was **forced and dated** rather than
+quietly absorbed. Prediction B had a written falsifier; it fired; the claim came down.
+
+### Status
+
+E8b prediction A passed, prediction B failed. The two-factor account stands, having survived a real
+test and correctly explained the failure of the other. Non-central seed 5 and central seeds 1-2
+remain.
