@@ -41,3 +41,9 @@ paper2/figures/*.png
 
 # built PDF is committed: it is the deliverable
 !paper/main.pdf
+
+# bench: node deps, the built UI, and the extraction cache are all regenerable
+viz/web/node_modules/
+viz/web/dist/
+runs/viz_cache/
+viz/web/*.tsbuildinfo

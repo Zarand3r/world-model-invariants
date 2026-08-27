@@ -29,6 +29,15 @@ uv run python scripts/fetch_assets.py     # 359 MB; --skip-data to regenerate th
 
 Nothing below the figure regeneration needs those assets.
 
+## The probe bench
+
+An interactive rig over the frozen models: steer the recovered invariant by hand, enforce it during
+imagination, and watch the predicted video. `viz/README.md` has the detail.
+
+```bash
+./viz/run.sh          # http://127.0.0.1:8130
+```
+
 ## Regenerating the figures (no GPU, seconds)
 
 ```bash
