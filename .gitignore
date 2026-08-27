@@ -29,8 +29,7 @@ venv/
 .vscode/
 runs/model_cache/
 
-# vendored third-party checkout (nested git repo); see docs/REPRODUCE.md
-external/
+# vendored third-party checkout: tracked as a git submodule pinned in .gitmodules, not ignored
 logs/
 
 paper/project_context.md

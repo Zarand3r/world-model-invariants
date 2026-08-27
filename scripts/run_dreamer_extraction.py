@@ -66,10 +66,14 @@ def run(ckpt, data, warmup=10, LD=LD, untrained=False):
     # unrecoverable initialisations. The untrained arm IS the null distribution, so its seeds have
     # to be recoverable or the null cannot be checked.
     torch.manual_seed(int(hashlib.sha256(ckpt.encode()).hexdigest()[:8], 16))
-    ck = torch.load(ckpt, map_location="cuda")
     m = DreamerV3Adapter(device="cuda").cuda()
     if not untrained:
-        m.load_state_dict(ck["model"])
+        m.load_state_dict(torch.load(ckpt, map_location="cuda")["model"])
+    # The untrained arm deliberately does NOT open the file. Its seed comes from the checkpoint
+    # PATH (above), and the weights are discarded, so loading them only forced reproducers to
+    # possess six checkpoints whose contents cannot affect the answer. The paper's null was run
+    # over runs/dreamer_ref_s{0..5}.pt; three of those models no longer exist anywhere, and with
+    # this change the arm still reproduces exactly, because only the path strings ever mattered.
     m.eval()
 
     val = slice(204, None)

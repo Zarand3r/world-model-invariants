@@ -1,0 +1,81 @@
+{
+  "repo_id": "Zarand3r/world-model-invariants",
+  "repo_type": "model",
+  "files": {
+    "checkpoints/dreamer_ref_s3.pt": {
+      "sha256": "41925a880287dba642e86b96854ec7ba1de2ffcd68c79a1f9c8823a7c51ce34f",
+      "bytes": 53828021,
+      "note": "conservative, seed 3",
+      "train": {
+        "steps": 6472,
+        "hours": 0.5,
+        "seed": 3
+      }
+    },
+    "checkpoints/dreamer_ref_s4.pt": {
+      "sha256": "22f23f8ff30b732c8443adb3cec4c80b9decccd1de7f1bd079e7fd079270a3b1",
+      "bytes": 53828021,
+      "note": "conservative, seed 4",
+      "train": {
+        "steps": 6509,
+        "hours": 0.5001,
+        "seed": 4
+      }
+    },
+    "checkpoints/dreamer_ref_s5.pt": {
+      "sha256": "c8d449c11ea67d18dcf8a19922ba175760a3d5a17cf021653d989b3f3169bde5",
+      "bytes": 53828021,
+      "note": "conservative, seed 5",
+      "train": {
+        "steps": 6461,
+        "hours": 0.5001,
+        "seed": 5
+      }
+    },
+    "checkpoints/dreamer_damped_s0.pt": {
+      "sha256": "c9ae767b03a86d5735ca6fa22ea3cc1d05fb1ad760ac335262f961a3f0b3edde",
+      "bytes": 53828101,
+      "note": "dissipative control, seed 0",
+      "train": {
+        "steps": 4710,
+        "hours": 0.5,
+        "seed": 0
+      }
+    },
+    "checkpoints/dreamer_damped_s1.pt": {
+      "sha256": "77bdb787e5cb24a7209dfbd41e78db70b502b74f652a13c50545177e17c081eb",
+      "bytes": 53828101,
+      "note": "dissipative control, seed 1",
+      "train": {
+        "steps": 4770,
+        "hours": 0.5001,
+        "seed": 1
+      }
+    },
+    "checkpoints/dreamer_damped_s2.pt": {
+      "sha256": "ea32f0847371f6b3783e10f9ae87edc12fd5f54dc45d6ff5ddd8d90d91d0d1d3",
+      "bytes": 53828101,
+      "note": "dissipative control, seed 2",
+      "train": {
+        "steps": 4730,
+        "hours": 0.5,
+        "seed": 2
+      }
+    },
+    "data/pendulum_pixels.npz": {
+      "sha256": "9eed2d0776a177961113f711b4ba4bd69d3db1a1c0f6f9c5519364824d910e8b",
+      "bytes": 6799505,
+      "note": "conservative substrate; make_pendulum_pixels.py --n-traj 256 --n-steps 120 --seed 0"
+    },
+    "data/pendulum_pixels_damped.npz": {
+      "sha256": "082cbfde0afa20c24f4f151cccf5efa80da739934a3bac6061aadf2904efc750",
+      "bytes": 6834005,
+      "note": "dissipative arm; make_pendulum_pixels.py --zeta 0.03 --n-traj 256 --n-steps 120 --seed 11"
+    },
+    "data/pendulum_pixels_eval.npz": {
+      "sha256": "c2bdf8bea9db44fdb4f2c643f49a35c97d7eed855a2be751ce2240415595f3b5",
+      "bytes": 22600263,
+      "note": "disjoint evaluation set; make_pendulum_pixels.py --n-traj 512 --n-steps 200 --seed 777"
+    }
+  }
+}

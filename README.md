@@ -9,11 +9,30 @@ Everything in `runs/` is the output of the script named beside it in the table b
 the paper are generated from those files and nothing else, so every number is checkable without a
 GPU.
 
+## Setup
+
+```bash
+git clone --recurse-submodules https://github.com/Zarand3r/world-model-invariants
+cd world-model-invariants
+uv sync
+```
+
+The DreamerV3 reference implementation is a submodule pinned at one upstream commit. The six
+checkpoints and three rendered datasets are too large for git and live at
+[huggingface.co/Zarand3r/world-model-invariants](https://huggingface.co/Zarand3r/world-model-invariants);
+`scripts/fetch_assets.py` downloads them into `runs/` and checks every file against a sha256 committed
+in `docs/ASSETS.json`, so a reproduction that starts from a download is still verifiable.
+
+```bash
+uv run python scripts/fetch_assets.py     # 359 MB; --skip-data to regenerate the .npz instead
+```
+
+Nothing below the figure regeneration needs those assets.
+
 ## Regenerating the figures (no GPU, seconds)
 
 ```bash
-pip install -e .
-python paper/make_figures.py          # reads runs/*.json, writes paper/figures/*.pdf
+uv run python paper/make_figures.py   # reads runs/*.json, writes paper/figures/*.pdf
 cd paper && tectonic -X compile main.tex
 ```
 
@@ -22,11 +41,12 @@ cd paper && tectonic -X compile main.tex
 ## Running the tests
 
 ```bash
-pytest tests/ --ignore=tests/test_timing_convention.py     # 37 tests, ~4s, no GPU
+uv run pytest tests/ -q                                    # 40 tests, ~6s
+uv run pytest tests/ --ignore=tests/test_timing_convention.py   # 37 tests, no submodule needed
 ```
 
-`test_timing_convention.py` checks our adapter against the reference DreamerV3 implementation and
-needs the vendored checkout described in `docs/REPRODUCE.md`.
+`test_timing_convention.py` checks our adapter against the reference DreamerV3 implementation, so it
+needs the submodule; one of its cases also needs `runs/dreamer_ref_s3.pt` and skips without it.
 
 ## Reproducing from scratch (GPU, a few hours)
 
@@ -34,15 +54,17 @@ needs the vendored checkout described in `docs/REPRODUCE.md`.
 implementation. In outline:
 
 ```bash
-python scripts/make_pendulum_pixels.py                      # render the dataset
-python scripts/make_pendulum_pixels.py --zeta 0.03 \
+uv run python scripts/make_pendulum_pixels.py               # render the dataset
+uv run python scripts/make_pendulum_pixels.py --zeta 0.03 \
        --out runs/pendulum_pixels_damped.npz                # the dissipative arm
-python scripts/train_dreamer_pendulum.py --seed 3 --out runs/dreamer_ref_s3.pt
-python scripts/run_dreamer_extraction.py --ckpts runs/dreamer_ref_s3.pt --ld 12
+uv run python scripts/train_dreamer_pendulum.py --seed 3 --out runs/dreamer_ref_s3.pt
+uv run python scripts/run_dreamer_extraction.py --ckpts runs/dreamer_ref_s3.pt --ld 12
 ```
 
-Model checkpoints (~54 MB each) and rendered datasets are not committed. Training is capped by wall
-clock rather than step count, so a re-run lands near but not exactly on the committed numbers.
+Training is capped by wall clock rather than step count, so a **re-trained** model lands near but not
+exactly on the committed numbers. The released checkpoints do reproduce them exactly: on the hosted
+`dreamer_ref_s{3,4,5}.pt`, the command above returns |rho|_E of 0.973, 0.967 and 0.975, matching
+`runs/dreamer_extraction_prereg_ld12.json` to 1e-9.
 
 ## What produced what
 
