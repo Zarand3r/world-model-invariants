@@ -2878,3 +2878,70 @@ is unresolvable here, and both statistics used above avoid the pixel readout ent
 
 Whether the same dissociation appears on the 2-DoF system, which has no energy ceiling and can test
 a HIGH band, is untested.
+
+---
+
+## 2026-08-27 17:10–17:35 UTC — E14b on the 2-DoF system: **partial replication, and one band is confounded**
+
+Git at `0e4ce82`. The 2-DoF system has no velocity clip, so both energy bands are constructible —
+the HIGH band the pendulum structurally cannot test.
+
+Bands defined by **energy** rather than by initial-condition scale: scaling the IC box *widens* the
+energy distribution rather than shifting it, so a scale alone leaves the band overlapping training.
+An energy filter was added to `make_dataset` and both bands verified disjoint from the training p5/p95.
+
+### Result, non-central seeds 3 and 4 at step 30,000
+
+| seed | band | \|rho_E\| | `rho_obs` | random `rho_obs` | vs in-dist |
+|---|---|---|---|---|---|
+| 3 | in-dist | 0.966 | 4.93e-03 | — | 1x |
+| 3 | LOW | 0.105 | **6.18e-03** | 7.95e-02 | **1x** |
+| 3 | HIGH | 0.004 | 8.67e-02 | 3.57e-01 | 18x |
+| 4 | in-dist | 0.971 | 5.06e-03 | — | 1x |
+| 4 | LOW | 0.017 | **6.28e-03** | 7.48e-02 | **1x** |
+| 4 | HIGH | 0.070 | 5.24e-02 | 3.61e-01 | 10x |
+
+### The LOW band is confounded and its `|rho_E|` must not be read
+
+Across-trajectory energy spread:
+
+| dataset | across-traj E std |
+|---|---|
+| 2-DoF training | 0.327 |
+| **2-DoF LOW** | **0.042** (8x smaller) |
+| 2-DoF HIGH | 0.657 |
+| pendulum training | 1.940 |
+| pendulum LOW | ~1.25 |
+
+The 2-DoF LOW band is **energy-degenerate**: every trajectory has nearly the same energy, so there is
+almost no across-trajectory signal for `|rho_E|` to correlate with. Its 0.105 and 0.017 are
+uninformative, not evidence of failure. The pendulum LOW band does not have this problem.
+
+Recorded as a **design defect in my own band construction**, caught by checking the spread rather
+than reading the correlation. The filter selected trajectories *below* a threshold, which necessarily
+compresses the distribution against the floor; the HIGH filter selects above a threshold with no
+ceiling, which does not.
+
+### What the informative comparisons say
+
+**2-DoF LOW conservation is intact** — `rho_obs` 6.2e-03 against 4.9e-03 in-distribution, a factor of
+1. The transition still conserves *something* well out of distribution here.
+
+**2-DoF HIGH degrades but not to random** — `rho_obs` rises 10-18x, yet stays **4x better than a
+random constraint** on the same latents (5.2e-02 vs 3.6e-01).
+
+**The pendulum result is stronger than either.** There `rho_obs` degraded ~200x to a level
+statistically indistinguishable from random. The 2-DoF system degrades far less.
+
+### Honest status of the E14b claim
+
+The decodability-vs-conservation dissociation is **established on the pendulum** (3 seeds, ~200x,
+indistinguishable from random) and **only partially reproduced on the 2-DoF system** (2 seeds, HIGH
+band, 10-18x, still well above random; LOW band confounded).
+
+Last iteration's framing — "the strongest form of the paper's thesis found so far" — stands for the
+pendulum and **does not generalise on this evidence**. Whether the difference is the system, the
+checkpoint (step 30,000 versus the pendulum's 6,500), or the band construction is untested.
+
+A cleaner 2-DoF LOW band with preserved energy spread would be needed before the LOW comparison means
+anything, and that is a new dataset rather than a reanalysis.

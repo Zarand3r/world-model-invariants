@@ -105,7 +105,8 @@ def render(Q):
     return np.clip(frame, 0, 255).astype(np.uint8).reshape(*shape, RES, RES, 3)
 
 
-def make_dataset(n_traj, n_steps, b, seed, out, a=0.05, w=1.0, dt=DT):
+def make_dataset(n_traj, n_steps, b, seed, out, a=0.05, w=1.0, dt=DT,
+                 ic_scale=1.0, e_lo=None, e_hi=None):
     """Simulate, reject out-of-frame trajectories, render, and save with full provenance."""
     rng = np.random.default_rng(seed)
     keep_q, keep_p = [], []
@@ -113,9 +114,18 @@ def make_dataset(n_traj, n_steps, b, seed, out, a=0.05, w=1.0, dt=DT):
     while len(keep_q) < n_traj and tries < 50:
         tries += 1
         need = n_traj - len(keep_q)
-        q0 = rng.uniform(-1, 1, (need * 2, 2)); p0 = rng.uniform(-1, 1, (need * 2, 2))
+        q0 = rng.uniform(-ic_scale, ic_scale, (need * 8, 2))
+        p0 = rng.uniform(-ic_scale, ic_scale, (need * 8, 2))
         Q, P = simulate(q0, p0, n_steps, False, w, w, a, b, dt)
         ok = np.abs(Q).max(axis=(1, 2)) < HALF * 0.95        # stays in frame with margin
+        if e_lo is not None or e_hi is not None:
+            # E14 bands are defined by ENERGY, not by initial-condition scale: scaling the IC box
+            # widens the energy distribution rather than shifting it, so a scale alone leaves the
+            # band overlapping training. Filtering on the trajectory-mean energy makes the band
+            # exact and is what the prereg specifies.
+            Em = energy(Q, P, False, w, w, a, b).mean(-1)
+            if e_lo is not None: ok &= Em < e_lo
+            if e_hi is not None: ok &= Em > e_hi
         for i in np.nonzero(ok)[0][:need]:
             keep_q.append(Q[i]); keep_p.append(P[i])
     Q = np.stack(keep_q); P = np.stack(keep_p)
@@ -142,10 +152,14 @@ if __name__ == "__main__":
     p_.add_argument("--n-traj", type=int, default=256)
     p_.add_argument("--b", type=float, default=0.40)
     p_.add_argument("--seed", type=int, default=0)
+    p_.add_argument("--ic-scale", type=float, default=1.0)
+    p_.add_argument("--e-lo", type=float, default=None)
+    p_.add_argument("--e-hi", type=float, default=None)
     p_.add_argument("--out", default="runs/osc2d_noncentral.npz")
     a_ = p_.parse_args()
     if a_.dataset:
-        make_dataset(a_.n_traj, a_.n_steps, a_.b, a_.seed, a_.out)
+        make_dataset(a_.n_traj, a_.n_steps, a_.b, a_.seed, a_.out,
+                     ic_scale=a_.ic_scale, e_lo=a_.e_lo, e_hi=a_.e_hi)
         raise SystemExit
     if a_.gate:
         H = a_.n_steps * DT
