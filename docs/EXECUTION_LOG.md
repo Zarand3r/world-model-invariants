@@ -2812,3 +2812,69 @@ are all unaffected. It bounds them.
 Whether **refitting** `C` on OOD latents recovers a scalar that is again conserved and repairs there
 would separate "the invariant is local" from "the method needs refitting per region". That is a new
 experiment and would need its own registration.
+
+---
+
+## 2026-08-27 16:40–17:00 UTC — **E14b: out of distribution, energy is decodable but not conserved**
+
+Git at `22d8d28`. Preregistered in `docs/E14B_PREREG.md` before any quantity was computed, with
+**no direction predicted for conservation** — the honest state was that I did not know, and
+committing to a direction would have invited reading the result to match it.
+
+### Result
+
+Whole pipeline refitted on the OOD latents at frozen hyperparameters — PCA basis, rank basis,
+`fit_hamiltonian_pair` — with in-distribution values recomputed in the same run:
+
+| seed | in-dist \|rho_E\| | in-dist `rho_obs` | **OOD \|rho_E\|** | **OOD `rho_obs`** | random `C` on OOD |
+|---|---|---|---|---|---|
+| 3 | 0.9730 | 6.274e-03 | **0.9177** | **1.677** | 1.737 |
+| 4 | 0.9299 | 8.649e-03 | **0.9603** | **1.343** | 2.855 |
+| 5 | 0.9657 | 6.851e-03 | **0.9314** | **1.711** | 1.858 |
+
+- **Identification succeeds.** Registered bar `|rho_E| > 0.8`: met on all three seeds (0.918-0.960).
+  The polynomial family *can* express OOD energy; E14's frozen-`C` collapse was extrapolation
+  failure, not a missing signal.
+- **Conservation fails completely.** `rho_obs` is **~200x worse** out of distribution (1.34-1.71
+  against 6.3e-03 to 8.7e-03), and **statistically indistinguishable from a random constraint**
+  (1.68 vs 1.74, 1.34 vs 2.86, 1.71 vs 1.86). A `rho_obs` above 1 means one autonomous step changes
+  `C` by more than its entire across-trajectory spread.
+
+### Why this is the strongest form of the paper's thesis found so far
+
+The project's central claim is that **decodability is not dynamical structure** — that a quantity can
+be readable from a representation without the model's transition using or preserving it. Every
+previous demonstration compared a trained model against untrained or damped controls.
+
+E14b shows the dissociation **inside a single trained model**, split by region of state space:
+
+| | energy decodable? | energy conserved by the transition? |
+|---|---|---|
+| in-distribution | yes (0.93-0.97; free probe 1.000) | **yes** (`rho_obs` ~7e-03) |
+| **out of distribution** | **yes** (0.92-0.96; free probe 0.999) | **no** (`rho_obs` ~1.5, = random) |
+
+Same model, same encoder, same extraction, same hyperparameters. The latent faithfully encodes states
+the model was never trained on — the probe reaches 0.999 — and the transition preserves **nothing**
+there. Decodability and dynamical structure come apart exactly where a learned dynamics model should
+fail, and the operator statistic sees it while any probe would not.
+
+### It also explains E14
+
+The frozen `C` collapsed OOD (0.03-0.31). The refit shows why, and it is **not** that a degree-4
+polynomial cannot extrapolate — refitting reaches 0.92-0.96. It is that **there is no conserved
+quantity to find out there**. `fit_hamiltonian_pair` minimises a conservation criterion; on OOD
+states the best it can achieve is `rho_obs` 1.34, so it returns something energy-correlated and
+not conserved. The frozen `C`, fitted where conservation held, has nothing to lock onto.
+
+Last iteration's framing — "the extraction method's function class is what fails to transfer" — was
+**half right and is corrected here**. The function class transfers fine. What does not transfer is
+the model's conservation of energy.
+
+### Scope
+
+Pendulum seeds 3/4/5 at step 6,500, OOD LOW band, 128 trajectories (more than the 52-trajectory
+analysis split, so `rho_obs` is estimated on more data). Not a repair test: E14 established that arm
+is unresolvable here, and both statistics used above avoid the pixel readout entirely.
+
+Whether the same dissociation appears on the 2-DoF system, which has no energy ceiling and can test
+a HIGH band, is untested.
