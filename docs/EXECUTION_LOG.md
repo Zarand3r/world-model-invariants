@@ -3186,3 +3186,69 @@ The evidence-base check added last iteration flagged this claim as n = 1, which 
 this iteration rather than carried forward. It immediately produced a correction to a claim I had
 stated three times in strong terms. That is the intended function, and it worked on the first
 opportunity.
+
+---
+
+## 2026-08-27 19:25–19:45 UTC — **E17b falsifies my own ill-posedness account, and flags something broader**
+
+Git at `24145a9`. Preregistered in `docs/E17B_PREREG.md` before any quantity was computed.
+
+### Why this test existed
+
+The degeneracy claim had already been restated once (from "never resolves" to "unstable"), and the
+evidence for instability was **confounded**: different checkpoints, different seeds, one accidental
+retraining. Since `fit_hamiltonian_pair` is **deterministic** given `(traj, flow)` — it initialises
+at `a[0] = 1.0` with no random component — the spread had to come from the data, which made a
+controlled test possible: bootstrap the trajectories at a **single fixed checkpoint**, holding model,
+training, and hyperparameters constant.
+
+### Result: FAILED, at the registered falsifier
+
+| arm | median `rho_E` | **IQR** | range |
+|---|---|---|---|
+| non-central (1 invariant) | 0.613 | **0.613** | [0.070, 0.974] |
+| central (2 invariants) | 0.336 | **0.479** | [0.074, 0.809] |
+
+**IQR ratio central/non-central = 0.8x.** Registered prediction was `>= 3x`; the registered falsifier
+was `< 2x`. **The falsifier fired.**
+
+The two-invariant arm is **not** more sensitive to which trajectories it sees. The "ill-posedness"
+account of the degeneracy is **not supported by this test**, and the third restatement the prereg
+anticipated is now required.
+
+### The broader flag, which matters more than the failed prediction
+
+**The one-invariant arm is also wildly unstable under bootstrap.** On the full 52-trajectory
+analysis set the same checkpoint gives `rho_E = 0.966`. Resampling those same 52 trajectories with
+replacement gives a **median of 0.613 and a range of 0.070 to 0.974**.
+
+A bootstrap resample contains roughly 63% unique trajectories, so this is most plausibly a
+**small-sample sensitivity** rather than anything about two invariants — and the codebase already
+warns about exactly this. `setup.tex` notes the search "is run on 52 trajectories, where a free fit
+over the full basis could drive the in-sample ratio to zero by overfitting", which is why `n_basis`
+is capped at 8.
+
+**What this does not overturn.** The full-sample fit is reproducible *across independently trained
+models*: 0.973 / 0.930 / 0.966 on the pendulum, 0.9874 / 0.9874 on the 2-DoF arm. Reproducibility
+across seeds is a different and stronger property than robustness to resampling within a seed, and it
+is the one the reported results rest on.
+
+**What it does flag.** The number of analysis trajectories (52) is close enough to the fit's
+requirement that removing a third of them materially changes the answer. That is worth knowing before
+any of these numbers appear in a paper, and it argues for reporting the fit on more trajectories —
+the eval sets have 512 — rather than only on the analysis split.
+
+### Where the degeneracy claim now stands, third statement
+
+- **Supported:** on the two-invariant system the joint fit **usually fails to isolate either
+  invariant** (6 of 7 measurements below `rho_E` 0.43) while the subspace reliably contains both
+  (`best rho_L` 0.941-0.995 everywhere). On the one-invariant system the full-sample fit converges to
+  the invariant on every seed and checkpoint tested past step 15,000.
+- **Not supported:** that this is because the two-invariant criterion is *more ill-posed*, in the
+  sense of being more data-sensitive. E17b tested that directly and it is false.
+- **Untested:** whether the difference is solution multiplicity, which the deterministic
+  implementation cannot probe without modifying the method.
+
+Three statements of this claim in three iterations, each narrower than the last, each forced by a
+test rather than by reflection. The claim that survives is the one about **outcomes**, not about
+mechanism.
