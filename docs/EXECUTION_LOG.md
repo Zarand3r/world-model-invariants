@@ -1333,3 +1333,79 @@ prevented me from characterising the arm at all until three existed.
 
 Stage 1 is complete. Stage 2 has E4 done; E5 and E13 remain. The mechanism question raised by E3's
 falsification is still open and is the most interesting unresolved item in the project.
+
+---
+
+## 2026-08-27 06:10–06:35 UTC — **E2b: violation accumulates sub-diffusively, not as a systematic bias**
+
+Git at `6bc01a0`. Damped seed 2 at step 56,000; all other jobs complete.
+
+Preregistered in `docs/E2B_PREREG.md`, under the roadmap's own E2-Outcome-B branch ("refocus
+accordingly"). Tests whether `|C(z_k) - C(z_0)|` grows like `k^1` (systematic bias) or `k^0.5`
+(random walk), by fitting `beta` in `log median|dC| = a + beta log k`.
+
+### The registered positive control failed — and it was my prereg that was wrong
+
+`E2B_PREREG` named damped models as the positive control, expecting `beta` near 1.0 because damped
+energy decays systematically, and registered the falsifier: "If damped models do not show `beta`
+above the conservative models', the estimator is not measuring what it claims."
+
+Damped models returned `beta` = **-0.011, -0.031, -0.052**. The falsifier fired.
+
+**Estimator validated independently on signals with known exponents:**
+
+| signal | measured `beta` | truth |
+|---|---|---|
+| synthetic random walk | 0.473 | 0.50 |
+| synthetic systematic drift | 1.000 | 1.00 |
+| synthetic saturated noise | 0.006 | 0.00 |
+| **true damped energy** | **0.947** | decays systematically |
+| true conservative energy | -0.037 | shadow-H oscillation, no drift |
+
+The estimator is correct. **The damped *model* was the wrong control.** Its recovered `C` is not
+energy-correlated at all — that is precisely the refusal result — so `|C(z_k) - C(z_0)|` saturates at
+k = 1 and `beta` measures time-to-saturation rather than an accumulation law. Random `C` behaves the
+same way (`beta` = 0.011). The right positive control is **true damped energy**, which the estimator
+handles correctly at 0.947.
+
+**This is the second control I have mis-specified by plausible-sounding reasoning** — E3's isotropic
+`1/LD` null was the first, and no arm could reach it. Both were caught by the arm that was supposed
+to be easy. The lesson recorded for the rest of the project: validate an estimator on a signal with a
+known answer *before* registering a threshold on it, not after the threshold fails.
+
+### Result, with the estimator validated
+
+| seed | `beta` | 95% CI |
+|---|---|---|
+| conservative s3 | **0.506** | [0.413, 0.618] |
+| conservative s4 | **0.358** | [0.253, 0.465] |
+| conservative s5 | **0.210** | [0.121, 0.309] |
+
+All three are far below 1.0, and two of three are below 0.5. Violation accumulates **diffusively or
+sub-diffusively — decisively not as a coherent systematic bias.** Seed 3 sits exactly on the random
+walk (CI contains 0.5, excludes 1.0); seeds 4 and 5 are sub-diffusive, i.e. the violation accumulates
+*more slowly* than an unbiased random walk, which implies a partially anti-correlated normal
+component — the transition mildly self-corrects.
+
+### What this settles, and what it does not
+
+It supplies the mechanism E3's falsification left open, and it is consistent with everything measured:
+
+- E2: per-step defect constant with depth
+- E3: normal component small (2% of error energy) and *less* systematic than the tangent component
+- E2b: accumulation diffusive or slower, not linear
+- E6: benefit grows with horizon, as accumulated deviation grows
+
+The reading: the transition is **near-unbiased but noisy with respect to `C`**. Each step nudges `C`
+by a small, near-zero-mean amount normal to the level set; those nudges accumulate diffusively into
+physical energy error, while the much larger tangent component moves the state along the level set
+and costs phase accuracy but no energy. Projection removes the accumulated normal displacement and
+leaves the tangent error alone.
+
+**The stronger implication, stated carefully.** A systematic bias would be an operator defect that
+better training might remove. Diffusive accumulation is closer to irreducible — training reduces
+noise but does not eliminate it, and nothing in the objective rewards cancelling it. That predicts
+the effect should *persist* at saturation, which is E8's question and is not yet answered. It is a
+prediction, not a result.
+
+Sub-diffusive `beta` on two of three seeds is not explained and is not being explained here.
