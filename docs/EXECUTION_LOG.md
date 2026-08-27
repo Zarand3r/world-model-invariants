@@ -1567,3 +1567,74 @@ eventually done for E2b (synthetic random walk 0.473, drift 1.000, saturated noi
 have been done first.
 
 This costs little when followed and has now cost three experiments when not.
+
+---
+
+## 2026-08-27 07:15–07:45 UTC — **E12b: invariant drift does predict energy drift** (2/3 at the registered bar)
+
+Git at `2508459`. All six models trained. Preregistered in `docs/E12B_PREREG.md`, which for the first
+time **validated the statistic on known-answer signals before registering a threshold** — the rule
+adopted after E3, E2b and E12.
+
+### The validation, and a prediction of mine it refuted
+
+`Spearman(D_sec(A), D_sec(B))` on synthetic series: **+0.987** (strong coupling), **+0.417**
+(coupling plus large independent drift), **-0.025** (independent), **+0.980** (coupling plus strong
+oscillation). The statistic has range and returns ~0 for independence.
+
+I had predicted the endpoint-difference version would be degraded by oscillation. On the synthetic
+series it was **not** (+0.982), and I recorded that in the prereg as making E12b a genuine test with
+a live negative outcome rather than a rescue.
+
+### Result
+
+| arm | rho | 95% CI |
+|---|---|---|
+| conservative s3 | **+0.740** | [+0.542, +0.848] |
+| conservative s4 | +0.454 | [+0.157, +0.685] |
+| conservative s5 | **+0.740** | [+0.551, +0.848] |
+| **random `C`** (n = 20) | **+0.022** | range [-0.323, +0.360] |
+| **damped** (n = 3) | +0.073, +0.095, +0.002 | descriptive |
+
+The registered bar was `rho > 0.5` with CI excluding 0 **on all three seeds**. Met on **two of
+three**; seed 4 is +0.454, positive with a CI excluding 0 but not clearing 0.5. The registered
+falsifier — "near 0 or inconsistent in sign" — **did not fire**: all three are positive, all three
+CIs exclude 0, and both control arms sit at zero.
+
+Reported as a **partial pass**: the coupling is real and specific, and the registered threshold was
+not met on every seed.
+
+### This resolves the uncomfortable diagnostic from last iteration
+
+The exploratory endpoint-difference numbers were +0.356, -0.124, +0.167, and I recorded them as
+possibly real because the synthetic validation said the endpoint statistic was not degraded by
+oscillation. On real data it clearly is: the slope statistic gives +0.740 / +0.454 / +0.740 on the
+same rollouts.
+
+**Why the validation missed it, recorded because it is the same class of error a fourth time.** The
+synthetic coupling was `B = 2.5A` — one gain, shared by every trajectory. Real trajectories have
+*different* local `dE/dC` gains, which endpoint differences absorb badly and a 100-point slope
+absorbs well. A validation is only as good as the structure it reproduces, and mine omitted the
+per-trajectory gain variation that E4 had already demonstrated exists across seeds.
+
+The rule stands and should be sharpened in the paper's methods: **validate the statistic on a
+known-answer signal that reproduces the structure of the real data**, not merely on a signal with a
+known answer.
+
+### Bearing on the dormant-pathway objection
+
+Makelov et al. warn that a subspace edit can work through a pathway the model does not normally use.
+E12b shows the `C` direction carries a **real, specific relationship to physical energy in unedited
+rollouts** — random constraints and damped models both give ~0. That is on-pathway evidence, and it
+is the evidence the failed E12 was reaching for.
+
+It does not fully close the objection: a correlation shows the direction is informative about energy
+in the model's own dynamics, not that the forward pass reads it. Combined with E4's transfer
+correlation (+0.808 to +0.916), the pair is substantially stronger than either alone. The objection
+is now **substantially addressed but not eliminated**, and should be stated that way.
+
+### Status
+
+Stage 1 complete. Stage 3 controls: E10 **not constructible** on this system, E11 **passed**, E12
+**failed as registered**, E12b **partial pass**. Next per Richard's approved order: the 2-DoF system,
+which now carries E10 as well as the generality question.

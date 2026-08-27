@@ -99,11 +99,19 @@ def run(ckpt, data, random_law=False, draw=0):
                "phase_err_median": float(np.nanmedian(perr)),
                "lag_median_abs": float(np.nanmedian(np.abs(lag)))}
         if eps == 0.0:
-            # E12: on UNEDITED rollouts, does C track decoded energy?
+            # E12 (registered, FAILED -- kept for the record): within-trajectory correlation.
             rs = [_spear(Ck[i], ph["energy"][i]) for i in range(Ck.shape[0])
                   if np.isfinite(ph["energy"][i]).all()]
             rec["e12_spearman_C_vs_E_median"] = float(np.median(np.abs(rs)))
             rec["e12_spearman_signed_median"] = float(np.median(rs))
+            # E12b (docs/E12B_PREREG.md): does C's DRIFT predict energy's DRIFT, across trajectories?
+            dC = _secular(Ck, 1.0)
+            dE = _secular(ph["energy"], 1.0)
+            ok = np.isfinite(dC) & np.isfinite(dE)
+            rec["e12b_spearman_Dsec_C_vs_Dsec_E"] = float(_spear(dC[ok], dE[ok]))
+            rec["e12b_n"] = int(ok.sum())
+            rec["e12b_Dsec_C_per_traj"] = np.where(ok, dC, np.nan).tolist()
+            rec["e12b_Dsec_E_per_traj"] = np.where(ok, dE, np.nan).tolist()
         out[f"eps{eps}"] = rec
     return out
 
