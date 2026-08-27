@@ -1760,3 +1760,69 @@ Extraction runs at **frozen hyperparameters first**: LD = 12, degree 4, `n_basis
 LD = 12 was chosen for a **2-dimensional** physical state; this state is **4-dimensional**. If
 recovery fails at those settings that is a **result about generality and will be reported as one**,
 and any adapted setting becomes a separate experiment with its own log entry. No silent tuning.
+
+---
+
+## 2026-08-27 08:45–09:00 UTC — **E17 recovery FAILS at frozen hyperparameters** (preliminary: 1 seed, 1 checkpoint)
+
+Git at `fcaa500`. Non-central seed 3 at step 6,500 — the first 2-DoF checkpoint. Run at **frozen**
+LD = 12, degree 4, `n_basis` = 8, WARMUP = 10, with **no tuning**, as `docs/E17_PREREG.md` requires.
+
+### Registered prediction 1: FAILED
+
+| | invariance ratio | \|rho_E\| | \|rho_L\| |
+|---|---|---|---|
+| **recovered `C`** (jointly fitted) | 2.62e-04 | **0.158** | 0.109 |
+| best eigenvector (rank 0) | 8.16e-05 | **0.696** | **0.818** |
+| pendulum reference | ~1e-04 | 0.967-0.975 | — |
+
+Registered bar was `|rho_E| > 0.8`. Measured **0.158**. **FAIL.**
+
+### What did and did not fail
+
+**Conservation transferred.** The empirical invariance ratio is 2.6e-04, the same order as the
+pendulum's. The method finds a genuinely well-conserved latent scalar on a 4-dimensional system at
+frozen settings. Retained rank is the full 12/12.
+
+**Identification did not.** The scalar it converges on is not energy. And the jointly-fitted `C` is
+**four times worse at energy correlation than the best raw eigenvector** (0.158 against 0.696) — so
+the failure is not "there is nothing to find", it is the **selection step choosing the wrong
+direction inside the conserved subspace**.
+
+That points at flow alignment specifically. `fit_hamiltonian_pair`'s docstring argues the answer is
+"a direction inside the conserved subspace that no single eigenvector isolates", and on the pendulum
+the flow criterion found it. Here it appears to move *away* from energy. The pairing residual is
+0.805, in the same range as the pendulum's 0.829-0.865, so the fit believes it succeeded.
+
+**A finding worth its own line.** The best-conserved eigenvector correlates **0.818 with angular
+momentum** and 0.696 with energy — in the arm where `L` is supposed to be broken. `L`'s invariance
+ratio in the generated data is 0.0638 against energy's 0.029, so `L` is *partially* conserved here,
+not absent. The latent's best-conserved direction may be tracking a mixture, or tracking `L`
+preferentially. Recorded, not explained, and not yet trustworthy on one seed.
+
+### Registered prediction 3: also failed, but improved
+
+E10 needs >= 8 candidates within +-0.10 of the recovered `C`'s `|rho_E|`. Found **3**.
+
+| pool | \|rho_E\| > 0.8 | > 0.5 | > 0.3 |
+|---|---|---|---|
+| pendulum, 250 candidates | 1 | 1 | 1 |
+| **2-DoF, 60 candidates** | 0 | **2** | **3** |
+
+Richer than the pendulum at a quarter of the pool size, and still not enough. E10 remains
+unconstructible for now.
+
+### Caveats that must be attached to every number above
+
+- **One seed, one checkpoint, and an early one.** Step 6,500 of 60,000. `val_recon` was still
+  falling when this was measured.
+- LD = 12 was fixed for a **2-dimensional** physical state; this one is **4-dimensional**. The
+  prereg flagged this in advance as the most likely failure point.
+- The central arm has not been trained yet — it queues behind the three non-central seeds.
+
+### What is NOT being done
+
+**No hyperparameters are being tuned.** The roadmap and `E17_PREREG` both require the frozen-setting
+failure to stand as a recorded result before any adaptation, and any adapted setting to be a separate
+experiment with its own entry. That order is being kept. The next evidence is later checkpoints and
+further seeds at the same frozen settings — not a larger LD.
