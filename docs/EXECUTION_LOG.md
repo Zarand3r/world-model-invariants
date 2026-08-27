@@ -1894,3 +1894,72 @@ unconstructible, and it is now clear that 2 degrees of freedom is not by itself 
 
 One seed. Steps 30,000 and 60,000 not yet reached. The central arm — the two-invariant test, and the
 sharper half of the matched pair — queues behind the remaining non-central seeds.
+
+---
+
+## 2026-08-27 09:40–10:00 UTC — **E17: recovery AND repair both transfer to two degrees of freedom**
+
+Git at `3a405e1`. Non-central seed 3. All at **frozen hyperparameters**, nothing tuned at any point.
+
+### 2-DoF physical readout, validated before any intervention number
+
+`decode_physics_osc2d` added to `latent_noether/pixel_readout.py`, reusing
+`centroids_from_frames`. Backward differences for momentum, for the same reason as the pendulum:
+`make_oscillator2d` integrates semi-implicitly so `p_k` is exactly `(q_k - q_{k-1})/dt`.
+
+| dataset | q error | p error | E error / across-traj std | L error / \|L\| | blank |
+|---|---|---|---|---|---|
+| non-central | 0.00102 | 0.0262 | **0.0316** | 0.0270 | 0.0000 |
+| central | 0.00105 | 0.0272 | **0.0408** | 0.0253 | 0.0000 |
+
+Comparable to the pendulum readout's 1.6%. No calibrated offset was needed — a disk's ink-weighted
+centroid **is** its centre, unlike the pendulum's rod-plus-axle.
+
+### Prediction 1, recovery: PASSES, and matches the pendulum by step 30,000
+
+| step | invariance ratio | **\|rho_E\|** | \|rho_L\| | verdict |
+|---|---|---|---|---|
+| 1,000 | 9.89e-01 | 0.007 | 0.027 | fail |
+| 3,000 | 3.55e-04 | 0.383 | 0.005 | fail |
+| 6,500 | 2.62e-04 | 0.158 | 0.109 | fail |
+| 15,000 | 6.62e-05 | **0.909** | 0.138 | PASS |
+| **30,000** | **1.64e-05** | **0.966** | 0.355 | **PASS** |
+
+0.966 against the pendulum's 0.967-0.975. The invariance ratio improves monotonically by nearly five
+orders of magnitude. The 2-DoF system needs roughly **4.6x the pendulum's training** to reach parity
+— a real and reportable difference, not a failure.
+
+### Prediction 3, repair: PASSES
+
+Direction-matched, H = 100, step 30,000:
+
+| eps | recovered | random median | tangent median | random beating recovered |
+|---|---|---|---|---|
+| 0.005 | **-32.5%** | -5.2% | -2.5% | 0/20 |
+| 0.01 | **-46.3%** | -7.1% | -1.3% | 0/20 |
+| 0.02 | **-57.6%** | -17.2% | +0.7% | **0/20** |
+
+Pendulum reference at the same horizon: -32 to -51%, random +7 to +10%, 0/60.
+
+Monotone dose-response, tangent controls at zero, and no random direction beats the recovered one at
+any step size. **The effect is if anything larger than on the pendulum.**
+
+One difference worth recording: random directions **help** here (-17.2%) where they hurt on the
+pendulum (+7 to +10%). With a 4-dimensional state and a richer conserved family, a random degree-4
+polynomial is more likely to have some overlap with a genuinely conserved direction. The recovered
+constraint is still 3.3x better and beaten 0/20, so the comparison holds — but "random constraints
+hurt" is a pendulum-specific statement and should not be carried over.
+
+### Claim C6 (generality)
+
+**Supported on the non-central arm, one seed.** Both halves of the central result — that the method
+recovers a physically meaningful invariant, and that enforcing it repairs imagined physics — survive
+a move from 2-dimensional to 4-dimensional state at frozen hyperparameters.
+
+### Still open
+
+- **Prediction 2, the two-invariant test**, is the sharper half of the matched pair and has not run:
+  the central models queue behind the remaining non-central seeds.
+- **Prediction 4, E10**, still fails — only 2 pool candidates above `rho_E` 0.5. Two degrees of
+  freedom is not by itself enough to make the decodability-matched null constructible.
+- One seed; seeds 4 and 5 pending.

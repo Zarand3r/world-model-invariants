@@ -159,3 +159,60 @@ if __name__ == "__main__":
     a = p.parse_args()
     if a.calibrate:
         print(json.dumps(_calibrate(), indent=2))
+
+
+# ---------------------------------------------------------------------------
+# 2-DoF anharmonic oscillator readout (E17). The pendulum functions above stay
+# untouched; this reuses `centroids_from_frames` and adds the oscillator's own
+# geometry and energy.
+# ---------------------------------------------------------------------------
+
+OSC_HALF = 2.0          # must match scripts/make_oscillator2d.HALF
+
+
+def position_from_frames(frames, half=OSC_HALF):
+    """(..., 64, 64, 3) -> (..., 2) position (q1, q2).
+
+    A disk's ink-weighted centroid IS its centre, so this needs no calibrated offset -- unlike the
+    pendulum, whose centroid is displaced by the axle glyph. Validated against known positions at
+    0.0014 units = 0.022 px before any dataset was generated.
+    """
+    cy, cx, mass = centroids_from_frames(frames)
+    q1 = (cx / (RES - 1) - 0.5) * 2 * half
+    q2 = -(cy / (RES - 1) - 0.5) * 2 * half          # +q2 is up, matching the renderer
+    bad = ~(mass > 0)
+    return np.stack([np.where(bad, np.nan, q1), np.where(bad, np.nan, q2)], -1)
+
+
+def momentum_from_position(q, dt=DT, axis=-2):
+    """BACKWARD differences, for the same reason as the pendulum.
+
+    `make_oscillator2d` integrates with semi-implicit Euler -- deliberately, to match gymnasium --
+    so `q_k = q_{k-1} + p_k dt` and the stored `p_k` is exactly the backward difference. Central
+    differences would inject the same convention error that cost 0.29 rad/s on the pendulum.
+    """
+    q = np.asarray(q, dtype=np.float64)
+    q = np.moveaxis(q, axis, -2)
+    out = np.empty_like(q)
+    out[..., 1:, :] = np.diff(q, axis=-2) / dt
+    out[..., 0, :] = out[..., 1, :]
+    return np.moveaxis(out, -2, axis)
+
+
+def osc2d_energy(q, p, w=1.0, a=0.05, b=0.40):
+    q1, q2 = q[..., 0], q[..., 1]
+    kin = 0.5 * (p ** 2).sum(-1)
+    pot = (0.5 * w ** 2 * (q1 ** 2 + q2 ** 2) + 0.25 * a * (q1 ** 4 + q2 ** 4)
+           + 0.5 * b * q1 ** 2 * q2 ** 2)
+    return kin + pot
+
+
+def osc2d_angmom(q, p):
+    return q[..., 0] * p[..., 1] - q[..., 1] * p[..., 0]
+
+
+def decode_physics_osc2d(frames, w=1.0, a=0.05, b=0.40, dt=DT, half=OSC_HALF):
+    """The E17 analogue of `decode_physics`: frames -> q, p, energy, angular momentum."""
+    q = position_from_frames(frames, half)
+    p = momentum_from_position(q, dt)
+    return {"q": q, "p": p, "energy": osc2d_energy(q, p, w, a, b), "angmom": osc2d_angmom(q, p)}
