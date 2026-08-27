@@ -1963,3 +1963,26 @@ a move from 2-dimensional to 4-dimensional state at frozen hyperparameters.
 - **Prediction 4, E10**, still fails — only 2 pool candidates above `rho_E` 0.5. Two degrees of
   freedom is not by itself enough to make the decodability-matched null constructible.
 - One seed; seeds 4 and 5 pending.
+
+---
+
+## 2026-08-27 10:10 UTC — Central arm launched concurrently (execution change, not a protocol change)
+
+Git at `75bac91`. Non-central seed 3 at step 46,000.
+
+The central arm is the **two-invariant test** — the sharpest thing the 2-DoF design offers, and the
+only experiment in the project that asks whether the method recovers an invariant *manifold* rather
+than a lucky scalar. In the queued order it sat behind non-central seeds 4 and 5, roughly five hours
+out.
+
+**Launched central seed 0 concurrently** rather than reordering or interrupting.
+
+This is an execution change with **no effect on the scientific protocol**, and specifically because
+of the training-contract decision made on 2026-08-26: training is capped by **optimizer steps**, not
+wall clock, so GPU contention changes how long a run takes and not what it produces. Under the
+original wall-clock contract this would have silently given the concurrent models less training than
+the sequential ones — exactly the M28 failure that motivated the change. Recorded here because it is
+the first time that decision has paid off in a way that was not the reason for making it.
+
+Memory is not a constraint (15.8 GB of 96 GB before the second job). Nothing was interrupted and no
+partial checkpoint was discarded.
