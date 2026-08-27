@@ -88,6 +88,13 @@ def run(ckpt, data, horizon, random_law=False, draw=0, tangent=False, eval_data=
         with torch.no_grad():
             hs = m.encode(fre).detach()
         fr = fre
+        # A 200-frame eval set supplies only T - WARMUP reference frames. Clamp rather than
+        # crash inside mse_loss on a shape mismatch, and record what was actually used so a
+        # requested horizon is never silently different from the reported one.
+        avail = fr.shape[1] - WARMUP
+        if horizon > avail:
+            print(f"  horizon {horizon} > {avail} available; clamped to {avail}", flush=True)
+            horizon = avail
         ref = fr[:, WARMUP:WARMUP + horizon]
     else:
         ref = fr[ANALYSIS][:, WARMUP:WARMUP + horizon]
@@ -121,6 +128,7 @@ def run(ckpt, data, horizon, random_law=False, draw=0, tangent=False, eval_data=
         by_eps[float(eps)] = {"pixel_mse": pmse, "D_sec_per_traj": np.where(np.isfinite(ds), ds, np.nan).tolist(),
                               "D_sec_median_abs": float(np.nanmedian(np.abs(ds)))}
     return {"ckpt": ckpt, "random_law": random_law, "tangent": tangent, "eval_data": eval_data,
+            "horizon_used": horizon,
             "draw": draw if random_law else None, "horizon": horizon, "by_eps": by_eps}
 
 
