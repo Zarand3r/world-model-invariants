@@ -33,7 +33,7 @@ import torch
 
 from latent_noether.dreamer_adapter import DreamerV3Adapter
 from latent_noether.gauge import effective_rank_basis, pca_subspace
-from latent_noether.hamiltonian_select import fit_hamiltonian_pair
+from latent_noether.fit_cache import cached_fit
 from latent_noether.polynomial import monomial_features
 
 DEGREE, LD, WARMUP = 4, 12, 10
@@ -69,8 +69,8 @@ def run(ckpt, data, random_law=False, draw=0, untrained=False, depth=DEPTH):
         nxt = m.transition(H.reshape(-1, H.shape[-1])).reshape(H.shape)
     F = (((nxt - h_mean) @ U) @ R) - Z
 
-    fit = fit_hamiltonian_pair(Z.double().cpu(), F.double().cpu(), degree=DEGREE, n_basis=8)
-    coeffs = torch.as_tensor(fit["coeffs"], dtype=Z.dtype, device=Z.device)
+    fit = cached_fit(Z.double().cpu(), F.double().cpu(), DEGREE, 8)
+    coeffs = torch.as_tensor(np.asarray(fit["coeffs"]), dtype=Z.dtype, device=Z.device)
     if random_law:
         g = torch.Generator(device="cpu").manual_seed(1000 + draw)
         rc = torch.randn(coeffs.shape[0], generator=g, dtype=torch.float64)

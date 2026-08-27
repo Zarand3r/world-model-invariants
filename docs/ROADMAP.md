@@ -38,7 +38,7 @@ Treat the project as six progressively stronger claims. Every experiment must ma
 |---|---|---|---|
 | **C1** | Emergence | Ordinary pixel-prediction training makes a physical invariant reproducibly emerge. | Supported; needs more seeds and training-to-convergence. |
 | **C2** | Physical validity | The recovered latent quantity corresponds to actual physics in decoded imagined worlds, not merely to a self-consistent latent scalar. | **Not yet established decisively.** |
-| **C3** | Failure mechanism | The model locally respects the learned law on observation-supported states but loses this property during recursive autonomous rollout. | **Not yet established.** |
+| **C3** | Failure mechanism | ~~The model locally respects the learned law on observation-supported states but loses this property during recursive autonomous rollout.~~ **Amended 2026-08-26 (provisional, seed 3 only, approved by Richard):** the model's transition carries a near-constant systematic violation of the learned law at every step, on and off the observation-supported manifold, which integrates into large long-horizon physical error. | **Original form falsified by E2 on seed 3.** Amended form untested; E3 is now its confirmatory test. Revisit on seeds 4/5. |
 | **C4** | Causal physical control | Changing the recovered invariant changes the physical regime imagined by the model in the quantitatively expected direction. | **Not yet established.** |
 | **C5** | Predictive utility | Invariant violation provides an internal early-warning signal for later rollout failure. | Preliminary evidence, weak. |
 | **C6** | Generality | The complete phenomenon survives beyond a 1-DoF pendulum. | **Not yet established.** |
@@ -621,7 +621,9 @@ learned world models more broadly?
 0. **E8** training-saturation sweep — *now produced as a by-product of Stage 1 training*
 1. **E1** physical-energy readout
 2. **E2** local conservation failure vs rollout depth
-3. **E3** tangent/normal decomposition
+3. **E3** tangent/normal decomposition — **PROMOTED 2026-08-26.** E2's Outcome B makes this the
+   confirmatory test of the amended C3: a depth-independent defect should appear as a persistent
+   normal component of one-step error that the projection removes.
 4. **E9** fresh untouched intervention set
 5. **E6** extended horizon analysis
 
@@ -691,13 +693,21 @@ Do not spend substantial time on:
 
 # Desired final scientific picture
 
+> **Amended 2026-08-26, provisional, approved by Richard.** E2 on seed 3 returned Outcome B: the
+> local conservation defect does not grow with rollout depth (ratio 1.18-1.65 against a registered
+> threshold of 3; slope CI includes zero). The state does leave observation support, but the
+> transition violates `C` by about the same amount on and off the manifold. The two struck-through
+> lines below are therefore replaced. E1's repair and specificity results are unaffected.
+
 The strongest paper should support this sequence:
 
     ordinary pixel prediction
       -> physical invariant emerges
-      -> transition respects it on observation-supported states
-      -> recursive imagination leaves that support
-      -> local physical consistency deteriorates
+      -> transition respects it far better than any random constraint (rho_obs 6.3e-03 vs 5.7e-01)
+      -> BUT carries a near-constant per-step violation, on and off the manifold
+      ~~-> recursive imagination leaves that support~~
+      ~~-> local physical consistency deteriorates~~
+      -> that constant violation INTEGRATES over the rollout
       -> violations accumulate into physical + pixel error
       -> violation predicts future rollout failure
       -> restoring the invariant repairs the trajectory
@@ -708,10 +718,20 @@ conservation law improves prediction." Both ideas have substantial prior art.
 
 The target contribution is:
 
-> A conventionally trained world model can spontaneously learn a correct physical constraint yet
+> ~~A conventionally trained world model can spontaneously learn a correct physical constraint yet
 > fail to remain within the region where its own transition respects that constraint during
-> recursive imagination. The resulting invariant violation exposes a specific mechanism of
-> long-horizon model error and provides both a causal control variable and a model-internal signal
-> for repairing or deciding when to distrust imagination.
+> recursive imagination.~~
+>
+> **Amended 2026-08-26 (provisional):** A conventionally trained world model can spontaneously learn
+> a correct physical constraint -- one its own transition preserves two orders of magnitude better
+> than any matched random constraint -- and still violate that constraint by a small, systematic,
+> depth-independent amount at every step of its own imagination. Integrated over a rollout, that
+> violation is a specific and repairable mechanism of long-horizon physical error, and the constraint
+> is both a causal control variable and a model-internal signal for deciding when to distrust
+> imagination.
+>
+> This is a claim about the learned *operator*, not about distribution shift, which places it beside
+> the energy-drift literature in machine-learned force fields and the projection methods of
+> geometric integration (Hairer §IV.4) rather than beside exposure bias.
 
 Every implementation decision should serve or falsify that claim.

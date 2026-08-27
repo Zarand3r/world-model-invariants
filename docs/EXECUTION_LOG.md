@@ -489,3 +489,85 @@ Seed 3 only, so none of this is yet a model-level claim. But the E2 outcome chan
 argues, not merely how strongly, so it is surfaced now rather than at the end of Stage 1.
 Recommended reframing is written up for Richard; **not acted on** beyond continuing Stage 1 as
 planned.
+
+---
+
+## 2026-08-26 23:00–00:30 UTC — Audit of the significant results, and a confound that had to be removed
+
+Prompted by Richard: check the headline results for bugs before building on them. Four audits and one
+performance defect. Seed 3 finished training and passed all acceptance checks (raw KL 1.15,
+1-step decode ratio 0.002, rollout finite, pixel std 0.070); seed 4 is at step 50,000.
+
+### Audit 1 — **arm B was not a matched control.** Confirmed, and it threatened the headline
+
+The E1 edit is a Newton step to the level set, so its size scales with how badly the constraint is
+violated. Measured on seed 3 / step 6,500: median `||dz_edit||` per step is **2.80e-01 for random
+draws against 9.57e-03 for the recovered `C` — a factor of 29.**
+
+So "0/20 random constraints improve anything" was confounded: it could equally mean random
+constraints perturb the latent 29x harder. Worse, the norm-matching that was supposed to control
+this cannot: the Newton step is invariant under `C -> lambda C`, so **coefficient norm has no effect
+on edit magnitude at all**. The published arXiv paper carries the same defect.
+
+**Resolution — `scripts/run_e1_direction_matched_null.py`.** Move a fixed distance along each
+constraint's normal, `z <- z - eps * sign(C - C0) * gradC/||gradC||`, so arms differ only in
+direction. Added equal-norm **tangent** controls (a random direction with its normal component
+projected out, which cannot change `C` to first order).
+
+| eps | recovered | random median | random best | tangent median | random beats recovered |
+|---|---|---|---|---|---|
+| 0.0025 | 1.062e-03 | 1.218e-03 | 1.090e-03 | 1.278e-03 | 0/20 |
+| 0.005 | 9.727e-04 | 1.351e-03 | 1.160e-03 | 1.259e-03 | 0/20 |
+| 0.01 | 1.072e-03 | 1.467e-03 | 1.239e-03 | 1.394e-03 | 0/20 |
+| 0.02 | **6.282e-04** | 1.495e-03 | 1.097e-03 | 1.379e-03 | 0/20 |
+
+Baseline (eps = 0) is 1.279e-03 for every arm. At the matched magnitude the recovered direction
+improves drift by up to **-51%** while random directions **worsen it by +17%** and equal-norm tangent
+steps by **+8%**. Pixel MSE moves the same way: recovered 0.00250 -> 0.00235, random -> 0.00262,
+tangent -> 0.00256.
+
+**The specificity claim survives the audit and is now stronger than before.** It is a claim about
+*direction*, with magnitude held fixed, and the tangent arm shows it is specifically the component
+normal to the level set that carries the benefit. That also anticipates E3's registered prediction.
+
+### Audit 2 — readout bias with alpha. Clean
+
+No blank decodes at any alpha. Decoded theta error *improves* with alpha (0.154 -> 0.110), so the
+readout is not degrading and cannot be manufacturing an apparent drift reduction.
+
+### Audit 3 — is E2's `rho` inflated by a shrunken denominator? No, it is conservative
+
+`rho = median|r| / std_traj(C)` is a ratio, so a small denominator could fake a large defect. Split:
+
+| arm | median abs r | std_traj(C) | rho_obs |
+|---|---|---|---|
+| trained, recovered C | 6.34e-03 | 1.010 | 6.27e-03 |
+| untrained | 4.42e-01 | 0.955 | 4.63e-01 |
+| random C (median of 5) | 4.37e+01 | 4.13e+01 | ~7.9e-01 |
+
+Numerator ratio random/trained **6904x**; denominator ratio only 41x. The normalisation *understates*
+the raw difference. E2's specificity result is sound — and note it involves no intervention at all,
+so it is untouched by the Audit-1 confound.
+
+### Audit 4 — a real bug in my own code, caught before it produced a number
+
+`_secular` used `np.arange(E.shape[-1], float)`, where `float` is read as `stop`, not `dtype`. It
+crashed rather than returning a wrong answer, so no result was affected. Fixed.
+
+### Performance defect — 95% of null-sweep runtime was a redundant eigendecomposition
+
+The 1819x1819 generalized eigenproblem costs **21.2 s** and was recomputed for every random draw,
+against **0.2 s** for the rollout it feeds. The fit depends only on `(Z, F)` and the fit parameters;
+the random coefficients are drawn afterwards.
+
+`latent_noether/fit_cache.py` memoises it, **keyed on a hash of the `Z` and `F` arrays**, not on file
+paths — a path-keyed cache would silently serve a stale invariant after a dataset regeneration or a
+retrain, which is the failure M29's provenance recording exists to prevent. Verified: exact match to
+the uncached fit, 30,861x on a hit, and a 1e-9 perturbation of either `Z` or `F` misses. Tests in
+`tests/test_fit_cache.py`. The direction-matched sweep went from ~8 min/draw to under 3 s/draw.
+
+This matters for E7: 20 seeds x 20 draws would have cost ~2.3 GPU-days in redundant eigenproblems.
+
+### Status
+
+Still seed 3 for every analysis. Seed 4 trains now, seed 5 and damped 0-2 after it (~5 h).
