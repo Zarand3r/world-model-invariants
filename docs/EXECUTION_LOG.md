@@ -571,3 +571,71 @@ This matters for E7: 20 seeds x 20 draws would have cost ~2.3 GPU-days in redund
 ### Status
 
 Still seed 3 for every analysis. Seed 4 trains now, seed 5 and damped 0-2 after it (~5 h).
+
+---
+
+## 2026-08-27 00:10–00:30 UTC — **Seed 4 replicates the two central findings; the anomaly does not**
+
+Git at `77d64ec`. Seed 4 at step 56,000; its milestone grid is complete through step 30,000.
+First model-level comparison, n = 2.
+
+### Direction-matched null replicates (step 6,500, H = 100)
+
+| seed | recovered | random median | tangent median | random beats recovered |
+|---|---|---|---|---|
+| 3 | **-50.9%** | +16.9% | +7.8% | 0/20 at eps 0.01 and 0.02 |
+| 4 | **-42.2%** | -8.0% | -8.7% | 0/20 at eps 0.01 and 0.02 |
+
+At matched step magnitude the recovered direction cuts secular drift in true decoded physical energy
+by 42–51% on both seeds, and **no random direction beats it on either**. The null itself behaves
+differently across seeds — random directions hurt on seed 3 (+16.9%) and help slightly on seed 4
+(-8.0%) — which is exactly why the comparison is run per model rather than pooled. The recovered
+direction is 5x better than the best random draw on seed 4 and beats it on seed 3 too.
+
+Tangent controls (equal norm, no first-order change in `C`) track the random arm on both seeds, not
+the recovered one. The benefit is in the normal component.
+
+### E2 Outcome B replicates — now 4/4 across two seeds
+
+| | rho_obs | ratio | sinusoid frac | outcome |
+|---|---|---|---|---|
+| s3 step 6,500 | 6.27e-03 | 1.65 | 0.104 | **B** |
+| s3 step 30,000 | 1.49e-02 | 1.18 | 0.107 | **B** |
+| s4 step 6,500 | 8.65e-03 | 1.47 | 0.101 | **B** |
+| s4 step 30,000 | 6.61e-03 | 1.64 | 0.098 | **B** |
+
+Registered thresholds are ratio >= 3 for A and sinusoid >= 0.5 for C. Neither is approached anywhere.
+The amended C3 — a depth-independent per-step violation rather than progressive loss of support —
+holds on both seeds.
+
+### Operator-level specificity replicates
+
+Seed 4: trained recovered `C` **8.65e-03**, untrained 4.96e-01 (57x), random `C` 9.12e-01 (105x).
+Seed 3 gave 6.27e-03 / 4.63e-01 / ~7.9e-01. Same two-orders-of-magnitude separation on both.
+
+### **Correction: the "conservation degrades with training" anomaly does not replicate**
+
+Previously reported as "confirmed by two independent statistics". Both of those statistics were on
+**seed 3**. Seed 4 goes the other way:
+
+| | step 6,500 | step 30,000 | direction |
+|---|---|---|---|
+| seed 3 rho_obs | 6.27e-03 | 1.49e-02 | worse with training |
+| seed 4 rho_obs | 8.65e-03 | 6.61e-03 | **better with training** |
+
+So it is seed-specific, and most likely noise. It should not be described as a finding, and the
+earlier framing — that it "cuts against any simple train-longer reading of E8" — is withdrawn. E8
+will settle it properly; with n = 2 there is nothing to explain yet.
+
+### Reproducibility: the pipeline is not bit-reproducible, and it does not matter
+
+At `eps = 0` no edit is applied, so all 21 runs should be identical. They are not: max relative
+deviation **9.0e-06**, from GPU floating-point nondeterminism (`transition` / `readout_from_h`).
+In the reported statistic this is a spread of **3.2e-09** in median abs `D_sec`, against a measured
+effect of **4.8e-04** — an SNR of about **1.5e5**. Recorded so that "0/20" is not mistaken for a
+bit-exact claim, and so a future re-run landing on slightly different digits is not read as a bug.
+
+### Status
+
+n = 2 conservative seeds. Seed 5 and damped 0-2 still to train (~4 h). Arm C (damped) has not run at
+all yet — it is the refusal control and remains outstanding.
