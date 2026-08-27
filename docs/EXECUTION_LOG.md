@@ -3371,3 +3371,53 @@ E10 in its **original** form — conservation varying at *high* matched decodabi
 One model (central seed 0, step 60,000); the evidence-base guard flags it n = 1. Central seed 2 is
 training. The honest summary is that E10b is **suggestive, not decisive**, and the paper should say
 so rather than presenting it as the decodability-versus-dynamics control the roadmap called for.
+
+---
+
+## 2026-08-28 00:30–00:50 UTC — Sample-size test completes; **degeneracy claim closed at n = 3 central seeds**
+
+Git at `8e1803e`.
+
+### Sample-size stability, all three sizes
+
+| sampling | n | median `rho_E` | IQR |
+|---|---|---|---|
+| bootstrap **with** replacement (E17b, invalid) | 52 | 0.613 | 0.613 |
+| disjoint, without replacement | 52 | 0.959 | 0.0171 |
+| disjoint, without replacement | 128 | 0.964 | 0.0109 |
+| disjoint, without replacement | **256** | **0.976** | **0.0080** |
+
+Median rises and IQR shrinks monotonically with `n` — textbook estimator behaviour. The withdrawal of
+the sample-size concern is complete and confirmed at three sizes.
+
+### Two-invariant degeneracy, n = 3 central seeds, 7 measurements
+
+| seed | step | joint `rho_E` | joint `rho_L` | best `rho_E` | best `rho_L` | isolates? |
+|---|---|---|---|---|---|---|
+| 0 | 6,500 | 0.085 | 0.364 | 0.745 | 0.941 | no |
+| 0 | 15,000 | 0.290 | 0.264 | 0.741 | 0.950 | no |
+| 0 | 30,000 | 0.146 | 0.015 | 0.704 | 0.967 | no |
+| 0 | 60,000 | 0.064 | 0.163 | 0.929 | 0.942 | no |
+| 1 | 6,500 | **0.904** | 0.236 | 0.787 | 0.962 | **YES** |
+| 1 | 15,000 | 0.061 | 0.177 | 0.778 | 0.978 | no |
+| 2 | 6,500 | 0.501 | 0.125 | 0.760 | 0.958 | no |
+
+- joint fit isolates an invariant (`>0.8`) in **1 of 7** measurements
+- joint `rho_E` median 0.146, range [0.061, 0.904]
+- **subspace `best rho_L` median 0.958, range [0.941, 0.978]** — stable across every seed and
+  checkpoint
+- non-central (one invariant): **3 of 3** isolate, monotonically (0.909 / 0.966 / 0.987)
+
+The claim in its third and final form is now at **n = 3 seeds**:
+
+> On a two-invariant system the extraction reliably recovers a conserved **subspace** containing both
+> invariants (`best rho_L` 0.94-0.98 in all 7 measurements) but usually fails to isolate either as a
+> single direction (1 of 7). On a one-invariant system it isolates the invariant every time.
+
+The **mechanism** remains untested — E17b falsified the ill-posedness account and the deterministic
+implementation cannot be probed for solution multiplicity without modifying it.
+
+### Evidence-base guard
+
+Regenerating `docs/RESULTS.md` now shows **no claim at n = 1**. Every headline claim rests on three
+or more independent model seeds.
