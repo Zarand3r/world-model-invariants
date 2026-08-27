@@ -3067,3 +3067,70 @@ checkpoint files by its absence.
 - Noted for the record: an unrelated job (`train_dreamer_pokedrag --seed 2`) has been sharing this
   GPU for 3.5 hours. It is not part of this project and has not been touched; it explains some of the
   contention in wall-clock timings, which the step-capped contract makes irrelevant to results.
+
+---
+
+## 2026-08-27 18:40–19:00 UTC — 2-DoF E8 curve at n=3; **verification of the overwritten checkpoints**
+
+Git at `95a19ed`.
+
+### 2-DoF E8 curve, now n = 3
+
+| seed | step 15,000 | step 30,000 | step 60,000 |
+|---|---|---|---|
+| 3 | -18.2% (0/12) | **-57.6%** (0/20) | **+4.1%** (0/20) |
+| 4 | -21.0% (0/12) | **-54.4%** (0/12) | **-42.7%** (0/20) |
+| 5 | -8.8% (**2/12**) | **-59.7%** (0/12) | **-42.5%** (0/12) |
+
+Baselines at step 60,000: 1.01e-03 (s3), 3.27e-03 (s4), 1.62e-03 (s5).
+
+**Step 30,000 is strikingly consistent**: -57.6, -54.4, -59.7. The peak of the two-factor curve is
+reproducible across seeds to within 5 percentage points.
+
+**At convergence, 2 of 3 seeds retain the effect.** Seed 3 (+4.1%) is the outlier and has the lowest
+residual drift of the three. Counting both systems: **5 of 6 fully-converged models retain the
+repair.** The "drift vanishes at convergence" reading, already withdrawn once, is now n = 1 of 3 on
+its own system.
+
+Seed 5 at step 15,000 remains the only conservative arm anywhere with a specificity failure (2/12),
+and it has the worst identification at that checkpoint (`|rho_E|` 0.580) — the two-factor prediction,
+holding.
+
+### Verification of the checkpoints the retraining overwrote
+
+Re-ran the central-arm recovery on the **new** step-3,000 and step-6,500 files and compared against
+what was reported from the originals:
+
+| step | quantity | reported | re-run | delta |
+|---|---|---|---|---|
+| 3,000 | joint `rho_E` | 0.4313 | 0.0628 | **-0.369** |
+| 3,000 | joint `rho_L` | 0.0511 | 0.3002 | **+0.249** |
+| 3,000 | best `rho_E` in pool | 0.8542 | 0.8411 | -0.013 |
+| 3,000 | best `rho_L` in pool | 0.7586 | 0.9196 | +0.161 |
+| 6,500 | joint `rho_E` | 0.0848 | 0.4198 | **+0.335** |
+| 6,500 | joint `rho_L` | 0.3643 | 0.1567 | -0.208 |
+| 6,500 | best `rho_E` in pool | 0.7454 | 0.6320 | -0.113 |
+| 6,500 | best `rho_L` in pool | 0.9407 | 0.9953 | +0.055 |
+
+**The specific joint-fit numbers do not reproduce.** They swing by 0.21-0.37 between two trainings of
+the same seed on the same data for the same number of steps.
+
+**The structure does.** A strongly angular-momentum-aligned direction is present in both runs
+(`rho_L` 0.920 and 0.995 against 0.759 and 0.941), alongside a separate energy-aligned direction, and
+in both runs the joint fit isolates neither.
+
+### This strengthens the degeneracy finding rather than weakening it
+
+An ill-posed optimisation is exactly what should be **unstable across reinitialisation**. The joint
+fit swinging 0.37 between identical training runs is the signature of a criterion with no unique
+optimum — which is what the degeneracy claim asserts. The stable part (the subspace) and the unstable
+part (the single direction selected inside it) are precisely the two halves of that claim.
+
+**Scope, stated plainly.** The degeneracy conclusion rests on steps 15,000 / 30,000 / 60,000, which
+were **not** overwritten, plus the monotone trend across all five checkpoints. The step-3,000 and
+step-6,500 rows in `docs/RESULTS.md` and in earlier log entries are from files that no longer exist,
+and their joint-fit values should be treated as illustrative rather than quotable. The subspace values
+at those steps do reproduce within 0.16.
+
+And it remains **n = 1 seed**, as the new evidence-base guard flags. Central seeds 1 and 2 are
+training.
