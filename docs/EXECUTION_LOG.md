@@ -717,3 +717,77 @@ the edit-magnitude confound that Audit 1 found in the intervention arms.
 does, the specificity story is one-sided: we have shown the recovered direction beats random
 directions *within* conservative models, but not that the pipeline declines to produce a useful
 direction when the underlying dynamics have no conserved quantity.
+
+---
+
+## 2026-08-27 01:10–01:35 UTC — **E3 falsifies its own registered prediction, and the fallback explanation fails too**
+
+Git at `cd687bb`. Seed 5 at step 36,000; damped models not yet started.
+
+### E3 registered primary: FALSIFIED
+
+`docs/E3_PREREG.md` predicted `f_perp > 1/12` with a CI excluding it, and named the falsifier
+explicitly: "`f_perp <= 1/12`. Then one-step error is not preferentially normal, the geometric story
+is wrong, and the projection's benefit needs a different explanation."
+
+| arm | median `f_perp` | 95% CI | x null | mean |
+|---|---|---|---|---|
+| conservative s3 | 0.0203 | [0.0180, 0.0224] | 0.24 | 0.0536 |
+| conservative s4 | 0.0218 | [0.0162, 0.0247] | 0.26 | 0.0544 |
+| conservative s5 | 0.0237 | [0.0226, 0.0261] | 0.28 | 0.0595 |
+| untrained | 0.0273 | [0.0249, 0.0306] | 0.33 | 0.0603 |
+| random `C` (n = 60) | 0.0499 | [0.0352, 0.0692] | 0.60 | — |
+
+One-step error is preferentially **tangent**, not normal — three to four times *less* aligned with
+`grad C` than chance, on every seed, CI excluding the null. **The registered falsifier fired.**
+
+### The registered null was also mis-specified, and I should say so plainly
+
+`1/LD` assumes `dz` is isotropic in the extracted subspace. It is not: **every arm, including random
+constraints, sits below 1/12.** A null that no arm can reach is not a null. The right comparison is
+the empirical random-`C` arm, which the prereg did name as "the control that matters".
+
+Against *that* null the direction of the effect is unchanged and clean: conservative seeds
+[0.0203, 0.0237] against random [0.0352, 0.0692], with **60/60 random draws above the weakest
+conservative seed**. The recovered constraint's gradient avoids the model's one-step error even more
+strongly than a random polynomial's does.
+
+**But this comparison is not independent of E2.** If `C` is well conserved then `C(T(z)) ~ C(z)`,
+hence `grad C . dz ~ 0`, hence low `f_perp`. E3's conservative-vs-random contrast is close to a
+restatement of E2's `rho_obs` contrast in different units, and must not be presented as
+corroborating evidence from an independent measurement.
+
+### The obvious fallback explanation also fails
+
+Post-hoc, and labelled as such: if the normal component is small but **systematic** it would still
+integrate into energy drift, while a larger **oscillatory** tangent component would not. Tested by
+the ratio of |mean| to std of the signed normal projection along each trajectory:
+
+| seed | normal \|mean\|/std | tangent \|mean\|/std |
+|---|---|---|
+| 3 | 0.096 | 0.199 |
+| 4 | 0.076 | 0.232 |
+| 5 | 0.065 | 0.200 |
+
+The normal component is **less** systematic than the tangent one, on all three seeds. The fallback is
+wrong too.
+
+### Where this leaves the mechanism
+
+The repair works and is highly specific — 3/3 seeds, 32-51% reduction in true decoded physical
+energy drift, 0/60 magnitude-matched random directions beating it. **We now have no working
+explanation of why.** The preregistered geometric account is falsified and its natural replacement
+is falsified.
+
+That is the honest state, and it is recorded as such rather than narrated into a story. The result
+stands on its own evidence; the mechanism is open.
+
+### A reporting bug in my own analysis, caught and fixed
+
+The first E3 summary reported 0.052-0.059 and called it the median. It was the median of
+*per-trajectory means*. `f_perp` is strongly right-skewed (median 0.020 against mean 0.054), so the
+two are different statistics and the registered one is the median. Two independent implementations
+of the underlying quantity were checked against each other and agree to 2.4e-07, and float32 vs
+float64 gradients agree to a ratio of 1.000 — the maths was right, the summary was not. The script
+now stores per-trajectory medians and means separately, under distinct keys. The conclusion is
+unchanged and in fact stronger: 0.24x the null rather than 0.63x.
