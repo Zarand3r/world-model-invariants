@@ -1049,3 +1049,51 @@ arms were run at 20 and should have been matched from the start.
 
 Seeds 4 and 5 at H = 190 on the disjoint eval set, to close the "seed 3 only at long horizon" caveat
 on the -75.9% headline.
+
+---
+
+## 2026-08-27 03:40–03:50 UTC — **Headline replicates on all three seeds: -54.6 to -75.9% at H = 190, out of sample**
+
+Git at `6dbfe54`. Damped seed 0 trained and passed acceptance (rollout finite, pixel std 0.0698);
+damped seed 1 training.
+
+`C`, `h_mean`, `U`, `R` frozen from the analysis split of `pendulum_pixels.npz`; scored on the 512
+never-seen trajectories of `pendulum_pixels_eval.npz` (generator seed 777).
+
+| seed | n random | baseline abs `D_sec` | recovered | recovered % | random % | random best | beats |
+|---|---|---|---|---|---|---|---|
+| 3 | 20 | 1.021e-03 | 2.459e-04 | **-75.9** | +8.8 | -16.3 | 0/20 |
+| 4 | 20 | 8.116e-04 | 3.688e-04 | **-54.6** | +9.7 | -14.4 | 0/20 |
+| 5 | 15 | 8.462e-04 | 3.485e-04 | **-58.8** | +7.4 | -24.7 | 0/15 |
+
+- recovered: median **-58.8%**, range [-75.9, -54.6]
+- random: +7.4 to +9.7% on every seed
+- **0 / 55 random directions beat the recovered one**
+- the best single random draw across all 55 (-24.7%) does not reach the **weakest** recovered
+  seed (-54.6%)
+
+This closes the last major caveat on the project's strongest number. The claim is now: on three
+independently trained models, with step magnitude held fixed so arms differ only in direction, and
+scored on 512 trajectories none of them ever saw, projecting the latent along the recovered
+invariant's normal reduces secular drift in **true decoded physical energy** by 55-76%, while
+identical-magnitude random and tangent directions do not.
+
+Seed 5's tangent arm has not run yet (0/5); its `beats` count is over 15 random draws rather than 20.
+Both will be restated when the run finishes.
+
+### Stage 1 status
+
+| item | status |
+|---|---|
+| adapter verification | complete |
+| E1 readout validation, arms (a) and (b) | complete |
+| E1 arms A / B / B' / D | complete, n = 3 |
+| E1 arm C (damped) | n = 1; seeds 1-2 training |
+| E2 | complete, Outcome B at 6/6 checkpoints |
+| E3 | complete, registered prediction **falsified** |
+| E6 | complete, monotone in horizon |
+| E9 | complete, n = 3, effect does not shrink out of sample |
+| E7 seeds | 3 conservative + 1 damped of 3 |
+
+Stage 1 is substantively complete apart from damped seeds 1 and 2. Next in the roadmap's order is
+Stage 2: **E4** (preregistered in `docs/E4_PREREG.md`), then E5, then E13.
