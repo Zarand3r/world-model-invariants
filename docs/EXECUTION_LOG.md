@@ -2357,3 +2357,64 @@ architecture's capacity for it, or of the shadow-Hamiltonian oscillation in the 
 a floor the model inherits. That is a new question and would need its own preregistration.
 
 **Still missing:** 2-DoF seeds 4 and 5 at step 60,000. The 29x baseline collapse is one seed.
+
+---
+
+## 2026-08-27 13:10–13:30 UTC — Baseline collapse replicates on seed 4; **the single-factor rule was wrong**
+
+Git at `ae27f5a`.
+
+### The 2-DoF baseline-drift collapse replicates
+
+| seed | step | baseline abs `D_sec` | relative to step 15,000 | recovered | beats |
+|---|---|---|---|---|---|
+| 3 | 15,000 | 2.937e-02 | 1.000x | -18.2% | 0/12 |
+| 3 | 30,000 | 7.709e-03 | 0.262x | **-57.6%** | 0/20 |
+| 3 | 60,000 | 1.010e-03 | 0.034x | **+4.1%** | 0/20 |
+| 4 | 15,000 | 2.736e-02 | 1.000x | -21.0% | 0/12 |
+| 4 | 30,000 | 8.846e-03 | 0.323x | **-54.4%** | 0/9 |
+
+Two seeds, near-identical baselines (2.94e-02 vs 2.74e-02), near-identical collapse ratio at step
+30,000 (0.262x vs 0.323x), and near-identical effects (-57.6% vs -54.4%). The 29x baseline collapse
+that was carrying much of the E8 argument on one seed is **reproducible**.
+
+### The single-factor rule from last iteration is refuted by its own data
+
+Last iteration I proposed: *"the repair works when the model still has residual invariant drift."*
+The seed-3 curve refutes it, and I did not notice at the time.
+
+At step 15,000 the 2-DoF baseline drift is **the largest of any checkpoint** (2.94e-02, 29x the
+step-60,000 value) and the effect is **the smallest of the three** (-18.2%). More drift did not mean
+more repair.
+
+Putting the recovery numbers beside it explains why:
+
+| step | baseline drift | recovered `C` \|rho_E\| | repair effect |
+|---|---|---|---|
+| 15,000 | **2.94e-02** (most) | 0.909 | -18.2% |
+| 30,000 | 7.71e-03 | 0.966 | **-57.6%** |
+| 60,000 | 1.01e-03 (least) | **0.987** | +4.1% |
+
+**Two factors, not one.** The repair needs *both* a well-identified invariant *and* residual drift to
+correct:
+
+- at 15,000 there is plenty to fix but the invariant is imperfect (0.909), so the correction is
+  aimed slightly wrong
+- at 30,000 the invariant is good (0.966) and drift remains — the effect peaks
+- at 60,000 the invariant is excellent (0.987) but there is almost nothing left to fix
+
+That is a **non-monotone** dependence on training, with a peak in the middle, and it is consistent
+with every measurement on both systems including the pendulum's noisy but never-vanishing curve
+(pendulum drift stays roughly flat, so it stays on the productive side of the peak throughout).
+
+**Recorded as a correction.** The one-factor rule was stated to Richard as "the single rule
+consistent with all seven measurements". It was not consistent with all seven — the step-15,000 point
+contradicted it and I read the curve too quickly. The two-factor account fits all nine points now
+available, and is itself a hypothesis rather than a result: it predicts that a checkpoint with high
+drift *and* high `|rho_E|` should show the largest effect, which no experiment has yet targeted
+directly.
+
+### Still missing
+
+2-DoF seed 4 at step 60,000, which is the only direct replication of the vanishing. Central seeds 1
+and 2. Non-central seed 5.
