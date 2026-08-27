@@ -1254,3 +1254,82 @@ tracking the latent state at all will partly track it. E4's claim is comparative
 Together these complete the three-seed refusal criterion that `E1_PREREG` and the repo's existing
 `docs/DISSIPATIVE_PREREG.md` both require, and which has been the outstanding gap in Stage 1 since
 the start.
+
+---
+
+## 2026-08-27 05:40–05:55 UTC — **STAGE 1 COMPLETE: arm C is a decisive refusal at n = 3**
+
+Git at `9f60dea`. Damped seed 2 still training past step 6,500; all three damped models have the
+checkpoint arm C requires.
+
+### Arm C, intervention side, n = 3
+
+Deviation from **true decaying physics**, `|D_sec - D_sec_true|`, at eps = 0.02, H = 100:
+
+| damped seed | recovered | random median | tangent median | random beating recovered | pixel MSE |
+|---|---|---|---|---|---|
+| 0 | -11.0% | -3.5% | -8.5% | 4/20 | +0.2% |
+| 1 | **+20.7%** | +27.5% | +2.9% | 8/20 | +0.6% |
+| 2 | +3.3% | +0.3% | +8.7% | 12/20 | -1.5% |
+| **conservative, n = 3** | **-32 to -51%** | +7.4 to +9.7% | -3.6 to +7.8% | **0/60** | -8 to -11% |
+
+Across the three damped models the recovered direction gives -11.0%, **+20.7%**, +3.3% — no
+consistent sign, harm on two of three seeds — and **24 of 60 random directions beat it**, against
+**0 of 60** on the conservative models.
+
+This is the registered refusal, and it is unambiguous: when the extraction is run on dynamics with
+no conserved quantity, the direction it returns is not distinguished from a random one.
+
+### Arm C, recovery side, n = 3
+
+| arm | `rho_obs` |
+|---|---|
+| conservative s3 / s4 / s5 | 6.274e-03 / 8.649e-03 / 6.851e-03 |
+| damped s0 / s1 / s2 | 3.741e-01 / 3.411e-01 / 3.663e-01 |
+
+**39x separation, no overlap between any conservative and any damped seed.** E2's depth ratio on the
+damped models is 0.89-1.02, flat as everywhere else.
+
+This reproduces, on the *operator* statistic, the non-overlap the published paper reports on its
+recovery statistics ("no conservative seed overlaps any damped seed on any row").
+
+### Correcting my own earlier characterisations of arm C, twice over
+
+At n = 1 with 10 draws I called arm C "partially met" — the intervention appeared to help by 11%
+where the registration expected none. At n = 1 with 20 draws I revised that to a pass on specificity
+grounds. At n = 3 the picture is cleaner than either: the seed-0 result was **not representative**.
+Seeds 1 and 2 show the recovered direction actively harming, and the fraction of random draws
+beating it rises to 8/20 and 12/20. Both earlier readings were drawn from a single damped model, and
+the roadmap's own instruction — model seed is the independent unit — was the thing that should have
+prevented me from characterising the arm at all until three existed.
+
+### STAGE 1 — final status
+
+| item | result |
+|---|---|
+| adapter verification | agrees with reference `img_step` to 0.0e+00 |
+| E1 readout validation (a) and (b) | theta 0.11 deg, decoded E 1.6% of spread, `D_sec` floor 1.0e-03 |
+| E1 arm A, conservative | **-32 to -51%** (H = 100), **-54.6 to -75.9%** (H = 190, out of sample) |
+| E1 arm B, magnitude-matched random | **0/60** beat recovered |
+| E1 arm B', equal-norm tangent | **0/15** beat recovered |
+| E1 arm C, damped | **refusal: 24/60 random beat recovered, harm on 2/3 seeds** |
+| E1 arm D, untrained | `rho_obs` 57-74x worse |
+| E2 | Outcome **B** at 9/9 checkpoints (6 conservative, 3 damped) |
+| E3 | registered prediction **FALSIFIED**; mechanism unexplained |
+| E6 | monotone in horizon, -48% at H = 100 -> -76% at H = 190 |
+| E9 | effect does not shrink out of sample, n = 3 |
+| E4 (Stage 2) | transfer correlation **+0.808 to +0.916**, 0/75 controls |
+
+### Claim status
+
+| claim | status |
+|---|---|
+| **C1 emergence** | supported, n = 3, with a matched dissipative control at n = 3 |
+| **C2 physical validity** | supported, n = 3, out of sample, magnitude-matched |
+| **C3 failure mechanism (amended)** | supported, Outcome B at 9/9 |
+| **C4 causal control** | supported, n = 3 |
+| C5 predictive utility | untested |
+| C6 generality | untested |
+
+Stage 1 is complete. Stage 2 has E4 done; E5 and E13 remain. The mechanism question raised by E3's
+falsification is still open and is the most interesting unresolved item in the project.
