@@ -81,11 +81,72 @@ def lyapunov(n_traj, n_steps, central, w1, w2, a, b, seed=0, d0=1e-8, dt=DT):
     return total / (n_steps * dt)
 
 
+RES = 64
+HALF = 2.0        # frame covers [-HALF, HALF]; measured |q| max is 1.80 over the IC distribution
+RADIUS_PX = 3.0
+DISK_RGB = np.array([204.0, 77.0, 77.0])      # same ink colour as the pendulum rod
+
+
+def render(Q):
+    """(..., 2) positions -> (..., 64, 64, 3) uint8. One anti-aliased disk on white.
+
+    Anti-aliasing matters: the geometric readout recovers position from the ink-weighted centroid,
+    and a hard-edged disk quantises that to whole pixels. A smooth edge buys sub-pixel accuracy, the
+    same property the pendulum's 500->64 block-average provided.
+    """
+    Q = np.asarray(Q, dtype=np.float64)
+    shape = Q.shape[:-1]
+    cx = (Q[..., 0] / HALF * 0.5 + 0.5) * (RES - 1)
+    cy = (-Q[..., 1] / HALF * 0.5 + 0.5) * (RES - 1)          # +q2 is up
+    ys, xs = np.mgrid[0:RES, 0:RES]
+    d = np.sqrt((xs - cx[..., None, None]) ** 2 + (ys - cy[..., None, None]) ** 2)
+    alpha = np.clip(RADIUS_PX - d + 0.5, 0.0, 1.0)             # smooth edge
+    frame = 255.0 - alpha[..., None] * (255.0 - DISK_RGB)
+    return np.clip(frame, 0, 255).astype(np.uint8).reshape(*shape, RES, RES, 3)
+
+
+def make_dataset(n_traj, n_steps, b, seed, out, a=0.05, w=1.0, dt=DT):
+    """Simulate, reject out-of-frame trajectories, render, and save with full provenance."""
+    rng = np.random.default_rng(seed)
+    keep_q, keep_p = [], []
+    tries = 0
+    while len(keep_q) < n_traj and tries < 50:
+        tries += 1
+        need = n_traj - len(keep_q)
+        q0 = rng.uniform(-1, 1, (need * 2, 2)); p0 = rng.uniform(-1, 1, (need * 2, 2))
+        Q, P = simulate(q0, p0, n_steps, False, w, w, a, b, dt)
+        ok = np.abs(Q).max(axis=(1, 2)) < HALF * 0.95        # stays in frame with margin
+        for i in np.nonzero(ok)[0][:need]:
+            keep_q.append(Q[i]); keep_p.append(P[i])
+    Q = np.stack(keep_q); P = np.stack(keep_p)
+    E = energy(Q, P, False, w, w, a, b)
+    L = angular_momentum(Q, P)
+    frames = render(Q)
+    # `states` is the 4-D phase-space state (q1, q2, p1, p2), named to match the pendulum
+    # dataset so train_dreamer_pendulum.py loads this file unchanged.
+    states = np.concatenate([Q, P], axis=-1)
+    np.savez_compressed(out, frames=frames, states=states, q=Q, p=P, energy=E, angmom=L,
+                        params=np.array([w, w, a, b, dt]))
+    print(f"  {out}: {Q.shape[0]} traj x {n_steps} steps, {frames.nbytes/1e6:.0f} MB raw, "
+          f"rejected {tries - 1} refill rounds")
+    print(f"    E across-traj std {E.mean(-1).std():.4f}   L invariance ratio "
+          f"{np.median(np.std(L,axis=1))/np.std(np.mean(L,axis=1)):.4f}")
+    return out
+
+
 if __name__ == "__main__":
     p_ = argparse.ArgumentParser()
     p_.add_argument("--gate", action="store_true")
     p_.add_argument("--n-steps", type=int, default=200)
+    p_.add_argument("--dataset", action="store_true")
+    p_.add_argument("--n-traj", type=int, default=256)
+    p_.add_argument("--b", type=float, default=0.40)
+    p_.add_argument("--seed", type=int, default=0)
+    p_.add_argument("--out", default="runs/osc2d_noncentral.npz")
     a_ = p_.parse_args()
+    if a_.dataset:
+        make_dataset(a_.n_traj, a_.n_steps, a_.b, a_.seed, a_.out)
+        raise SystemExit
     if a_.gate:
         H = a_.n_steps * DT
         print(f"E17 CHAOS GATE   horizon {a_.n_steps} steps = {H:.1f} time units")

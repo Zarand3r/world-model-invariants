@@ -1701,3 +1701,62 @@ without a great deal of confusion. Nothing was rendered or trained under the bro
 Renderer, then dataset, then training under the frozen step-capped contract. The extraction runs at
 **frozen hyperparameters first** (LD = 12, degree 4, n_basis = 8) with any adaptation recorded as a
 separate experiment, per the roadmap.
+
+---
+
+## 2026-08-27 08:20–08:45 UTC — E17 renderer, datasets, and training launched
+
+Git at `46294d3`. Frozen parameters from the chaos gate: `w1 = w2 = 1.0, a = 0.05, dt = 0.05`,
+non-central `b = 0.40`, central `b = 0.05`.
+
+### Renderer
+
+Single anti-aliased disk at `(q1, q2)` on white, 64x64, frame covering `[-2, 2]` — measured
+`|q|` max over the initial-condition distribution is 1.80, so trajectories stay in frame with
+margin. Ink colour `(204, 77, 77)`, the same as the pendulum rod, so the readout's ink threshold
+carries over unchanged.
+
+Anti-aliasing is deliberate. The readout recovers position from the ink-weighted centroid, and a
+hard-edged disk quantises that to whole pixels. The smooth edge buys sub-pixel accuracy — the
+property the pendulum got for free from its 500 -> 64 block-average.
+
+**Readout validated before any dataset was generated** (the standing rule). On five known
+positions spanning the frame: **max position error 0.0014 units = 0.022 px.** Essentially exact,
+and far better than the pendulum's 0.11 deg angular error, because a disk's centroid *is* its
+position while a rod's centroid is offset by the axle glyph.
+
+### Datasets
+
+| file | trajectories x steps | b | seed | E across-traj std | **L invariance ratio** |
+|---|---|---|---|---|---|
+| `osc2d_noncentral.npz` | 256 x 120 | 0.40 | 0 | 0.3269 | **0.0638** |
+| `osc2d_central.npz` | 256 x 120 | 0.05 | 11 | 0.3128 | **0.0000** |
+| `osc2d_noncentral_eval.npz` | 512 x 200 | 0.40 | 777 | 0.3057 | **0.1040** |
+
+Zero trajectories rejected for leaving the frame in any set. Angular momentum is **exactly**
+conserved in the central arm and clearly broken in the non-central one, while total energy is
+equally well conserved in both — the contrast the experiment turns on, confirmed in the data as
+generated rather than assumed.
+
+`states` is saved as the 4-D phase-space state `(q1, q2, p1, p2)`, named to match the pendulum
+dataset so `train_dreamer_pendulum.py` loads these files **unchanged**. Also saved: `q`, `p`,
+`energy`, `angmom`, and the parameter vector, so every downstream number is traceable to the
+generating physics without re-simulation.
+
+### Training launched
+
+Six models under the **frozen step-capped contract**, identical to the pendulum arm: 60,000 steps,
+E8 milestone grid `{1k, 3k, 6.5k, 15k, 30k, 60k}`, `--max-hours 6` as a non-binding energy bound.
+
+- non-central seeds 3/4/5 -> `runs/osc2d_nc_s{3,4,5}.pt`
+- central seeds 0/1/2 -> `runs/osc2d_ce_s{0,1,2}.pt`
+
+Estimated ~8.5 h. The step-6,500 checkpoints — enough to begin analysis — arrive roughly 10 minutes
+into each run.
+
+### Registered next step, restated so it cannot drift
+
+Extraction runs at **frozen hyperparameters first**: LD = 12, degree 4, `n_basis` = 8, WARMUP = 10.
+LD = 12 was chosen for a **2-dimensional** physical state; this state is **4-dimensional**. If
+recovery fails at those settings that is a **result about generality and will be reported as one**,
+and any adapted setting becomes a separate experiment with its own log entry. No silent tuning.
