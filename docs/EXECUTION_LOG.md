@@ -2418,3 +2418,62 @@ directly.
 
 2-DoF seed 4 at step 60,000, which is the only direct replication of the vanishing. Central seeds 1
 and 2. Non-central seed 5.
+
+---
+
+## 2026-08-27 13:40–14:00 UTC — **E8b prediction A passes: identification, not drift, is the binding factor**
+
+Git at `36299b6`. Preregistered in `docs/E8B_PREREG.md` **before the quantity was computed**, with a
+falsifier and a confound check, precisely because the two-factor account was fitted to observed data
+and needed an out-of-sample test to be worth anything.
+
+### The natural experiment
+
+The central arm is the cleanest available way to **decouple the two factors**. Its joint fit is
+broken (`|rho_E|` 0.146) while its conserved subspace is excellent (angular momentum at 0.967) — so
+it has drift to correct and no correctly-identified direction to correct along. The matched
+non-central arm at the same step has both.
+
+| step 30,000 | baseline abs `D_sec` | \|rho_E\| | repair | random beating it |
+|---|---|---|---|---|
+| **central** | **1.201e-02** | **0.146** | **+4.6%** | **10/12** |
+| non-central | 7.709e-03 | 0.966 | **-57.6%** | 0/20 |
+
+**Registered prediction A** (repair `> -20%`): **PASS**, at +4.6%.
+Falsifier (`<= -40%`) not approached.
+
+**Confound check, registered in advance:** the comparison is only about identification if the two
+arms have comparable drift. The central arm's baseline is **1.56x the non-central arm's** — it has
+*more* to correct, not less, and still fails. The test is valid and the direction of the confound
+works against the prediction rather than for it.
+
+### The specificity collapse is the extra signal
+
+The central arm's repair is not merely small — **10 of 12 random directions beat it.** When `C` is
+misidentified, projecting along it is no better than projecting along a random direction. Every
+other conservative arm in this project has been 0/N.
+
+That is a sharper statement of the paper's own thesis than any pendulum result: it is not enough for
+a latent scalar to be conserved, decodable, or even to span the right subspace. **It has to be the
+right direction**, and when it is not, the intervention loses both its effect and its specificity at
+once.
+
+### What this establishes
+
+The two-factor account is now **predictive rather than descriptive**. It was fitted to the seed-3
+training curve, registered with a falsifier, and tested on a system it was not fitted to — the
+central arm, whose repair had never been measured — and it predicted the outcome correctly including
+the direction of the confound.
+
+It also closes a loop that ran through this whole session. The two-invariant degeneracy was found as
+a **methodological** limitation of `fit_hamiltonian_pair`. E8b shows that limitation has a direct
+**functional** consequence: a model whose invariant is not isolated cannot be repaired, even though
+the conserved structure is demonstrably present in its latent at `|rho_L|` 0.967.
+
+### What it does not establish
+
+Nothing about **why** the pendulum's drift stays flat under training while the 2-DoF model's
+collapses 29x. That question is untouched by either prediction and would need its own registration.
+
+**Prediction B** — 2-DoF seed 4 at step 60,000 showing `|effect| < 15%` — is still pending; that
+checkpoint has not been reached.
