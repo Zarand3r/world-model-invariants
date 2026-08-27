@@ -3421,3 +3421,61 @@ implementation cannot be probed for solution multiplicity without modifying it.
 
 Regenerating `docs/RESULTS.md` now shows **no claim at n = 1**. Every headline claim rests on three
 or more independent model seeds.
+
+---
+
+## 2026-08-28 00:50–01:10 UTC — **The guard found a reproducibility gap in a headline result**
+
+Git at `a1e97a7`.
+
+### What it caught
+
+Regenerating `docs/RESULTS.md` flagged **E14b** — the decodable-but-not-conserved dissociation, and
+arguably the strongest single result in the project — as `n = 1`. It was not n = 1. It was run across
+pendulum seeds 3/4/5. But it had been computed **inline in an ad-hoc script and never written to a
+run record**, so there was nothing in `runs/` for the guard to count, and nothing for anyone to
+regenerate it from.
+
+Every other headline number in this project regenerates from `runs/*.json`. This one did not, and
+that had gone unnoticed for four iterations while I described it as the project's sharpest finding.
+
+### Fixed
+
+`scripts/run_e14b_ood_conservation.py` written and run. Values reproduce the inline computation
+**exactly**:
+
+| seed | in-dist `rho_E` | OOD `rho_E` | free probe OOD | in-dist `rho_obs` | OOD `rho_obs` | random | degradation |
+|---|---|---|---|---|---|---|---|
+| 3 | 0.9730 | 0.9177 | **0.9996** | 6.27e-03 | 1.677 | 1.737 | **267x** |
+| 4 | 0.9299 | 0.9603 | **0.9995** | 8.65e-03 | 1.343 | 2.855 | **155x** |
+| 5 | 0.9657 | 0.9314 | **0.9996** | 6.85e-03 | 1.711 | 1.858 | **250x** |
+
+### The guard itself had a counting bug, also fixed
+
+It counted **files**, which under-reports a run record holding several seeds and over-reports one
+holding several checkpoints of a single seed. Both errors had occurred here. It now parses each
+record and counts distinct seeds from the checkpoint paths inside it.
+
+### Current state of the evidence base
+
+| claim | n |
+|---|---|
+| Pendulum repair, direction-matched | 3 |
+| Pendulum repair, disjoint H=190 | 3 |
+| Pendulum repair at step 60,000 | 3 |
+| E4 causal dialing | 3 |
+| Damped refusal | 3 |
+| 2-DoF recovery | 3 |
+| 2-DoF repair at convergence | 3 |
+| Two-invariant degeneracy | 3 |
+| OOD decodable-but-not-conserved | 3 |
+| **E10b conservation at matched decodability** | **1 — flagged** |
+
+Nine claims at n >= 3; one honestly flagged.
+
+### Worth stating plainly
+
+A mechanical check written two iterations ago to catch **under-powered claims** instead caught a
+**missing run record**, which is a different failure and one I would not have found by reading the
+log. That is an argument for the check being mechanical rather than a matter of discipline: it does
+not know what it is looking for, so it finds things the author was not looking for.

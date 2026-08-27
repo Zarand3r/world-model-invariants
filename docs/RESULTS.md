@@ -110,7 +110,9 @@ drift out of the prose. A claim resting on n = 1 is flagged, not omitted.
 | Damped refusal (arm C) | model seeds | 3 | n>=3 |
 | 2-DoF recovery (E17) | model seeds | 3 | n>=3 |
 | 2-DoF repair at convergence | model seeds | 3 | n>=3 |
-| Two-invariant degeneracy (central arm) | model seeds | 1 | **n=1 — DO NOT GENERALISE** |
+| Two-invariant degeneracy (central arm) | model seeds | 3 | n>=3 |
+| OOD decodable-but-not-conserved (E14b) | model seeds | 3 | n>=3 |
+| E10b conservation at matched decodability | model seeds | 1 | **n=1 — DO NOT GENERALISE** |
 
 ---
 

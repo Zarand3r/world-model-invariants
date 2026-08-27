@@ -160,7 +160,31 @@ row("claim", "independent units", "n", "status")
 row("---", "---", "---", "---")
 
 def _n_seeds(files):
-    return sum(1 for f in files if (RUNS / f).exists())
+    """Count independent model seeds, looking inside multi-model run records.
+
+    Counting files alone under-reports a record that holds several seeds and over-reports one
+    holding several checkpoints of the same seed. Both errors have occurred in this project.
+    """
+    seeds = set()
+    n_files = 0
+    for f in files:
+        p = RUNS / f
+        if not p.exists():
+            continue
+        n_files += 1
+        try:
+            d = json.loads(p.read_text())
+        except Exception:
+            continue
+        models = d.get("models") if isinstance(d, dict) else None
+        if isinstance(models, list) and models:
+            for mrec in models:
+                ck = mrec.get("ckpt", "")
+                import re
+                mm = re.search(r"_s(\d+)", ck)
+                if mm:
+                    seeds.add((f.split("_s")[0] if "_s" in f else f, mm.group(1)))
+    return max(len(seeds), n_files)
 
 CLAIMS = [
     ("Pendulum repair, direction-matched (H=100)", "model seeds",
@@ -178,7 +202,11 @@ CLAIMS = [
      ["e17_intervention_nc_s3_step60000.json", "e8b_predB_nc_s4_step60000.json",
       "e8_curve_osc_s5_step60000.json"]),
     ("Two-invariant degeneracy (central arm)", "model seeds",
-     ["e17_recovery_ce.json"]),
+     ["e17_recovery_ce.json", "e17_recovery_ce_s1.json", "e17_recovery_ce_s2.json"]),
+    ("OOD decodable-but-not-conserved (E14b)", "model seeds",
+     ["e14b_ood_conservation.json"]),
+    ("E10b conservation at matched decodability", "model seeds",
+     ["e10b_matched_decodability.json"]),
 ]
 for name, unit, files in CLAIMS:
     n = _n_seeds(files)
