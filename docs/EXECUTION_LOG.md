@@ -3309,3 +3309,65 @@ This is the sixth retraction of the session and the first that **removes** a con
 narrowing a claim. The pattern is consistent and worth stating plainly: outcome claims measured
 against preregistered controls have survived; my explanations and my ad-hoc statistical choices have
 not.
+
+---
+
+## 2026-08-28 00:05–00:30 UTC — **E10b: conservation predicts repair even at near-zero decodability, but the two are still not cleanly separated**
+
+Git at `57ab003`. Preregistered in `docs/E10B_PREREG.md`, with **no direction predicted**.
+
+### E10 became constructible, on the arm that was failing
+
+E10 was recorded as **not constructible** on the pendulum: of 250 candidates, exactly one had
+`|rho_E| > 0.3`, so no matched band could be populated. The **central 2-DoF arm** supplies one — but
+only because its jointly-fitted `C` sits at `|rho_E| = 0.064` from the two-invariant degeneracy, so
+**147 of 150** candidates match it, with invariance ratios spanning **4.12e-06 to 9.33e-01**.
+
+The band is therefore at **low** decodability. E10b asks the complementary question to the original
+E10: among candidates that are equally and poorly energy-correlated, does better conservation alone
+produce a repair?
+
+### Result — 20 candidates stratified by invariance ratio
+
+| invariance ratio | `|rho_E|` | repair |
+|---|---|---|
+| 4.12e-06 | 0.112 | -5.1% |
+| **5.72e-05** | 0.068 | **-17.2%** |
+| 1.68e-04 | 0.002 | -10.8% |
+| 5.03e-04 | 0.007 | -9.9% |
+| 1.31e-03 | 0.007 | -7.4% |
+| 1.68e-02 | 0.001 | -4.1% |
+| 2.47e-01 – 9.33e-01 (12 candidates) | 0.000 | -3.2% to +4.1% |
+
+**PRIMARY: Spearman(invariance ratio, repair) = +0.707.** Repair is a percent change, so positive
+correlation means *worse conservation gives less improvement* — better-conserved candidates repair
+better. The best-conserved candidates deliver up to **-17.2%** despite `|rho_E|` of 0.068, i.e.
+essentially no energy correlation at all.
+
+### The registered check failed, and it matters
+
+The prereg required reporting `Spearman(|rho_E|, repair)` "to confirm decodability really is held
+fixed and is not secretly driving the result". Measured: **-0.621**. Not inert.
+
+Inspecting the selection shows why: 14 of 20 candidates have `|rho_E|` rounding to 0.000, and the
+handful with any energy correlation at all (0.112, 0.068, 0.007) are **the same ones with the best
+conservation**. Conservation and decodability remain rank-correlated even inside a band constructed
+to hold decodability fixed.
+
+### What can and cannot be claimed
+
+**Can:** at `|rho_E| <= 0.112` — no meaningful energy correlation, against 0.987 for a properly
+identified invariant — conservation quality still tracks repair magnitude across five orders of
+magnitude of invariance ratio, and the best-conserved candidates produce a real repair (-17.2%).
+That is evidence conservation contributes **independently of tracking the physical quantity**.
+
+**Cannot:** that the two have been cleanly separated. They have not. The residual rank correlation of
+-0.621 means some of the effect could still ride on the small remaining decodability differences.
+E10 in its **original** form — conservation varying at *high* matched decodability — remains
+**unconstructed on any system tested**, and this is a complementary result rather than a substitute.
+
+### Status
+
+One model (central seed 0, step 60,000); the evidence-base guard flags it n = 1. Central seed 2 is
+training. The honest summary is that E10b is **suggestive, not decisive**, and the paper should say
+so rather than presenting it as the decodability-versus-dynamics control the roadmap called for.
