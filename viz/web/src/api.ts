@@ -7,7 +7,8 @@ export type Model = {
 };
 
 export type BundleInfo = {
-  key: string; ckpt: string; ld: number; degree: number; warmup: number;
+  key: string; ckpt: string; model_key: string; ld: number; degree: number; warmup: number;
+  max_horizon: number; max_alpha: number;
   eigenvalues: number[]; rho_energy: number; drift_of_C: number;
   n_traj: number; n_steps: number; retained_rank: number; n_basis: number; n_monomials: number;
   weights: number[]; pairing_residual: number; rank_and_test_residual: number;
@@ -47,13 +48,21 @@ export type PaperRefs = {
 };
 
 async function jsonOrThrow(r: Response) {
-  if (!r.ok) throw new Error(`${r.status} ${await r.text()}`);
+  if (!r.ok) {
+    // the API answers a rejected request with {"detail": "..."}; show that, not "422 {...}"
+    const body = await r.text();
+    let detail = body;
+    try { detail = JSON.parse(body).detail ?? body; } catch { /* not JSON */ }
+    throw new Error(detail);
+  }
   return r.json();
 }
 
-const post = (url: string, body: unknown) =>
+const post = (url: string, body: unknown, signal?: AbortSignal) =>
   fetch(url, { method: "POST", headers: { "content-type": "application/json" },
-               body: JSON.stringify(body) }).then(jsonOrThrow);
+               body: JSON.stringify(body), signal }).then(jsonOrThrow);
+
+export const aborted = (e: unknown) => e instanceof DOMException && e.name === "AbortError";
 
 export const api = {
   models: (): Promise<{ models: Model[]; resident: string[]; cached_bundles: string[] }> =>
@@ -63,12 +72,13 @@ export const api = {
     Promise<{ key: string; cached: boolean; job?: string }> =>
     post("/api/bundles", { model, ld, degree }),
   bundle: (key: string): Promise<BundleInfo> => fetch(`/api/bundles/${key}`).then(jsonOrThrow),
-  law: (key: string, body: { weights?: number[]; draw?: number }): Promise<LawScores> =>
-    post(`/api/bundles/${key}/law`, body),
-  rollout: (key: string, body: { traj: number; horizon: number; alpha: number; weights?: number[] }):
-    Promise<Rollout> => post(`/api/bundles/${key}/rollout`, body),
-  dose: (key: string, body: { horizon: number; weights?: number[] }): Promise<Dose> =>
-    post(`/api/bundles/${key}/dose`, body),
+  law: (key: string, body: { weights?: number[]; draw?: number }, signal?: AbortSignal):
+    Promise<LawScores> => post(`/api/bundles/${key}/law`, body, signal),
+  rollout: (key: string, body: { traj: number; horizon: number; alpha: number; weights?: number[] },
+            signal?: AbortSignal): Promise<Rollout> =>
+    post(`/api/bundles/${key}/rollout`, body, signal),
+  dose: (key: string, body: { horizon: number; weights?: number[] }, signal?: AbortSignal):
+    Promise<Dose> => post(`/api/bundles/${key}/dose`, body, signal),
   leverage: (key: string): Promise<Leverage> =>
     fetch(`/api/bundles/${key}/leverage`).then(jsonOrThrow),
 };

@@ -10,13 +10,23 @@ import time
 
 import numpy as np
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from viz.server import assets, bundles, law, leverage, paper_refs, registry, rollout
 
 app = FastAPI(title="Invariant Probe Bench")
+
+
+@app.exception_handler(ValueError)
+def _bad_request(_request, exc: ValueError):
+    """A rejected request is the caller's problem, not a server fault.
+
+    The validation lives next to the arithmetic (`rollout.check_request`, `law.check_weights`) so
+    scripts and tests get it too; this only decides the status code.
+    """
+    return JSONResponse({"detail": str(exc)}, status_code=422)
 DIST = pathlib.Path(__file__).resolve().parents[1] / "web" / "dist"
 
 PAPER_ALPHAS = (0.0, 0.05, 0.1, 0.2, 0.4)
@@ -56,6 +66,9 @@ def post_bundle(req: BundleReq):
 
 @app.get("/api/jobs/{jid}/events")
 def job_events(jid: str):
+    if jid not in bundles._jobs:
+        raise HTTPException(404, f"no job {jid}; it may have aged out of the job list")
+
     def stream():
         sent = 0
         while True:
@@ -74,7 +87,8 @@ def job_events(jid: str):
 def get_bundle(key: str):
     b = _bundle(key)
     law.basis_grads(b)          # 5.8 s once per bundle; paid here, not under the first slider drag
-    return {"key": key, "ckpt": b.ckpt, "ld": b.ld, "degree": b.degree, "warmup": b.warmup,
+    return {"key": key, "ckpt": b.ckpt, "model_key": b.model_key, "ld": b.ld, "degree": b.degree,
+            "warmup": b.warmup, "max_horizon": rollout.max_horizon(b), "max_alpha": rollout.MAX_ALPHA,
             "eigenvalues": b.eigenvalues.tolist(), **bundles.summary(b),
             "weights": b.weights.tolist(), "pairing_residual": b.residual,
             "rank_and_test_residual": b.rank_and_test_residual,
@@ -105,10 +119,11 @@ class RollReq(BaseModel):
 @app.post("/api/bundles/{key}/rollout")
 def post_rollout(key: str, req: RollReq):
     b = _bundle(key)
-    m = registry.get(pathlib.Path(b.ckpt).stem)
+    rollout.check_request(b, [req.traj], req.horizon, (0.0, req.alpha))    # before loading a model
+    m = registry.get(b.model_key)
     with registry.GPU:
         r = rollout.imagine(m, b, [req.traj], req.horizon, (0.0, req.alpha),
-                            weights=req.weights, cache_key=key)
+                            weights=req.weights)
     return {
         "alpha": req.alpha, "traj": req.traj, "horizon": req.horizon,
         "truth": rollout.sheet_data_uri(r["truth"][0]),
@@ -129,11 +144,12 @@ class DoseReq(BaseModel):
 @app.post("/api/bundles/{key}/dose")
 def post_dose(key: str, req: DoseReq):
     b = _bundle(key)
-    m = registry.get(pathlib.Path(b.ckpt).stem)
     al = tuple(req.alphas or PAPER_ALPHAS)
+    rollout.check_request(b, None, req.horizon, al)
+    m = registry.get(b.model_key)
     with registry.GPU:
         r = rollout.imagine(m, b, None, req.horizon, al, weights=req.weights,
-                            keep_frames=False, cache_key=key)
+                            keep_frames=False)
     e = np.asarray(r["mse_by_alpha"], dtype=np.float64)
     return {"alphas": list(al), "mse": e.tolist(),
             "normalised_slope": float(np.polyfit(np.asarray(al), e / e[0], 1)[0]),
@@ -147,7 +163,9 @@ def get_leverage(key: str, horizon: int = leverage.HORIZON):
     cache = bundles.CACHE / f"{key}__leverage_h{horizon}.json"
     if cache.exists():
         return json.loads(cache.read_text())
-    m = registry.get(pathlib.Path(b.ckpt).stem)
+    if not 1 <= horizon <= rollout.max_horizon(b):
+        raise HTTPException(422, f"horizon must be between 1 and {rollout.max_horizon(b)}")
+    m = registry.get(b.model_key)
     with registry.GPU:
         r = leverage.measure(m, b, horizon=horizon)
     cache.write_text(json.dumps(r))

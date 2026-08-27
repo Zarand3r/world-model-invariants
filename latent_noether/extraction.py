@@ -47,6 +47,7 @@ def true_energy(states: np.ndarray) -> np.ndarray:
 @dataclasses.dataclass
 class Bundle:
     """One extraction. Arrays are numpy so this serialises to a plain .npz."""
+    model_key: str              # the registry key; `ckpt` is an absolute path and moves with the repo
     ckpt: str
     ld: int
     degree: int
@@ -66,6 +67,12 @@ class Bundle:
     residual: float             # pairing residual of the fitted law
     rank_and_test_residual: float
 
+    # Derived, cached on the instance rather than in a module-level dict. A dict keyed on
+    # `id(bundle)` looked equivalent and is not: 3000 short-lived Bundles reuse 7 distinct ids under
+    # CPython, so as soon as one is evicted and collected the next bundle inherits its gradients.
+    # Hanging the cache off the object ties its lifetime to the thing it describes and cannot alias.
+    basis_grads: "np.ndarray | None" = dataclasses.field(default=None, repr=False, compare=False)
+
     @property
     def coeffs(self) -> np.ndarray:
         """The collapsed degree-`degree` coefficient vector of the fitted C."""
@@ -84,15 +91,20 @@ def encode_split(model, frames: torch.Tensor, warmup: int) -> torch.Tensor:
 
 
 def build_bundle(model, frames: torch.Tensor, states: np.ndarray, *, ckpt: str = "",
-                 ld: int = 12, degree: int = 4, warmup: int = 10, split_start: int = 204,
-                 n_basis: int = 8) -> Bundle:
-    """Run the full extraction on the analysis split and return everything downstream of it.
+                 model_key: str = "", ld: int = 12, degree: int = 4, warmup: int = 10,
+                 split_start: int = 204, n_basis: int = 8) -> Bundle:
+    """Run the full extraction and return everything downstream of it.
 
-    `frames` and `states` are the WHOLE dataset; `split_start` selects the analysis trajectories, so
-    a caller cannot accidentally fit on the training split by slicing differently from the scripts.
+    `frames` and `states` are ALREADY restricted to the analysis trajectories; `split_start` is
+    recorded so the bundle says which split it came from. The split is applied in exactly one place
+    (`viz.server.assets.analysis_split`) rather than re-derived here, so a caller cannot fit on one
+    slice and score on another — and passing only the split keeps 1.5 GB of unused training frames
+    off the GPU.
     """
-    sl = slice(split_start, None)
-    H = encode_split(model, frames[sl], warmup)                       # (n, T, D)
+    if frames.shape[0] != states.shape[0]:
+        raise ValueError(f"frames and states disagree on trajectory count: "
+                         f"{frames.shape[0]} vs {states.shape[0]}")
+    H = encode_split(model, frames, warmup)                           # (n, T, D)
     h_mean = H.reshape(-1, H.shape[-1]).mean(0)
 
     U = pca_subspace(H, ld)
@@ -123,11 +135,12 @@ def build_bundle(model, frames: torch.Tensor, states: np.ndarray, *, ckpt: str =
     Gmat = (Phi @ torch.as_tensor(basis.T, dtype=Phi.dtype)).numpy()  # (N, k)
 
     return Bundle(
-        ckpt=ckpt, ld=ld, degree=degree, warmup=warmup, split_start=split_start,
+        model_key=model_key, ckpt=ckpt, ld=ld, degree=degree, warmup=warmup,
+        split_start=split_start,
         h_mean=h_mean.detach().cpu().numpy(), P=P.detach().cpu().numpy(),
         P_pinv=torch.linalg.pinv(P).detach().cpu().numpy(),
         Z=Zc.numpy(), flow=Fc.numpy(), G=Gmat, basis_coeffs=basis, weights=weights,
-        energy=true_energy(states[sl])[:, warmup:],
+        energy=true_energy(states)[:, warmup:],
         eigenvalues=ev.detach().cpu().numpy(), participation_ratio=pr,
         residual=float(fit["residual"]),
         rank_and_test_residual=float(fit["rank_and_test_residual"]),

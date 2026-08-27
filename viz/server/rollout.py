@@ -26,12 +26,19 @@ source rectangle; JSON-encoding pixel arrays was never on the table. `optimize=T
 off: it cost 0.382 s per sheet against 0.037 s, three sheets per request, to save 5% of the bytes.
 Decoded frames are noisy and do not deflate well, so the extra passes buy almost nothing.
 
-**Encoded latents are cached per bundle.** A rollout needs one start state, but encoding a single
+**Encoded latents are cached per model.** A rollout needs one start state, but encoding a single
 trajectory measured 0.297 s against 0.173 s for all fifty-two — a batch of one leaves the GPU idle.
-So the whole split is encoded once per bundle and every later rollout indexes into it.
+So the whole split is encoded once and every later rollout indexes into it. The cache is keyed on
+the model, not the bundle: the encoding depends only on the weights and the frames, so bundles that
+differ merely in extraction dimension share one entry instead of each storing a copy.
+
+**Indices are checked before anything reaches the device.** An out-of-range trajectory used to fire
+a CUDA device-side assert, which is not a recoverable error: it poisons the process's CUDA context,
+so every later request failed until the server was restarted while the page kept serving 200s.
 """
 import threading
 import base64
+import collections
 import io
 
 import numpy as np
@@ -42,23 +49,33 @@ from latent_noether.extraction import Bundle
 from latent_noether.polynomial import monomial_features
 
 
-_STARTS: dict[str, torch.Tensor] = {}
+_STARTS: collections.OrderedDict[str, torch.Tensor] = collections.OrderedDict()
 _STARTS_LOCK = threading.Lock()
+MAX_STARTS = 3                      # ~12 MB each; bounded so a long session cannot grow without end
+MAX_ALPHA = 2.0                     # negative alpha is a legitimate anti-correction control; the
+                                    # bound only keeps the projection from diverging outright
 
 
-def start_states(model, b: Bundle, cache_key: str) -> torch.Tensor:
-    """Teacher-forced latents for the whole analysis split, encoded once. (n, T, D) on the GPU."""
-    with _STARTS_LOCK:
-        hit = _STARTS.get(cache_key)
-    if hit is not None:
-        return hit
+def analysis_frames(b: Bundle) -> torch.Tensor:
+    """The scaled analysis frames this bundle was built from."""
     from viz.server import assets
-    spec = next(m for m in assets.models() if m.path == b.ckpt)
-    frames = assets.dataset(spec.data)["scaled"][b.split_start:]
-    with torch.no_grad():
-        hs = model.encode(frames).detach()
+    return assets.analysis_split(assets.model(b.model_key).data, b.split_start)["scaled"]
+
+
+def start_states(model, b: Bundle) -> torch.Tensor:
+    """Teacher-forced latents for the whole analysis split, encoded once. (n, T, D) on the GPU."""
+    key = f"{b.model_key}@{b.split_start}"
     with _STARTS_LOCK:
-        _STARTS[cache_key] = hs
+        if key in _STARTS:
+            _STARTS.move_to_end(key)
+            return _STARTS[key]
+    with torch.no_grad():
+        hs = model.encode(analysis_frames(b)).detach()
+    with _STARTS_LOCK:
+        _STARTS[key] = hs
+        _STARTS.move_to_end(key)
+        while len(_STARTS) > MAX_STARTS:
+            _STARTS.popitem(last=False)
     return hs
 
 
@@ -72,8 +89,32 @@ def _C_and_grad(z: torch.Tensor, coeffs: torch.Tensor, degree: int):
     return vals.detach(), g.detach()
 
 
+def max_horizon(b: Bundle) -> int:
+    """Imagined steps that can be scored against real frames: everything after the warmup."""
+    return int(b.Z.shape[1])
+
+
+def check_request(b: Bundle, trajs, horizon: int, alphas) -> list[int]:
+    """Validate and normalise a rollout request. Raises ValueError; never reaches the GPU."""
+    n = int(b.Z.shape[0])
+    idx = list(range(n)) if trajs is None else [int(t) for t in trajs]
+    bad = [t for t in idx if not 0 <= t < n]
+    if bad:
+        raise ValueError(f"trajectory {bad[0]} is out of range; this bundle has {n} (0-{n - 1})")
+    if not 1 <= horizon <= max_horizon(b):
+        raise ValueError(f"horizon must be between 1 and {max_horizon(b)}, got {horizon}")
+    a = np.asarray(alphas, dtype=np.float64).ravel()
+    if a.size == 0:
+        raise ValueError("no alphas given")
+    if not np.all(np.isfinite(a)):
+        raise ValueError("alphas must all be finite")
+    if np.any(np.abs(a) > MAX_ALPHA):
+        raise ValueError(f"|alpha| must be at most {MAX_ALPHA}")
+    return idx
+
+
 def imagine(model, b: Bundle, trajs, horizon: int, alphas, weights=None,
-            keep_frames: bool = True, cache_key: str = "") -> dict:
+            keep_frames: bool = True) -> dict:
     """Roll each trajectory forward `horizon` steps once per alpha.
 
     The start state is the encoded latent at the end of the warmup — the same state the paper's
@@ -84,22 +125,19 @@ def imagine(model, b: Bundle, trajs, horizon: int, alphas, weights=None,
     exercised a second implementation would prove nothing about what the browser shows. The batch
     is laid out as (alpha, traj) and flattened, so one rollout covers the whole grid.
     """
-    from viz.server import assets
-    spec = next(m for m in assets.models() if m.path == b.ckpt)
-    data = assets.dataset(spec.data)
-    frames = data["scaled"][b.split_start:]
+    idx = check_request(b, trajs, horizon, alphas)
+    frames = analysis_frames(b)
     dev = frames.device
-    idx = list(range(frames.shape[0])) if trajs is None else list(trajs)
     w = b.weights if weights is None else np.asarray(weights, dtype=np.float64)
+    from viz.server.law import check_weights
+    check_weights(b, w)
     coeffs = torch.as_tensor(w @ b.basis_coeffs, dtype=torch.float32, device=dev)
 
     h_mean = torch.as_tensor(b.h_mean, device=dev)
     P = torch.as_tensor(b.P, dtype=torch.float32, device=dev)
     P_pinv = torch.as_tensor(b.P_pinv, dtype=torch.float32, device=dev)
     al = np.asarray(alphas, dtype=np.float32).ravel()
-    na, nt = len(al), len(idx)
-
-    hs = start_states(model, b, cache_key or b.ckpt)[idx]
+    hs = start_states(model, b)[idx]
     ref = frames[idx][:, b.warmup: b.warmup + horizon]
 
     preds, Cs, C0s = [], [], []

@@ -22,6 +22,7 @@ MAX_RESIDENT = 3
 
 _models: collections.OrderedDict[str, DreamerV3Adapter] = collections.OrderedDict()
 _lock = threading.Lock()
+_loading: dict[str, threading.Lock] = {}
 
 
 def get(key: str) -> DreamerV3Adapter:
@@ -30,6 +31,18 @@ def get(key: str) -> DreamerV3Adapter:
         if key in _models:
             _models.move_to_end(key)
             return _models[key]
+        # One loader per key. Without this, two concurrent misses each built a 3.8 GB adapter and
+        # both landed on the device before either reached the eviction check.
+        gate = _loading.setdefault(key, threading.Lock())
+    with gate:
+        with _lock:
+            if key in _models:
+                _models.move_to_end(key)
+                return _models[key]
+        return _load(key)
+
+
+def _load(key: str) -> DreamerV3Adapter:
     spec = assets.model(key)
     m = DreamerV3Adapter(device="cuda").cuda()
     m.load_state_dict(torch.load(spec.path, map_location="cuda")["model"])

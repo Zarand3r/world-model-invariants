@@ -31,14 +31,11 @@ def _grads(b: Bundle) -> np.ndarray:
     return np.stack(out)
 
 
-_grad_cache: dict[int, np.ndarray] = {}
-
-
 def basis_grads(b: Bundle) -> np.ndarray:
-    gid = id(b)
-    if gid not in _grad_cache:
-        _grad_cache[gid] = _grads(b)
-    return _grad_cache[gid]
+    """Cached on the bundle itself — see the note on `Bundle.basis_grads`."""
+    if b.basis_grads is None:
+        b.basis_grads = _grads(b)
+    return b.basis_grads
 
 
 def pairing_residual(b: Bundle, weights: np.ndarray) -> float:
@@ -56,11 +53,35 @@ def pairing_residual(b: Bundle, weights: np.ndarray) -> float:
 
 
 def scores(b: Bundle, weights: np.ndarray | None = None) -> dict:
+    """All three statistics for one set of mixing weights.
+
+    **The weights are deliberately NOT normalised.** An earlier version divided by the norm, which
+    measured as an exact no-op: every statistic here is invariant to the scale AND the sign of C.
+    Correlation is scale-free; drift is a ratio of variances; and the pairing residual fits `B` by
+    least squares, so `B` absorbs any rescaling of `grad C`. Checked at scales 1.0, 3.7, 0.02 and
+    -1.0 — identical to ten decimals. The normalisation also returned weights that differed from the
+    ones the caller sent, and silently substituted the fitted weights when the norm underflowed,
+    which hid a degenerate request instead of reporting it.
+    """
     w = b.weights if weights is None else np.asarray(weights, dtype=np.float64)
-    n = float(np.linalg.norm(w))
-    w = w / n if n > 1e-30 else b.weights
+    check_weights(b, w)
     return {"rho_energy": rho_energy(b, w), "drift_of_C": drift_of_C(b, w),
             "pairing_residual": pairing_residual(b, w), "weights": w.tolist()}
+
+
+def check_weights(b: Bundle, w: np.ndarray) -> None:
+    """Fail with something a caller can act on, before numpy fails with something they cannot.
+
+    A wrong-length vector used to surface as `matmul: Input operand 1 has a mismatch in its core
+    dimension 0` behind a 500.
+    """
+    k = b.basis_coeffs.shape[0]
+    if w.shape != (k,):
+        raise ValueError(f"expected {k} mixing weights, got {tuple(w.shape)}")
+    if not np.all(np.isfinite(w)):
+        raise ValueError("mixing weights must all be finite")
+    if not np.any(w):
+        raise ValueError("mixing weights are all zero, which defines no invariant")
 
 
 def random_weights(b: Bundle, draw: int) -> np.ndarray:
@@ -79,6 +100,6 @@ def random_weights(b: Bundle, draw: int) -> np.ndarray:
 
 def scatter(b: Bundle, weights: np.ndarray | None = None, stride: int = 7) -> dict:
     """C against true energy, thinned for the browser. Full arrays are ~5700 points."""
-    C = b.C(weights).ravel()[::stride]
-    E = b.energy.ravel()[:b.C(weights).size][::stride]
-    return {"C": C.tolist(), "E": E.tolist()}
+    Cfull = b.C(weights)
+    return {"C": Cfull.ravel()[::stride].tolist(),
+            "E": b.energy.ravel()[:Cfull.size][::stride].tolist()}

@@ -122,12 +122,3 @@ export function Dots({ xs, ys, sx, sy, cls, r = 1.6 }:
     </g>
   );
 }
-
-export function ticks(lo: number, hi: number, s: Scale, n = 4) {
-  const out: { at: number; label: string }[] = [];
-  for (let i = 0; i <= n; i++) {
-    const v = lo + ((hi - lo) * i) / n;
-    out.push({ at: s(v), label: fmt(v, 2) });
-  }
-  return out;
-}

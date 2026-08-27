@@ -40,10 +40,16 @@ class Model:
 
 
 def _meta(path: pathlib.Path) -> dict:
-    """steps/hours/seed off a checkpoint without materialising the weights."""
+    """steps/hours/seed off a checkpoint without materialising the weights.
+
+    `mmap` keeps this to a header read; there are two dozen 54 MB checkpoints to enumerate. A bare
+    `except` here used to fall back to a full CPU load, which turned a corrupt checkpoint into a
+    slow startup instead of an error, so only the narrow "this file cannot be mmapped" case falls
+    back and anything else propagates.
+    """
     try:
         ck = torch.load(path, map_location="meta", weights_only=False, mmap=True)
-    except Exception:
+    except (RuntimeError, ValueError):          # not a zipfile-format checkpoint
         ck = torch.load(path, map_location="cpu", weights_only=False)
     return {k: ck.get(k) for k in ("steps", "hours", "seed")}
 
@@ -79,10 +85,28 @@ def model(key: str) -> Model:
     raise KeyError(f"unknown model {key!r}; have {[m.key for m in models()]}")
 
 
+SPLIT_START = 204          # the analysis trajectories; everything before them trained the model
+
+
 @functools.lru_cache(maxsize=3)
 def dataset(name: str) -> dict:
-    """frames as uint8 on CPU, states, and the GPU-side scaled tensor the encoder wants."""
+    """The raw arrays, on the CPU. Nothing here reaches the GPU."""
     d = np.load(RUNS / name)
-    frames = d["frames"]
-    return {"frames": frames, "states": d["states"],
-            "scaled": torch.as_tensor(frames).float().div_(255.).sub_(0.5).cuda()}
+    return {"frames": d["frames"], "states": d["states"]}
+
+
+@functools.lru_cache(maxsize=4)
+def analysis_split(name: str, split_start: int = SPLIT_START) -> dict:
+    """The analysis trajectories: scaled frames on the GPU, plus their states.
+
+    **The only place the split is applied.** Every consumer — the extraction, the rollouts, the
+    leverage sweep — asks for it here, so none of them can disagree about which trajectories are
+    held out.
+
+    Uploading the whole array instead cost 1.51 GB of VRAM per conservative dataset and 5.03 GB for
+    the evaluation set, to use 0.31 GB: only 52 of 256 trajectories are ever touched.
+    """
+    d = dataset(name)
+    frames = d["frames"][split_start:]
+    return {"scaled": torch.as_tensor(frames).float().div_(255.).sub_(0.5).cuda(),
+            "states": d["states"][split_start:], "split_start": split_start}

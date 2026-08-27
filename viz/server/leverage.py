@@ -23,7 +23,7 @@ import numpy as np
 import torch
 
 from latent_noether.extraction import Bundle
-from viz.server.rollout import _C_and_grad
+from viz.server.rollout import _C_and_grad, analysis_frames, start_states
 
 HORIZON = 40
 EPS_FRAC = 0.25
@@ -38,9 +38,7 @@ def spearman(a, b) -> float:
 
 
 def measure(model, b: Bundle, horizon: int = HORIZON, eps_frac: float = EPS_FRAC) -> dict:
-    from viz.server import assets
-    spec = next(m for m in assets.models() if m.path == b.ckpt)
-    frames = assets.dataset(spec.data)["scaled"][b.split_start:]
+    frames = analysis_frames(b)
     dev = frames.device
     P = torch.as_tensor(b.P, dtype=torch.float32, device=dev)
     h_mean = torch.as_tensor(b.h_mean, device=dev)
@@ -50,9 +48,7 @@ def measure(model, b: Bundle, horizon: int = HORIZON, eps_frac: float = EPS_FRAC
     V = Z.reshape(-1, r).var(0).cpu().numpy()
     eps = float(eps_frac * Z.reshape(-1, r).norm(dim=-1).mean())
 
-    with torch.no_grad():
-        hs = model.encode(frames).detach()
-    h0 = hs[:, b.warmup].clone()
+    h0 = start_states(model, b)[:, b.warmup].clone()
     ref = frames[:, b.warmup: b.warmup + horizon]
 
     def loss(h_start):

@@ -1,11 +1,16 @@
 /** The bench. One state object; every panel reads from it and the URL mirrors it. */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { api, watchJob } from "./api";
+import { aborted, api, watchJob } from "./api";
+import { useDebounced } from "./useDebounced";
 import type { BundleInfo, Dose, LawScores, Leverage, Model, PaperRefs, Rollout } from "./api";
 import { Theatre } from "./Theatre";
 import { Directions, InvariantPanel, LawBench } from "./Panels";
 
 const PAPER = { ld: 12, degree: 4, horizon: 50, alpha: 0.4 };
+
+/** `max` on a number input is advisory — the browser still reports a typed 999. */
+const clamp = (v: number, lo: number, hi: number) =>
+  Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : lo;
 
 function readUrl() {
   const q = new URLSearchParams(location.search);
@@ -33,6 +38,12 @@ export default function App() {
   const [playing, setPlaying] = useState(true);
   const [doseBusy, setDoseBusy] = useState(false);
   const drawRef = useRef(0);
+
+  // The GPU work is driven by the SETTLED values, so a drag runs one rollout instead of twenty.
+  const alpha = useDebounced(cfg.alpha, 120);
+  const traj = useDebounced(cfg.traj, 120);
+  const horizon = useDebounced(cfg.horizon, 300);
+  const settledWeights = useDebounced(weights, 120);
 
   useEffect(() => {
     api.models().then((d) => setModels(d.models)).catch((e) => setStatus(String(e)));
@@ -67,30 +78,36 @@ export default function App() {
     return () => { cancelled = true; };
   }, [cfg.model, cfg.ld, cfg.degree]);
 
-  // weights -> scores. Cheap enough to fire on every slider frame.
+  // weights -> scores. No GPU, ~35 ms, so this runs on the raw slider value and stays live.
   useEffect(() => {
     if (!bundleKey || !weights.length) return;
+    const ctl = new AbortController();
     const id = ++drawRef.current;
-    api.law(bundleKey, { weights }).then((s) => { if (id === drawRef.current) setLaw(s); })
-      .catch(() => undefined);
+    api.law(bundleKey, { weights }, ctl.signal)
+      .then((s) => { if (id === drawRef.current) setLaw(s); })
+      .catch((e) => { if (!aborted(e)) setStatus(String(e)); });
+    return () => ctl.abort();
   }, [bundleKey, weights]);
 
-  // the theatre: one trajectory, free vs corrected
+  // the theatre: one trajectory, free vs corrected. Debounced, and the in-flight request is
+  // abandoned when the inputs move again, so the server is never working on a stale frame.
   useEffect(() => {
-    if (!bundleKey || !weights.length) return;
-    let cancelled = false;
-    api.rollout(bundleKey, { traj: cfg.traj, horizon: cfg.horizon, alpha: cfg.alpha, weights })
-      .then((r) => { if (!cancelled) { setRoll(r); setFrame((f) => Math.min(f, r.mse.free.length - 1)); } })
-      .catch((e) => !cancelled && setStatus(String(e)));
-    return () => { cancelled = true; };
-  }, [bundleKey, cfg.traj, cfg.horizon, cfg.alpha, weights]);
+    if (!bundleKey || !settledWeights.length) return;
+    const ctl = new AbortController();
+    api.rollout(bundleKey, { traj, horizon, alpha, weights: settledWeights }, ctl.signal)
+      .then((r) => { setRoll(r); setFrame((f) => Math.min(f, r.mse.free.length - 1)); setStatus(""); })
+      .catch((e) => { if (!aborted(e)) setStatus(String(e)); });
+    return () => ctl.abort();
+  }, [bundleKey, traj, horizon, alpha, settledWeights]);
 
   const runDose = useCallback(() => {
     if (!bundleKey) return;
     setDoseBusy(true);
-    api.dose(bundleKey, { horizon: cfg.horizon, weights })
-      .then(setDose).catch(() => undefined).finally(() => setDoseBusy(false));
-  }, [bundleKey, cfg.horizon, weights]);
+    api.dose(bundleKey, { horizon, weights })
+      .then(setDose)
+      .catch((e) => { if (!aborted(e)) setStatus(String(e)); })
+      .finally(() => setDoseBusy(false));
+  }, [bundleKey, horizon, weights]);
 
   useEffect(() => { if (bundleKey && weights.length) runDose(); }, [bundleKey]);   // once per bundle
 
@@ -138,11 +155,13 @@ export default function App() {
           </label>
           <label>trajectory
             <input type="number" min={0} max={(info?.n_traj ?? 52) - 1} value={cfg.traj}
-                   onChange={(e) => set({ traj: Number(e.target.value) })} />
+                   onChange={(e) => set({
+                     traj: clamp(Number(e.target.value), 0, (info?.n_traj ?? 52) - 1) })} />
           </label>
           <label>horizon
-            <input type="number" min={5} max={200} step={5} value={cfg.horizon}
-                   onChange={(e) => set({ horizon: Number(e.target.value) })} />
+            <input type="number" min={5} max={info?.max_horizon ?? 110} step={5} value={cfg.horizon}
+                   onChange={(e) => set({
+                     horizon: clamp(Number(e.target.value), 1, info?.max_horizon ?? 110) })} />
           </label>
           <label className="alpha">α {cfg.alpha.toFixed(2)}
             <input type="range" min={0} max={1} step={0.01} value={cfg.alpha}

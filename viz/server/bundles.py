@@ -7,7 +7,7 @@ one or a job id, and watches progress. Everything interactive is then arithmetic
 The cache key includes the checkpoint's size and mtime, so replacing a checkpoint invalidates its
 bundles instead of silently serving an extraction of the previous weights.
 """
-import dataclasses
+import collections
 import hashlib
 import json
 import pathlib
@@ -16,7 +16,6 @@ import time
 import uuid
 
 import numpy as np
-import torch
 
 from latent_noether.extraction import Bundle, build_bundle, drift_of_C, rho_energy
 from viz.server import assets, registry
@@ -24,20 +23,28 @@ from viz.server import assets, registry
 CACHE = pathlib.Path(__file__).resolve().parents[2] / "runs" / "viz_cache"
 CACHE.mkdir(parents=True, exist_ok=True)
 
-_ARRAYS = ("h_mean", "P", "P_pinv", "Z", "flow", "G", "basis_coeffs", "weights", "energy", "eigenvalues")
-_SCALARS = ("ckpt", "ld", "degree", "warmup", "split_start", "participation_ratio", "residual",
+CACHE_VERSION = 2      # bump when the Bundle layout changes, so stale entries rebuild rather than
+                       # failing to load, or worse loading with a field silently missing
+
+_ARRAYS = ("h_mean", "P", "P_pinv", "Z", "flow", "G", "basis_coeffs", "weights", "energy",
+           "eigenvalues")
+_SCALARS = ("model_key", "ckpt", "ld", "degree", "warmup", "split_start",
+            "participation_ratio", "residual",
             "rank_and_test_residual")
 
-_mem: dict[str, Bundle] = {}
+MAX_MEM = 4            # bundles held in memory; each is a few MB plus its cached gradients
+MAX_JOBS = 32
+
+_mem: collections.OrderedDict[str, Bundle] = collections.OrderedDict()
 _mem_lock = threading.Lock()
-_jobs: dict[str, dict] = {}
+_jobs: collections.OrderedDict[str, dict] = collections.OrderedDict()
 
 
 def key(model_key: str, ld: int, degree: int) -> str:
     p = pathlib.Path(assets.model(model_key).path)
     st = p.stat()
     stamp = hashlib.sha256(f"{st.st_size}:{int(st.st_mtime)}".encode()).hexdigest()[:8]
-    return f"{model_key}__ld{ld}__deg{degree}__{stamp}"
+    return f"{model_key}__ld{ld}__deg{degree}__v{CACHE_VERSION}__{stamp}"
 
 
 def _path(k: str) -> pathlib.Path:
@@ -51,13 +58,21 @@ def cached(k: str) -> bool:
 def load(k: str) -> Bundle:
     with _mem_lock:
         if k in _mem:
+            _mem.move_to_end(k)
             return _mem[k]
     z = np.load(_path(k), allow_pickle=False)
     meta = json.loads(_path(k).with_suffix(".json").read_text())
     b = Bundle(**{n: z[n] for n in _ARRAYS}, **{n: meta[n] for n in _SCALARS})
+    _remember(k, b)
+    return b
+
+
+def _remember(k: str, b: Bundle) -> None:
     with _mem_lock:
         _mem[k] = b
-    return b
+        _mem.move_to_end(k)
+        while len(_mem) > MAX_MEM:
+            _mem.popitem(last=False)
 
 
 def _save(k: str, b: Bundle) -> None:
@@ -84,21 +99,31 @@ def build(model_key: str, ld: int, degree: int, progress=lambda s: None) -> Bund
     progress(f"loading {spec.key}")
     m = registry.get(model_key)
     progress(f"reading {spec.data}")
-    d = assets.dataset(spec.data)
+    d = assets.analysis_split(spec.data)
     progress(f"encoding, then a {degree}-degree fit in {ld} dimensions")
     t0 = time.time()
     with registry.GPU:
-        b = build_bundle(m, d["scaled"], d["states"], ckpt=spec.path, ld=ld, degree=degree)
+        b = build_bundle(m, d["scaled"], d["states"], ckpt=spec.path, model_key=model_key,
+                         ld=ld, degree=degree, split_start=d["split_start"])
     progress(f"fitted in {time.time() - t0:.1f} s")
     _save(k, b)
+    _remember(k, b)
+    return b
+
+
+def _remember(k: str, b: Bundle) -> None:
     with _mem_lock:
         _mem[k] = b
-    return b
+        _mem.move_to_end(k)
+        while len(_mem) > MAX_MEM:
+            _mem.popitem(last=False)
 
 
 def start_job(model_key: str, ld: int, degree: int) -> str:
     jid = uuid.uuid4().hex[:12]
     _jobs[jid] = {"state": "queued", "messages": [], "key": key(model_key, ld, degree)}
+    while len(_jobs) > MAX_JOBS:
+        _jobs.popitem(last=False)
 
     def run():
         j = _jobs[jid]
