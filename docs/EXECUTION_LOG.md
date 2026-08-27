@@ -1826,3 +1826,71 @@ unconstructible for now.
 failure to stand as a recorded result before any adaptation, and any adapted setting to be a separate
 experiment with its own entry. That order is being kept. The next evidence is later checkpoints and
 further seeds at the same frozen settings — not a larger LD.
+
+---
+
+## 2026-08-27 09:10–09:25 UTC — **E17 recovery PASSES at step 15,000: the step-6,500 failure was undertraining**
+
+Git at `f482d2e`. Non-central seed 3, frozen hyperparameters throughout — **nothing was tuned
+between the failure and this result.**
+
+### The milestone sweep
+
+| step | recovered `C` ratio | **\|rho_E\|** | \|rho_L\| | best eigenvector \|rho_E\| | \|rho_E\| in pool > 0.5 |
+|---|---|---|---|---|---|
+| 1,000 | 9.89e-01 | 0.007 | 0.027 | 0.016 | 0 |
+| 3,000 | 3.55e-04 | 0.383 | 0.005 | 0.323 | 2 |
+| 6,500 | 2.62e-04 | **0.158** | 0.109 | 0.696 | 2 |
+| **15,000** | **6.62e-05** | **0.909** | 0.138 | 0.708 | 2 |
+
+**Registered prediction 1 (`|rho_E| > 0.8`): PASSES at step 15,000.**
+
+The invariance ratio improves monotonically across training (9.9e-01 -> 6.6e-05), and the recovered
+scalar's energy correlation reaches 0.909 — within reach of the pendulum's 0.967-0.975.
+
+### The previous entry's headline is superseded, and the discipline is why
+
+Last iteration reported `|rho_E| = 0.158` at step 6,500 as a **failure of generality at frozen
+hyperparameters**, with the caveat that it was one early checkpoint. It was an **undertraining
+artefact**. The 2-DoF system needs roughly **2.3x the pendulum's training** before the invariant
+becomes recoverable — which is unsurprising for a 4-dimensional state and is itself a finding worth
+reporting.
+
+The reason this resolved cleanly is that the prereg forbade tuning on the failure. Had LD been raised
+at step 6,500 — the obvious move, and the one the prereg flagged in advance as most tempting — the
+result would have been "generality requires a larger extraction dimension", which is **false**, and
+it would have been extremely hard to detect afterwards.
+
+### Flow alignment: broken at 6,500, working at 15,000
+
+| step | recovered `C` | best eigenvector | which is better |
+|---|---|---|---|
+| 6,500 | 0.158 | 0.696 | **eigenvector, by 4x** |
+| 15,000 | **0.909** | 0.708 | **joint fit, by 1.3x** |
+
+At step 6,500 the joint fit was actively worse than taking the top eigenvector; at 15,000 it is
+clearly better. This is direct evidence for `fit_hamiltonian_pair`'s own claim — that the answer is
+"a direction inside the conserved subspace that no single eigenvector isolates" — **and** for the
+condition under which that claim holds: the conserved subspace has to be good enough first. The
+pairing criterion cannot find a direction that is not yet there.
+
+Recorded because it is a mechanism for the earlier failure, not a restatement of it.
+
+### `L` is not what it converges on
+
+At step 15,000 the recovered `C` has `|rho_E| = 0.909` against `|rho_L| = 0.138`. The step-6,500
+observation that the best eigenvector correlated 0.818 with angular momentum does **not** persist:
+with adequate training the method picks energy specifically, in the arm where energy is the
+better-conserved quantity. The earlier observation is retained in the log as what it was — a reading
+from an undertrained model.
+
+### Registered prediction 3 still fails
+
+E10 needs >= 8 candidates within +-0.10 of the recovered `C`'s `|rho_E|`. The pool still has only
+**2** candidates above 0.5 at any checkpoint. Richer than the pendulum, still not enough. E10 remains
+unconstructible, and it is now clear that 2 degrees of freedom is not by itself the fix.
+
+### Caveats
+
+One seed. Steps 30,000 and 60,000 not yet reached. The central arm — the two-invariant test, and the
+sharper half of the matched pair — queues behind the remaining non-central seeds.
