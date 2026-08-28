@@ -103,6 +103,17 @@ for stale, why in (("6.3x", "E18 ratio is 6.7x (median), not the mean-based 6.3x
                    ("+20.0", "supervised effect median is +26.8%, not the mean +20.0%")):
     CHECKS.append((f"no stale mean-based value {stale!r} ({why})", "-", stale not in CORPUS))
 
+# --- figure hygiene: filename prefix must be unique, and match the figure it renders as ---
+# paper1.2 inherited paper 1.0's filenames, so `fig4_leverage` rendered as Figure 3 and TWO files
+# began `fig2_`. That is the collision the archive script's own header warns about, having once
+# shipped stale figures. Assert one file per figure number.
+_figs = sorted(p.name for p in (TEX.parent / "figures").glob("*.pdf"))
+_prefixes = [f.split("_")[0] for f in _figs]
+CHECKS.append((f"one figure file per number ({', '.join(_figs)})", "-",
+               len(_prefixes) == len(set(_prefixes))))
+CHECKS.append(("every shipped figure is referenced by a section", "-",
+               all(f in CORPUS for f in _figs)))
+
 # --- an overclaim guard: any "N of N" claim about the supervised probe increasing drift ---
 inc = sum(1 for r in sup if r["effect_pct"] > 0)
 # Catch "the supervised probe increases drift on 3 of 3" while allowing the CORRECT sentence,

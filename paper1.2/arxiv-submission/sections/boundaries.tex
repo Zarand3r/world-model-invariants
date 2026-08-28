@@ -1,0 +1,42 @@
+\section{Where the phenomenon stops}
+\label{sec:boundaries}
+
+Both boundaries below are measurements with matched controls rather than caveats, and each
+constrains what produces conservation.
+
+\paragraph{The invariant is bounded to the training distribution.}
+We generate trajectories whose energies lie outside the training band, holding the integrator,
+renderer and rejection rule fixed. The frozen $C$ collapses there, $|\rho|_E$ falling from
+$0.93$--$0.97$ to $0.03$--$0.31$.
+
+Refitting the entire pipeline on those latents separates two explanations. Identification recovers
+immediately --- $|\rho|_E$ of $0.92$--$0.96$, and a freely fitted probe reaches $0.999$ --- so the
+information is present and the polynomial family can express it. What does not recover is
+conservation: $\rho_{\mathrm{obs}}$ is $55$--$267\times$ worse than in-distribution. There is no
+well-conserved quantity to find outside the training band, which is why a scalar fitted where
+conservation held has nothing to lock onto.
+
+The model's \emph{representation} generalises out of distribution. Its \emph{conservation} does not.
+
+\paragraph{The phenomenon is architecture-dependent.}
+We repeat the full pipeline on a deliberately different world model: a deterministic convolutional
+GRU autoencoder with no stochastic latent, no KL term and no unimix, its recurrent state matched at
+512 so the extraction operates on a latent of the same dimensionality, and its transition trained by
+an open-loop rollout term. The analysis code runs unchanged.
+
+Identification transfers on 2 of 3 models ($|\rho|_E$ 0.97, 0.89, 0.19). Conservation transfers on
+none: $\rho_{\mathrm{obs}}$ is $1.75$--$9.02$ against the RSSM's ${\sim}7\times10^{-3}$.
+
+Because the conv-GRU's transition receives less training signal than an RSSM prior, we retrained all
+three seeds with seven times more open-loop rollout (56 of 64 steps against 8) and repeated the
+analysis. Conservation did not move: median $\rho_{\mathrm{obs}}$ $5.33 \to 5.26$, a $767\times$ gap
+to the RSSM, with the range in fact tightening to $4.83$--$5.55$. Identification did not improve
+either --- 2 of 3 seeds again ($0.91$, $0.91$, $0.19$), and the failure falls on the same seed under
+both training budgets, which points at the initialisation rather than at the training amount. Seven
+times more prior training changes neither what the search finds nor how well the transition keeps it.
+
+We are explicit about what this comparison cannot settle. An open-loop reconstruction term and a
+prior--posterior KL are different losses, not the same loss at different strengths, so the residual
+gap narrows toward the architecture without isolating it. What the comparison does establish is that
+conservation is not an automatic consequence of training a pixel world model whose transition rolls
+out accurately, and the supportable scope of every claim above is RSSM-like models, in distribution.

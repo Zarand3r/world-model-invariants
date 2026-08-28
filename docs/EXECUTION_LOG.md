@@ -5388,3 +5388,57 @@ and the baseline that beats it -- plus a guard that fails if the "untested" phra
 
 No experiment run. One paper statement corrected from "untested" to a reported negative, with its
 numbers pinned; the correction moves against the paper's own convenience.
+
+## 2026-08-28 -- **G6 artifact gate: the arXiv archive builds and compiles standalone; figure hygiene fixed**
+
+Loop iteration. Seed 5 at step 20,000; seeds 3 and 4 complete and accepted. F1 analysis still blocked
+on the extractor question and not run. No failures in `runs/logs/`.
+
+Ran the artifact gate, which needs no pending decision.
+
+### The archive script was still targeting the superseded manuscript
+
+`make_arxiv_archive.sh` hardcoded `cd ../paper`. After the fork to `paper1.2` it would have silently
+packaged **paper 1.0** -- the version containing the norm-matched-null defect this work exists to
+correct. Generalised to take the directory as an argument, defaulting to `paper` for compatibility.
+
+### Clean-room compile
+
+Extracted `paper1.2/arxiv-submission.tar.gz` into an empty directory with no repo access:
+
+- compiles with **zero errors**
+- **14 pages**, identical to the in-repo build
+- **0 unresolved citations** -- `main.bbl` and `refs.bib` both ship, so a rebuild that re-runs BibTeX
+  still resolves
+- exactly the five referenced figures, no extras
+
+### Figure hygiene, which was a real hazard rather than cosmetics
+
+`paper1.2` inherited paper 1.0's figure filenames, so the numbering had drifted:
+
+| file | rendered as |
+|---|---|
+| `fig1_probe_vs_operator` | Figure 1 |
+| `fig2_shadow_sweep` | Figure 2 |
+| **`fig4_leverage`** | **Figure 3** |
+| **`fig2_ld_sweep`** | **Figure 4** |
+| **`fig3_low_variance`** | **Figure 5** |
+
+Two files began `fig2_`. That is precisely the collision `make_arxiv_archive.sh`'s own header warns
+about -- "doing that once left two stale figures in it that differed from the paper's own." Renamed
+so filename matches rendered number, and deleted two unreferenced paper-1.0 leftovers
+(`fig1_three_claims.pdf`, `fig5_random_null.pdf`) which `paper/` still carries.
+
+Recompiled: 14 pages, no errors, numbering now consistent. Archive rebuilt and re-verified in a clean
+extraction.
+
+### Guards
+
+Two checks added to `verify_paper_numbers.py`: one figure file per number (no shared prefixes), and
+every shipped figure referenced by a section. **34/34 checks pass.**
+
+### Net
+
+No experiment run and no number changed. The submission artifact now builds from the *current*
+manuscript rather than the superseded one, compiles in isolation, and a documented failure mode is
+under a mechanical guard.

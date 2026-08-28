@@ -154,7 +154,7 @@ def fig1_three_claims():
 
 
 # ---------------------------------------------------------------------------------------
-def fig2_ld_sweep():
+def fig4_ld_sweep():
     """Recovery improves with latent dimension while the pairing residual gets worse.
 
     ONE axis, deliberately. This was a twinx() dual-axis chart until 2026-08-13. Two y-scales
@@ -184,13 +184,13 @@ def fig2_ld_sweep():
     ax.text(lds.index(12), 1.07, "registered", fontsize=6, ha="center", color="#52514e")
     ax.legend(frameon=False, loc="center left", handlelength=1.5, fontsize=7, labelspacing=.3)
     fig.tight_layout()
-    fig.savefig(OUT / "fig2_ld_sweep.pdf")
+    fig.savefig(OUT / "fig4_ld_sweep.pdf")
     plt.close(fig)
     return dict(lds=lds, rho=rho, res=res)
 
 
 # ---------------------------------------------------------------------------------------
-def fig3_low_variance():
+def fig5_low_variance():
     """Energy lives in the low-variance directions, and that is not where the residual lives."""
     rows = _load("dreamer_residual_decomp.json")
     e_first = np.median([r["first6_energy_r2"] for r in rows])
@@ -229,12 +229,12 @@ def fig3_low_variance():
     ax[1].legend(frameon=False, loc="upper center", ncol=1, handlelength=1.2)
     ax[1].set_title("(b) where the misfit is", loc="left", fontweight="bold")
     fig.tight_layout(w_pad=1.4)
-    fig.savefig(OUT / "fig3_low_variance.pdf")
+    fig.savefig(OUT / "fig5_low_variance.pdf")
     plt.close(fig)
     return dict(e_first=e_first, e_added=e_added, r_added=r_added, f_added=f_added)
 
 
-def fig4_leverage():
+def fig3_leverage():
     """What the correction acts on: prominence rank against consequence rank, per direction."""
     rows = json.load(open(R / "dreamer_leverage.json"))
     fig, ax = plt.subplots(1, 2, figsize=(6.6, 2.65))
@@ -267,7 +267,7 @@ def fig4_leverage():
     _panel(ax[1], "(b) the edit finds it anyway",
            "not given the damage ranking")
     fig.tight_layout(w_pad=2.2, rect=(0, 0.06, 1, 1))
-    fig.savefig(OUT / "fig4_leverage.pdf"); plt.close(fig)
+    fig.savefig(OUT / "fig3_leverage.pdf"); plt.close(fig)
     return rows
 
 
@@ -315,9 +315,9 @@ def fig5_random_null():
 if __name__ == "__main__":
     s1 = fig1_three_claims()
     s5 = fig5_random_null()
-    s4 = fig4_leverage()
-    s2 = fig2_ld_sweep()
-    s3 = fig3_low_variance()
+    s4 = fig3_leverage()
+    s2 = fig4_ld_sweep()
+    s3 = fig5_low_variance()
     print("fig1  trained", [round(x, 3) for x in s1["cons_rho"]],
           " null", [round(x, 3) for x in sorted(s1["null_rho"])],
           " damped", [round(x, 3) for x in s1["damp_rho"]])

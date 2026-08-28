@@ -1,0 +1,118 @@
+\section{Decodability is not dynamical structure}
+\label{sec:dissociation}
+
+A probe establishes that a quantity can be read out of a representation. It says nothing about
+whether the model's own transition uses or preserves that quantity. We measure the second property
+directly, with a statistic on the transition operator: apply one autonomous step at a real encoded
+state and ask how much a candidate scalar changes,
+\begin{equation}
+\rho_{\mathrm{obs}}(C) \;=\;
+\frac{\operatorname{median}_t \bigl| C(T(z_t)) - C(z_t) \bigr|}
+     {\operatorname{std}_{\mathrm{traj}} C},
+\label{eq:rhoobs}
+\end{equation}
+normalised so it is invariant to the scale of $C$ and comparable across candidates. A value near
+zero means the transition preserves $C$; a value near one means a single step moves $C$ by its entire
+across-trajectory spread.
+
+\paragraph{A perfect probe identifies a direction the dynamics do not use.}
+The sharpest test replaces the label-free search with the answer it is trying to find. We fit a
+degree-4 polynomial readout to \emph{true} pendulum energy by ridge regression on the same latent,
+then use it to drive the identical correction. It reaches $|\rho|_E = 0.9999$: as a probe it is
+essentially perfect.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig1_probe_vs_operator.pdf}
+\caption{A perfect probe is not a conserved quantity. Colour is the constraint; marker is the model
+seed (all three shown, never averaged). \textbf{Left:} the supervised probe reads true energy almost
+perfectly. \textbf{Centre:} the model's own transition preserves it an order of magnitude worse than
+the label-free scalar. \textbf{Right:} acting on it fails to reduce rollout energy drift, while the
+label-free scalar cuts drift on every seed. Probe quality and dynamical relevance rank the three
+constraints differently.}
+\label{fig:probe_vs_operator}
+\end{figure}
+
+\begin{table}[t]
+\centering\small
+\caption{The correct physical quantity, fitted optimally, is worse conserved and does not repair
+rollouts. Median across three independently trained models, with the per-seed range in brackets;
+20 magnitude-matched random constraints per model (60 total, pooled).}
+\label{tab:supervised}
+\begin{tabular}{lccc}
+\toprule
+constraint & $|\rho|_E$ & $\rho_{\mathrm{obs}}$ & change in energy drift \\
+\midrule
+label-free $C$ & 0.966 \,[0.930, 0.973] & \textbf{6.9\,[6.3, 8.7]$\times10^{-3}$} & \textbf{$-$42.2\% \,[$-$50.9, $-$32.2]} \\
+supervised energy probe & \textbf{0.9999} & 4.58\,[4.57, 4.59]$\times10^{-2}$ & $+$26.8\% \,[$-$0.3, $+$33.4] \\
+random, magnitude-matched & 0.126 & 1.07 & $+$4.0\% \,[$-$20.7, $+$42.6] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:supervised} and Figure~\ref{fig:probe_vs_operator} show the outcome. The supervised
+probe tracks energy better than the label-free scalar on every seed, and is $6.7\times$ less preserved
+by the transition ($5.3$--$7.3\times$ per seed); both hold on 3 of 3 models. It also never repairs the
+rollout: its effect on energy drift is $+26.8\%$ and $+33.4\%$ on two models and $-0.3\%$ on the third,
+against a $32$--$51\%$ reduction from the label-free scalar on all three. The direction that best
+predicts the physical variable and the direction the model's dynamics actually respect are not the
+same direction.
+
+This also answers the practical objection to a label-free method. The search is not a workaround for
+missing labels: it finds something a supervised fit on perfect labels does not, because it optimises
+conservation by the transition rather than agreement with the variable.
+Section~\ref{sec:mechanism} identifies what it finds, and why fitting true energy cannot find it.
+
+\paragraph{The dissociation is directional, and appears on four further axes.}
+In every case we can construct, decodability survives where conservation fails; we have not found the
+converse. Table~\ref{tab:axes} collects them. On each row a probe would report success.
+
+\begin{table}[t]
+\centering\small
+\caption{Decodability is retained while conservation degrades, across four independent axes.
+$\rho_{\mathrm{obs}}$ for the trained conservative model in-distribution is $6.3$--$8.7\times10^{-3}$.}
+\label{tab:axes}
+\begin{tabular}{llcc}
+\toprule
+axis & contrast & decodability & $\rho_{\mathrm{obs}}$ degradation \\
+\midrule
+training & untrained network & $|\rho|_E$ up to 0.908 & 74$\times$ \\
+state space & outside training energies & free probe 0.999 & 55--267$\times$ \\
+architecture & deterministic conv-GRU & $|\rho|_E$ 0.91 (2 of 3 seeds) & 767$\times$ \\
+objective & transition never trained & $|\rho|_E$ 0.97 & $\sim$10\,000$\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The out-of-distribution row is the cleanest, because it holds the model fixed and varies only the
+region of state space. Outside the training energy band a freely fitted probe recovers energy at
+$0.999$ --- the encoder generalises --- while the transition conserves it $55$--$267\times$ worse,
+reaching values statistically indistinguishable from a random constraint at the earliest checkpoint.
+Decodability and conservation come apart inside a single trained model, split by where in state space
+it is asked.
+
+\paragraph{Whether conservation \emph{alone} predicts the intervention is not established.}
+The control that would show this directly asks whether, among candidates matched in energy
+correlation, better conservation alone produces a larger repair. The 2-DoF system admits such a band:
+on two of three seeds, 397 and 398 of 400 candidates lie within $0.10$ of the recovered scalar's
+$|\rho|_E$, spanning five orders of magnitude of conservation quality at $|\rho|_E \le 0.11$. Across
+20 candidates stratified by conservation, the rank correlation with repair is $+0.19$, $+0.57$ and
+$+0.19$ on the three seeds, with the 95\% confidence interval excluding zero on \textbf{one of
+three}. We report this as a negative result: the relationship is visible but not established at
+$n = 3$.
+
+Two further facts belong with it. The point estimate moves with the size of the candidate pool
+($+0.29 \to +0.19$ on one seed between pools of 150 and 400), so the statistic is not stable to a
+design choice that should be immaterial --- though the one-of-three verdict is identical under both
+pools. And on the third seed the band cannot be built at all: its reference $|\rho|_E$ is $0.111$ and
+only 19 of 400 candidates fall within $0.10$ of it, with an increase from 150 to 400 candidates
+adding none.
+
+That last failure is the informative part. On a system whose transition conserves energy, the
+well-conserved latent directions \emph{are} the energy-like ones. This is why E10's original
+high-decodability form could not be constructed on the pendulum at any pool size, why the matched
+band here exists only at low decodability, and why on one seed it does not exist at all. The two
+properties may not be separable by this design on any system where the model has learned the physics.
+That is a statement about the difficulty of \emph{this control}, not about the dissociation itself,
+for which the supervised probe above and Section~\ref{sec:mechanism} give direct evidence. What does
+hold across all three seeds is that the recovered scalar repairs: $-16.7\%$, $-7.3\%$ and $-6.8\%$.

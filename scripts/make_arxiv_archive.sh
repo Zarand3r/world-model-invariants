@@ -2,7 +2,11 @@
 # Rebuild paper/arxiv-submission.tar.gz from the repo. Never hand-copy files into the archive:
 # doing that once left two stale figures in it that differed from the paper's own.
 set -euo pipefail
-cd "$(dirname "$0")/../paper"
+# Which manuscript to package. Defaults to `paper` for backwards compatibility; `paper1.2` is the
+# current one. Hardcoding the directory meant the archive silently kept targeting the superseded
+# manuscript after the fork.
+DIR="${1:-paper}"
+cd "$(dirname "$0")/../$DIR"
 OUT=arxiv-submission
 rm -rf "$OUT" && mkdir -p "$OUT/sections" "$OUT/figures"
 
@@ -17,5 +21,5 @@ for f in $(grep -oh 'figures/[a-z0-9_]*\.pdf' sections/*.tex | sort -u); do cp "
 
 rm -f arxiv-submission.tar.gz
 ( cd "$OUT" && tar -czf ../arxiv-submission.tar.gz . )
-echo "wrote paper/arxiv-submission.tar.gz"
+echo "wrote $DIR/arxiv-submission.tar.gz"
 tar -tzf arxiv-submission.tar.gz | grep -v '/$' | sort | sed 's/^/  /'
