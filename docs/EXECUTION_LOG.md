@@ -4126,3 +4126,63 @@ paper cannot present it as one.
 sections. 5,625 words across sections. Figure 1 is specified in `CLAIMS.md` but **not yet built** —
 the existing `fig1_three_claims.pdf` belongs to paper 1.0's argument and does not show the supervised
 comparison the new lead rests on.
+
+---
+
+## 2026-08-28 04:40–05:00 UTC — **F2 FAILS: invariant drift is not a usable trust signal**
+
+Git at `a246c19`. Preregistered in `docs/F2_PREREG.md` before any quantity was computed, and
+identified beforehand as *the* experiment that would decide whether this work is usable rather than
+merely diagnostic.
+
+### Result
+
+Spearman between each **online** signal at rollout step 25 and decoded physical energy error at step
+100, across the analysis trajectories:
+
+| signal | s3 | s4 | s5 |
+|---|---|---|---|
+| **accumulated invariant drift** | **-0.022** | **+0.087** | **-0.243** |
+| instantaneous drift | -0.076 | +0.172 | +0.044 |
+| **latent displacement** `\|z_k - z_0\|` | **+0.274** | **+0.290** | **+0.310** |
+| whitened NN distance | +0.010 | +0.281 | +0.434 |
+| random-constraint drift *(control)* | +0.134 | +0.344 | +0.198 |
+| ensemble disagreement (3 models) | +0.001 | +0.142 | -0.015 |
+
+**Accumulated invariant drift beats all baselines on 0 of 3 models.** Registered prediction was 3 of
+3. **The falsifier fired**: *"any baseline matches or beats it on a majority of models. Then invariant
+drift is not the best available online signal, the practical claim is unsupported, and the paper
+should not make it."*
+
+Worse, **the control failed too**. Random-constraint drift was registered to sit near zero; it
+reaches +0.134/+0.344/+0.198 and beats the real signal on 2 of 3 models. Whatever predicts late
+physical error here, it is not specific to the recovered invariant.
+
+The best predictor is the simplest thing available — **how far the latent has moved** — on all three
+models.
+
+### What this does and does not overturn
+
+**It does not touch the repair or the dissociation.** Those are *causal* claims: acting on `C` changes
+the imagined physics, established by intervention with matched controls. F2 asked a *predictive*
+question: does early drift forecast late error. A quantity can be causally load-bearing without being
+the best forecaster of an outcome it only partly determines.
+
+Nor does it contradict E12b, which found `Spearman(D_sec(C), D_sec(E))` of +0.74/+0.45/+0.74. That
+correlated **slopes over a whole rollout**; F2 correlates an **early snapshot** with a **late absolute
+error**. The second is the practically relevant question, and it is the one that fails.
+
+**It does close the practical direction.** The roadmap's F2 — *"define a physical trust horizon: stop
+trusting autonomous imagination when learned physical consistency crosses a calibrated threshold"* —
+is not supported. The paper must not claim it, and I should not have described it to Richard as the
+single highest-value remaining item without registering the falsifier first; that framing presumed
+the outcome.
+
+### Consequence for the paper's significance
+
+The honest position is unchanged from the audit: this is a **methodological** contribution about how
+to measure whether a model uses a quantity, not a usable monitoring tool. The strongest claim remains
+E18 --- a probe fitted to the true physical quantity at 0.9999 identifies a direction the dynamics do
+not use --- and that claim is untouched by F2.
+
+`docs/ROADMAP.md` F2 is marked **attempted and negative**, not pending.

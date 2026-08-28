@@ -561,7 +561,14 @@ rather than toward a constant level set, improves imagination.
 
 This is the natural bridge to model-based RL.
 
-## F2 — Invariant drift as an online trust signal
+## F2 — Invariant drift as an online trust signal  **[ATTEMPTED 2026-08-28 — NEGATIVE]**
+
+> **Result: does not work.** Accumulated invariant drift at rollout step 25 predicts decoded physical
+> energy error at step 100 with Spearman -0.02 / +0.09 / -0.24, beaten on all three models by simple
+> latent displacement (+0.27 / +0.29 / +0.31) and beaten on two of three by a random-constraint
+> control that was registered to sit near zero. The registered falsifier fired. The physical trust
+> horizon below is **not supported** and must not be claimed. See `docs/F2_PREREG.md` and the
+> execution log entry of 2026-08-28.
 
 Test whether the model can know its imagination is becoming unreliable *before* large visible error
 appears.
