@@ -1,0 +1,126 @@
+# Pre-registration — F1, from conservation laws to balance laws under action
+
+**Written 2026-08-28, before any F1 quantity was computed.** Roadmap Stage 5, specified at
+`docs/ROADMAP.md:552`.
+
+## The question
+
+Every result in this project so far concerns **free evolution**, where the target relation is
+`C(z_{t+1}) - C(z_t) = 0`. Under actuation, energy is no longer conserved; it obeys an accounting
+relation. For the actuated pendulum with applied torque `tau`,
+
+    I*thetaddot = m g (l/2) sin(theta) + tau        =>        dE/dt = tau * thetadot
+
+with no dissipation term, since the simulator is undamped. So the question becomes:
+
+> Does an ordinary action-conditioned world model, trained only on pixels and actions, spontaneously
+> learn a latent scalar whose change per step is accounted for by the action, rather than one that
+> stays constant?
+
+This is a strictly harder question than conservation. A constant is a degenerate balance law, and a
+search for constants would simply fail here.
+
+## What makes this worth running
+
+If the answer is yes, the paper's object generalises from "conserved quantity" to "quantity with a
+learned source term", which is the form physical bookkeeping actually takes in any controlled system
+and the natural bridge to model-based RL. If the answer is no, that is a sharp boundary on the whole
+programme: the method would be shown to work only where the true relation is `dC = 0`.
+
+**No direction is predicted.** Free-evolution success does not obviously transfer, because the model
+must learn a *state-dependent coupling* to the action rather than an invariant direction.
+
+## Design
+
+### Data
+
+Gymnasium Pendulum, undamped, with **nonzero torque**. Actions are piecewise-constant random torques,
+held for `K` steps and redrawn, with magnitude bounded so that `|thetadot|` stays clear of the
+simulator's `|thetadot| = 8` clip — the clip breaks the balance relation outright, exactly as it
+would break conservation. The action sequence is stored with the frames and states, and the torque
+bound and hold length are recorded in the run record.
+
+Free-evolution data is **not** reused: a model trained on `tau = 0` has never seen an action.
+
+### Method: balance-law extraction
+
+Generalise the free-evolution fit. Instead of seeking `C` with `Delta C = 0`, seek a pair `(C, P)`
+minimising the **balance residual**
+
+    R  =  || C(z_{t+1}) - C(z_t)  -  P(z_t, a_t) ||^2
+
+over the same degree-4 monomial family for `C`. The power term is parameterised as **linear in the
+action with a state-dependent coefficient**,
+
+    P(z, a)  =  a * ( monomials(z) . q )
+
+which is the correct functional form: the true power `tau * thetadot` is linear in `tau` with a
+coefficient that is a function of state. `C` and `P` are fitted jointly by alternating least squares,
+mirroring `fit_hamiltonian_pair`, and normalised so `R` is scale-free in `C`.
+
+## Gate 0 — does the balance law close on the GROUND TRUTH? (no model)
+
+**Run before any training.** On ground-truth states and actions, compute the normalised residual of
+
+    E_{t+1} - E_t  -  tau_t * thetadot_t * dt
+
+E19 established that this simulator conserves a **shadow** Hamiltonian rather than the textbook one,
+so the discrete balance relation will carry an `O(dt)` correction for the same reason. We therefore
+evaluate the residual for textbook `E` **and** for the E19 shadow `H~ = E + 0.125 * thetadot *
+sin(theta)`, and for the power evaluated at `thetadot_t` and at `thetadot_{t+1}` (the semi-implicit
+update uses the updated velocity, so the second is the candidate that should close).
+
+**G0 passes** if some combination drives the normalised residual **below 0.05**, i.e. the discrete
+balance law closes to within 5% of the per-step energy change.
+
+> **If G0 fails, STOP.** The relation being tested would not hold in the data, so no result about the
+> model could be interpreted. Report as a negative and do not train anything.
+
+This gate is the F1 analogue of E1's readout gate and E19's P1, and it exists because E19 showed that
+assuming the textbook relation holds discretely is exactly the mistake that makes a perfect fit
+meaningless.
+
+## Registered predictions, conditional on G0
+
+**P1 — identification.** The jointly fitted `C` correlates with the ground-truth energy at
+`|rho_E| >= 0.8` on at least 2 of 3 seeds.
+
+**P2 — the source term is physical.** The fitted power coefficient `monomials(z) . q` correlates with
+true `thetadot` at `|rho| >= 0.8` on at least 2 of 3 seeds. This is what distinguishes a genuine
+balance law from a curve fit: the coupling to the action must be the physical one.
+
+**P3 — the balance law beats conservation.** The balance residual `R` of the fitted `(C, P)` is at
+least `5x` lower than the residual of the **best conserved** scalar found by the free-evolution
+search on the same latent, i.e. forcing `P = 0`. If a constant scalar does just as well, the model
+has not learned a source term and the "balance law" framing adds nothing.
+
+**P4 — control.** `R` is at least `5x` lower than for 20 random `(C, P)` pairs drawn at matched
+coefficient norm.
+
+## Falsifiers, stated plainly
+
+- **G0 fails** -> the relation does not hold in the data; stop, report negative, train nothing.
+- **P1 fails** -> the search does not find energy under actuation; the free-evolution result does not
+  transfer, and that is the finding.
+- **P2 fails while P1 passes** -> `C` is energy-like but its action coupling is not physical; the fit
+  is absorbing the action as a nuisance term rather than learning power. Report as a **negative**:
+  this is the most likely way to get a misleadingly good `R`.
+- **P3 fails** -> a conserved scalar explains the data as well as a balance law; the generalisation
+  is empty on this system.
+
+## Scope and honesty constraints, fixed now
+
+- 3 independently trained seeds, step-capped exactly as in Stage 1, with the E8 checkpoint grid.
+- The evidence-base guard will flag this claim until it reaches n = 3.
+- Physical labels (`E`, `thetadot`, `tau`) are used **only after the fit is frozen**, for evaluation,
+  per the roadmap's rule at line 79. The fit sees `z` and `a` only.
+- The second half of the roadmap's F1 item — "correcting toward the predicted energy balance improves
+  imagination" — is **deliberately not registered here**. It is only meaningful if P1-P3 pass, and
+  registering an intervention before knowing whether the object exists would repeat the error E10b
+  was caught by. It will get its own preregistration.
+
+## Provenance
+
+All records carry the `latent_noether.provenance` stamp: argv, git HEAD and dirty state, and the
+sha256 of every input. This is the first experiment in the project preregistered *after* the
+provenance audit, and it is expected to be reproducible from the record alone.
