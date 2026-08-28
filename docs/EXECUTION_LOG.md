@@ -4903,3 +4903,28 @@ an inline loop without that guard is what silently retrained over analysed `ce_s
 contract. Seed 3 running.
 
 Nothing is claimed yet: P1-P3 are unevaluated and the balance-law extraction is not written.
+
+### Early action-use check, run at step 1,000 and 3,000 rather than after 18 hours
+
+The new criterion only runs at end of training, which would mean discovering a dead action input
+after three seeds x 6 hours. Ran it directly on the first two checkpoints instead.
+
+| checkpoint | true | shuffled | zeros | ratio | verdict |
+|---|---|---|---|---|---|
+| `f1_act_s3_step1000` | 0.003722 | 0.004145 | 0.003801 | **0.898** | OK |
+| `f1_act_s3_step3000` | 0.003488 | 0.004010 | 0.003910 | **0.870** | OK |
+
+The model **is** using the action, and the margin **improves with training**, which is the right
+direction.
+
+**But it is thin, and I am flagging it now rather than at the end.** True actions beat shuffled by
+only ~13% in 20-step rollout MSE, against a bar of 0.9. Two readings are possible and this checkpoint
+cannot separate them: either the action conditioning is still weak and will strengthen (supported by
+0.898 -> 0.870 over 2,000 steps), or a torque of `|tau| <= 1.0` simply moves the pixels little over
+20 steps compared with the pendulum's own swing, in which case the ratio will plateau near 0.85.
+
+**Registered response, decided now rather than after seeing the outcome:** track the ratio across the
+E8 checkpoint grid. If it has not fallen meaningfully below the step-3000 value of 0.870 by step
+60,000, the action conditioning is too weak for F1's question to be answerable on this dataset, and
+the honest move is to report that as a boundary and raise the torque -- **not** to proceed to the
+balance-law fit and interpret whatever it returns. A fit will always return something.
