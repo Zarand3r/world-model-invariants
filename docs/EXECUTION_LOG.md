@@ -5004,3 +5004,40 @@ had already named, and is frozen before any checkpoint is analysed.
 ### Nothing is claimed about the model yet
 
 No F1 model quantity has been computed. The extractor is validated; the checkpoints are not analysed.
+
+### F1 analysis script written; preliminary smoke test at step 30,000 (n = 1, NO CLAIMS)
+
+`scripts/run_f1_balance.py` written and smoke-tested on `f1_act_s3_step30000.pt` so the final
+three-seed run is de-risked rather than discovered broken at the end. **This is one seed at half
+training and nothing is claimed from it.** The registered read is step 60,000 across 3 seeds.
+
+| power degree | terms | residual | ratio vs conserved-only | `rho(C, E)` | `rho(q, thetadot)` |
+|---|---|---|---|---|---|
+| **1** | 12 | 0.00962 | **1.5x** | **0.9514** | **0.7849** |
+| 2 | 90 | 0.00518 | 2.7x | 0.9203 | 0.8543 |
+| 3 | 454 | 0.00455 | 3.1x | 0.9018 | 0.8138 |
+| 4 | 1819 | 0.00309 | 4.6x | 0.8734 | 0.6962 |
+
+**P1 True, P2 False, P3 False, P4 True** at the registered degree 1.
+
+`rho(C, E) = 0.95` says the model learns an energy-like scalar under actuation, which is itself
+non-trivial: nothing in the training objective mentions energy and the quantity is no longer
+conserved. But P2 misses at 0.785 against the 0.8 bar, and P3 is 1.5x against a 5x bar -- the action
+term buys much less over a plain conserved scalar here than it did on ground truth (55.6x).
+
+**A structural asymmetry worth recording now, before the final read, and explicitly NOT as grounds to
+move the bar.** On ground truth the degree-1 power basis had 3 terms and `thetadot` was literally one
+of the coordinates, so the true coupling was exactly representable. In the model the latent is a
+12-dimensional PCA of the RSSM state, and degree 1 means *linear in PCA components*; whether
+`thetadot` is linearly recoverable there is an empirical question, and P2 rising to 0.854 at degree 2
+suggests it needs mild nonlinearity. The reference curve and the model setting are therefore not
+strictly comparable at fixed degree.
+
+That is a reason to **report** the sweep, which the amendment already requires, not a reason to read
+P1-P3 at degree 2. The registration says plainly: if degree 1 fails we do not climb the ladder, and
+degrees 2-4 are reported as sensitivity. If P2 and P3 fail at degree 1 at step 60,000 across seeds,
+**F1 is reported as a negative** -- the model learns an energy-like scalar but not a balance law with
+the physical action coupling -- with the degree-2 numbers shown as sensitivity and this asymmetry
+stated as the leading explanation to test next, not as a result.
+
+Training: seed 3 at step 32,000; seeds 4 and 5 queued behind the guarded driver.
