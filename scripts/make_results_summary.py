@@ -153,9 +153,11 @@ for s in (3, 4, 5):
 
 # ---- evidence-base guard ----
 section("Evidence base per claim (mechanical n-check)")
-print("This session recorded **eight corrections**. Six came from generalising an n = 1")
+print("This session recorded **ten corrections**. Seven came from generalising a small-n")
 print("observation; two came from re-reading what a statistic actually measures, and both of")
-print("those *removed* a stated weakness rather than narrowing a claim.")
+print("those *removed* a stated weakness rather than narrowing a claim; one was an overclaim")
+print("caught only by rendering a figure and looking at it (E18: the supervised probe was")
+print("stated to increase drift on 3 of 3 models, but on one it reduces it by 0.3%).")
 print("This table is generated from the run records so the evidence base behind each claim cannot")
 print("drift out of the prose. A claim resting on n = 1 is flagged, not omitted.\n")
 row("claim", "independent units", "n", "status")
@@ -209,6 +211,10 @@ CLAIMS = [
      ["e14b_ood_conservation.json"]),
     ("E10b conservation at matched decodability", "model seeds",
      ["e10b_matched_decodability.json", "e10b_matched_decodability_s1.json"]),
+    ("Supervised-probe dissociation (E18)", "model seeds",
+     ["e18_supervised_baseline.json"]),
+    ("Second architecture, conv-GRU (F4)", "model seeds", ["f4_recovery.json"]),
+    ("Second architecture, longer-trained (F4b)", "model seeds", ["f4b_recovery.json"]),
 ]
 for name, unit, files in CLAIMS:
     n = _n_seeds(files)

@@ -97,9 +97,11 @@ Source: `e4_s{3,4,5}.json`
 
 ## Evidence base per claim (mechanical n-check)
 
-This session recorded **eight corrections**. Six came from generalising an n = 1
+This session recorded **ten corrections**. Seven came from generalising a small-n
 observation; two came from re-reading what a statistic actually measures, and both of
-those *removed* a stated weakness rather than narrowing a claim.
+those *removed* a stated weakness rather than narrowing a claim; one was an overclaim
+caught only by rendering a figure and looking at it (E18: the supervised probe was
+stated to increase drift on 3 of 3 models, but on one it reduces it by 0.3%).
 This table is generated from the run records so the evidence base behind each claim cannot
 drift out of the prose. A claim resting on n = 1 is flagged, not omitted.
 
@@ -115,6 +117,9 @@ drift out of the prose. A claim resting on n = 1 is flagged, not omitted.
 | Two-invariant degeneracy (central arm) | model seeds | 3 | n>=3 |
 | OOD decodable-but-not-conserved (E14b) | model seeds | 3 | n>=3 |
 | E10b conservation at matched decodability | model seeds | 2 | n=2 — provisional |
+| Supervised-probe dissociation (E18) | model seeds | 3 | n>=3 |
+| Second architecture, conv-GRU (F4) | model seeds | 3 | n>=3 |
+| Second architecture, longer-trained (F4b) | model seeds | 3 | n>=3 |
 
 ---
 
