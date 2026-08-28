@@ -57,3 +57,51 @@ this checkpoint, as reference points on the same axis.
 
 Central seed 0 at step 60,000, one model. The evidence-base guard will flag it n = 1 and it will be
 reported as provisional until central seed 2 finishes training.
+
+---
+
+## Amendment, 2026-08-28 -- pool size, approved by Richard before running
+
+**Written before any 400-pool quantity was computed.**
+
+### Why
+
+At the registered pool of 150, the band populates 147/150 on central s0 and 148/150 on s1, but only
+**19/150** on s2, whose reference `|rho_E|` is 0.111 rather than 0.05-0.06 and therefore sits in a
+sparse region of the eigenfamily. s2's 19 candidates span invariance ratios of `1.8e-06` to `7.3e-04`
+-- under three orders of magnitude, against **five** on the other two seeds.
+
+The design exists to vary conservation widely at fixed decodability. On s2 it barely varies
+conservation, so s2's near-zero Spearman is a **weak test**, not evidence against the hypothesis.
+
+Pool size was always a design lever rather than a result here: the original `E10_PREREG` recorded E10
+as unconstructible on the pendulum "at any pool size", which presupposes that enlarging the pool is a
+legitimate move to populate a band.
+
+### The change
+
+`N_CANDIDATES` 150 -> **400**, applied to **all three seeds**, not only to s2. Running s2 alone at a
+larger pool would give one seed a bespoke design and would be indistinguishable from tuning. Every
+other parameter is unchanged: band `|rho_E - ref| <= 0.10`, 20 strata by quantiles of
+`log10(ratio)`, direction-matched, `eps = 0.02`, `H = 100`, same checkpoints.
+
+### Registered predictions
+
+**A1.** s2's band populates to **at least 100 of 400** and its selected candidates span **at least
+four orders of magnitude** of invariance ratio. *If A1 fails, s2 is not constructible at this pool
+size either, and that is reported as a property of the seed rather than retried at a larger pool.*
+
+**A2.** The primary metric is re-read on all three seeds at the matched 400-pool design. The
+registered falsifier is unchanged: **a CI containing zero** means no relationship is established on
+that seed.
+
+**No direction is predicted**, exactly as in the original registration. Enlarging the pool is
+expected to change s2 the most and s0/s1 the least, since their bands were already near-saturated;
+if s0 or s1 move substantially, that itself is evidence the metric is unstable to pool size and will
+be reported as such.
+
+### Reporting rule, fixed now
+
+The 400-pool results become primary because the design is matched across seeds. The 150-pool results
+are **kept in `runs/e10b_matched_band.json` and reported alongside**, not replaced. If the two pools
+disagree on whether a CI excludes zero, both are stated and the claim is written to the weaker.

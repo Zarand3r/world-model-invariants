@@ -51,7 +51,7 @@ def _secular(E, norm):
     return ((E - E.mean(-1, keepdims=True)) @ kc / (kc @ kc)) / norm
 
 
-def run(ckpt, data):
+def run(ckpt, data, n_candidates=N_CANDIDATES):
     d = np.load(data)
     fr = torch.as_tensor(d["frames"]).float().div_(255.).sub_(0.5).cuda()
     norm = float(d["energy"].mean(-1).std())
@@ -93,7 +93,7 @@ def run(ckpt, data):
         return 100.0 * (vals[EPS] - vals[0.0]) / vals[0.0]
 
     ref_rho = rho_E(ref_coeffs)
-    cands = polynomial_invariants(Z.double().cpu(), degree=DEGREE, max_results=N_CANDIDATES)
+    cands = polynomial_invariants(Z.double().cpu(), degree=DEGREE, max_results=n_candidates)
     scored = []
     for i, c in enumerate(cands):
         cc = torch.as_tensor(np.asarray(c["coeffs"]), dtype=Z.dtype, device=Z.device)
@@ -138,6 +138,8 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--ckpts", nargs="+", required=True)
     p.add_argument("--data", default="runs/osc2d_central.npz")
+    p.add_argument("--n-candidates", type=int, default=N_CANDIDATES,
+                   help="pool size; the 2026-08-28 amendment raises this to 400 for all seeds")
     p.add_argument("--out", default="runs/e10b_matched_band.json")
     a = p.parse_args()
     op = pathlib.Path(a.out)
@@ -145,7 +147,7 @@ if __name__ == "__main__":
     out.setdefault("provenance", {}).setdefault("runs", []).append({
         "data": a.data, "data_sha256": hashlib.sha256(pathlib.Path(a.data).read_bytes()).hexdigest(),
         "degree": DEGREE, "ld": LD, "warmup": WARMUP, "horizon": HORIZON, "eps": EPS,
-        "n_candidates": N_CANDIDATES, "band": BAND, "n_strata": N_STRATA,
+        "n_candidates": a.n_candidates, "band": BAND, "n_strata": N_STRATA,
         "analysis_slice": [ANALYSIS.start, ANALYSIS.stop],
         "git": subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip(),
         "utc": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")})
@@ -154,6 +156,6 @@ if __name__ == "__main__":
         if ck in done or not pathlib.Path(ck).exists():
             print(f"[E10b] skip {ck}"); continue
         print(f"[E10b] {ck}", flush=True)
-        out["models"].append(run(ck, a.data)); op.write_text(json.dumps(out, indent=1) + "\n")
+        out["models"].append(run(ck, a.data, a.n_candidates)); op.write_text(json.dumps(out, indent=1) + "\n")
     op.write_text(json.dumps(out, indent=1) + "\n")
     print(f"wrote {op}")
