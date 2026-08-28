@@ -157,3 +157,43 @@ def test_validated_invariants_exposes_overfitting_the_fit_ratio_hides():
     traj = _as_t(simulate(OscillatorParams(), sample_initial_conditions(16, rng), 120))
     hi = validated_invariants(traj, degree=8)[0]
     assert hi["heldout_ratio"] >= hi["ratio"]        # held-out is never the optimistic one
+
+
+def test_returned_coefficients_live_in_RAW_monomial_space():
+    """`polynomial_invariants` fits in standardised feature space and must convert back.
+
+    The eigenproblem standardises columns because raw degree-4 monomials span many orders of
+    magnitude, then returns `c_raw = c_std / sd`. **Every consumer in `scripts/` applies these
+    coefficients to raw `monomial_features`.** If the conversion were dropped, no error would be
+    raised anywhere -- the numbers would silently change, in every experiment at once.
+
+    This is not hypothetical. On 2026-08-28 a throwaway probe applied returned coefficients to
+    *standardised* features and reported |rho(C, E)| = 0.58 for a model whose true value is 0.97,
+    which read as evidence of a problem with the paper until the probe itself was found to be wrong.
+    Nothing in the suite pinned the convention.
+
+    The check: reconstructing C from the returned coefficients on raw features must reproduce the
+    reported invariance ratio.
+    """
+    torch.manual_seed(0)
+    n_traj, T = 24, 40
+    t = torch.linspace(0.0, 6.0, T)
+    amp = torch.rand(n_traj, 1) * 1.5 + 0.5
+    phase = torch.rand(n_traj, 1) * 6.283
+    traj = torch.stack([amp * torch.cos(t + phase), -amp * torch.sin(t + phase)], dim=-1).double()
+
+    res = polynomial_invariants(traj, degree=2, max_results=1)[0]
+    c = torch.as_tensor(res["coeffs"], dtype=traj.dtype)
+
+    feats = monomial_features(traj.reshape(-1, traj.shape[-1]), 2)      # RAW, as consumers use
+    C = (feats @ c).reshape(n_traj, T)
+
+    within = C.var(dim=1).mean()
+    total = C.reshape(-1).var()
+    ratio = float(within / total)
+
+    assert ratio == pytest.approx(res["ratio"], abs=1e-6, rel=1e-3), (
+        f"reported ratio {res['ratio']:.3e} but raw-space reconstruction gives {ratio:.3e}; "
+        "the returned coefficients are no longer in raw monomial space"
+    )
+    assert ratio < 1e-6, f"harmonic energy should be near-perfectly conserved, got {ratio:.3e}"

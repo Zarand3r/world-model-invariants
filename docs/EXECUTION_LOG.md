@@ -5302,3 +5302,41 @@ whenever that call is made.
 No paper number changed; one paper-critical piece of machinery audited and confirmed sound; one of my
 own previously-logged numbers withdrawn; F1's failure attributed with evidence rather than left
 ambiguous.
+
+## 2026-08-28 -- **Coefficient-convention audit across the codebase; a regression test now pins it**
+
+Loop iteration. Seed 4 at step 44,000; seed 5 queued. The F1 control-design decision remains with
+Richard and I am not re-asking each iteration, nor patching F1 in the meantime.
+
+### The audit
+
+The `balance.py` conditioning bug and my own broken probe both came from the same place: whether
+invariant coefficients live in **raw** or **standardised** monomial space. `polynomial_invariants`
+fits in standardised space and returns `c_raw = c_std / sd`. If any committed script applied those
+coefficients to standardised features -- as my throwaway probe did -- it would be a live bug on a
+paper-critical path, and it would raise no error.
+
+Checked **every** coefficient-application site in `scripts/` and `latent_noether/`. All of them --
+E4, E10, E11/E12, E12c, E14b, E18, E19, the edit and leverage scripts, the LD sweep, the extraction
+and residual-decomposition scripts -- apply coefficients to raw `monomial_features`. **No bug.** The
+one place that standardises (`run_dreamer_residual_decomp.py:50-54`) does so for an unrelated ridge
+regression, not for applying an invariant.
+
+### But nothing pinned the convention, so now something does
+
+Dropping the `/ sd` conversion would raise no error anywhere. Every number in every experiment would
+change silently and simultaneously. Added
+`tests/test_polynomial.py::test_returned_coefficients_live_in_RAW_monomial_space`: it reconstructs
+`C` from the returned coefficients on raw features and asserts the resulting invariance ratio matches
+the reported one.
+
+**Verified in both directions**, as with the overclaim guard: the test passes on the current code,
+and removing the `/ sd` conversion makes it fail. Restored afterwards; `git diff` on
+`polynomial.py` is empty. Full suite: **54 passed, 1 skipped.**
+
+The docstring records the incident that motivated it, so the reason survives the code.
+
+### Net
+
+No bug found, which is the useful outcome of an audit; one silent-failure mode now covered by a test
+that is verified to catch it. No paper number changed.
