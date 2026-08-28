@@ -5442,3 +5442,52 @@ every shipped figure referenced by a section. **34/34 checks pass.**
 No experiment run and no number changed. The submission artifact now builds from the *current*
 manuscript rather than the superseded one, compiles in isolation, and a documented failure mode is
 under a mechanical guard.
+
+## 2026-08-28 -- **The governing roadmap was two weeks of results out of date**
+
+Loop iteration. Seed 5 at step 38,000. No failures. F1 analysis still blocked; not run.
+
+Checked whether `docs/ROADMAP.md` -- the document this loop is instructed to follow every iteration
+-- reflects what has actually happened. It does not:
+
+| term | occurrences in ROADMAP.md before this entry |
+|---|---|
+| E18 | **0** |
+| E19 | **0** |
+| E10b | **0** |
+| E14b | **0** |
+| F4b | **0** |
+| shadow | **0** |
+
+Only F2 carried a status marker. **The strongest result in the project (E19) did not appear in the
+governing plan at all**, and neither did the result the paper now leads with (E18). C3's status line
+still read "Revisit on seeds 4/5" although E2 has since run on both.
+
+### What was added
+
+An **Execution status** section listing every planned item with its outcome, placed *before* the plan
+rather than edited into it, so what was predicted stays legible next to what happened. Every number
+in it was recomputed from the run records in this iteration rather than copied from memory:
+
+- E18 ratio 6.7x, effects -42.2% / +26.8%
+- E19 physics improvement 591x, argmin at `c* = 0.125` on 3/3 seeds, residual 1.10x
+- F4b median `rho_obs` 5.26, degradation 767x
+- E10b Spearman +0.19 / +0.57 / +0.19
+- E14b degradations 267x / 155x / 250x
+
+It records the **negatives and withdrawals** in the same table as the successes: E10's
+unconstructibility, E10b's negative and its irreproducible +0.71, E17b's invalid bootstrap, F2's
+fired falsifier, E1's defective original null, and E3's withdrawn "unexplained mechanism" weakness.
+It also names what has **not** been attempted -- F3, contacts, multiple objects, and any downstream
+planner demonstration -- with the last flagged as the paper's most reviewer-visible gap.
+
+### Why this matters beyond tidiness
+
+The loop instruction is "review progress on `docs/ROADMAP.md` and continue executing it". A stale
+governing document means every iteration reasons from a plan that does not know about eight completed
+experiments. It also would have misled anyone reading the repo cold: the roadmap described a project
+whose headline result had not been discovered yet.
+
+### Net
+
+No experiment run, no paper number changed. 34/34 mechanical checks still pass.
