@@ -49,7 +49,7 @@ predicted from the integrator with no fitting. \textbf{Left:} on ground-truth tr
 model involved, $T_{c^\star}$ is $591\times$ better conserved than textbook energy. \textbf{Right:}
 the learned transition agrees, on all three seeds. The sweep passes from the supervised probe's level
 (red) down to the label-free scalar's (blue) exactly at $c^\star$. The wrong-sign control at
-$c=-c^\star$ is $14\times$ worse, so this is not monotone in $|c|$.}
+$c=-c^\star$ is $12\times$ worse (median over seeds), so this is not monotone in $|c|$.}
 \label{fig:shadow}
 \end{figure}
 
@@ -58,8 +58,8 @@ Figure~\ref{fig:shadow} shows both halves. On ground-truth trajectories, with no
 invariance ratio of $T_c$ falls by $591\times$ between $c=0$ and $c=c^\star$, confirming the
 derivation and fixing the sign. On the learned transition, $\rho_{\mathrm{obs}}$ is minimised at
 $c^\star$ on 3 of 3 models, falling $4.9$--$6.9\times$ below its value at $c=0$. The curve is not
-monotone in $|c|$: the wrong-sign, right-magnitude control at $c=-c^\star$ is $14\times$ worse than
-at $c=+c^\star$. A post-hoc refinement over $c \in [0.090, 0.170]$ locates the minimum at
+monotone in $|c|$: the wrong-sign, right-magnitude control at $c=-c^\star$ is $12\times$ worse than
+at $c=+c^\star$ (range $10$--$14\times$ over the three models). A post-hoc refinement over $c \in [0.090, 0.170]$ locates the minimum at
 $0.125 \pm 0.005$ on every seed.
 
 The repair follows the same curve. Enforcing $T_{c^\star}$ during imagination changes energy drift by
