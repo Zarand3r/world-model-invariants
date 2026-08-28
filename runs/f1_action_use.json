@@ -31,6 +31,22 @@
    "mse_zeros": 0.0038024887908250093,
    "ratio_true_over_shuffled": 0.7393521314960072,
    "ratio_true_over_zeros": 0.8478195445445675
+  },
+  {
+   "ckpt": "runs/f1_act_s3_step30000.pt",
+   "mse_true": 0.00328833214007318,
+   "mse_shuffled": 0.0044078161008656025,
+   "mse_zeros": 0.003834537463262677,
+   "ratio_true_over_shuffled": 0.7460229884426033,
+   "ratio_true_over_zeros": 0.8575563993252137
+  },
+  {
+   "ckpt": "runs/f1_act_s3.pt",
+   "mse_true": 0.003280306002125144,
+   "mse_shuffled": 0.004385294392704964,
+   "mse_zeros": 0.003865945152938366,
+   "ratio_true_over_shuffled": 0.7480241252632907,
+   "ratio_true_over_zeros": 0.8485133317610317
   }
  ],
  "provenance": {
@@ -69,6 +85,36 @@
       "sha256": "a49e67d6052ca70badf1292621b15a22c15afa45e6c7efff358d7e755d2de5df",
       "mtime": "2026-08-28T17:09:36+00:00",
       "bytes": 53828965
+     },
+     "runs/pendulum_actuated.npz": {
+      "sha256": "ea7b6c2e19522825188574425c85aca48ccbde520a31738c1a5821985f0b3583",
+      "mtime": "2026-08-28T16:44:03+00:00",
+      "bytes": 7269181
+     }
+    }
+   },
+   {
+    "argv": [
+     "scripts/run_f1_action_use.py",
+     "--ckpts",
+     "runs/f1_act_s3_step30000.pt",
+     "runs/f1_act_s3.pt"
+    ],
+    "cwd": "/home/rbao/world-model-invariants",
+    "utc": "2026-08-28T18:40:47+00:00",
+    "git": "2b8a29ff808fbb9f09ce9a73c98fd103f1279aab",
+    "git_dirty": true,
+    "python": "3.13.13",
+    "inputs": {
+     "runs/f1_act_s3_step30000.pt": {
+      "sha256": "540588998f711d3e90de2d85e08bc4847aa2f37a93d3c514b3b635c4a32fab3a",
+      "mtime": "2026-08-28T17:35:06+00:00",
+      "bytes": 53829605
+     },
+     "runs/f1_act_s3.pt": {
+      "sha256": "bc3b4c8156feaa4e0616d566c29c3a6ba67a2acdd2a5e883be7c4a6fb157f8f6",
+      "mtime": "2026-08-28T18:25:26+00:00",
+      "bytes": 53830469
      },
      "runs/pendulum_actuated.npz": {
       "sha256": "ea7b6c2e19522825188574425c85aca48ccbde520a31738c1a5821985f0b3583",

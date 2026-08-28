@@ -236,3 +236,39 @@ that the model represents an approximately conserved, energy-like scalar even un
 the action term adding nothing that generalises. That is a legitimate negative and it will be
 reported as one. The registered read remains step 60,000 across 3 seeds; nothing is concluded from
 the preliminary checkpoint.
+
+---
+
+## Amendment 3, 2026-08-28 -- a positive control for the extraction at the model's operating point
+
+**Written before the control was run, with both outcomes interpreted in advance.**
+
+Seed 3 at step 60,000 fails P1, P2 and P3 on held-out data. Before that is reported as "the model
+does not learn a balance law", one alternative must be excluded: **the extraction may simply be
+underpowered at the model's operating point.** The ground-truth validation that justified the method
+ran at `LD = 3` (35 coefficients, 47,600 samples). The model runs at `LD = 12` (1,819 coefficients,
+~2,860 training samples) -- three orders of magnitude less favourable.
+
+### The control
+
+Take ground-truth states in the periodic coordinates `(cos th, sin th, thetadot)`, where the balance
+law is known and exactly representable, and **embed them in 12 dimensions with a random linear map**,
+then run the *identical* pipeline -- same PCA to `LD = 12`, same effective-rank basis, same degree-4
+`C` basis, same power-degree sweep, same held-out split, same trajectory and step counts as the
+analysis set.
+
+The embedding is information-preserving, so a method adequate at the model's operating point must
+still recover the law.
+
+### Registered interpretation, both directions
+
+- **Control RECOVERS the law** (`rho(C, H~) >= 0.8`, `rho(q, thetadot) >= 0.8`, held-out ratio
+  `>= 5x`): the extraction is adequate at `LD = 12` with this sample size, and F1's failure is a
+  property of **the model**, not the method. The negative stands as a finding.
+- **Control FAILS**: the extraction is underpowered at this operating point and **F1 is inconclusive,
+  not negative.** No claim about the model may be made from it; the honest report is that the method
+  does not scale to this latent dimension at this sample size, and F1 needs a lower-dimensional
+  extraction or more data before its question can be asked.
+
+Recording this before running so the outcome cannot be reinterpreted afterwards. The second outcome
+is the more damaging one for the F1 programme and it is registered as freely as the first.
