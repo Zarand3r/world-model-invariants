@@ -102,6 +102,13 @@ def run(ckpt, data, horizon, random_law=False, draw=0, tangent=False, eval_data=
 
     by_eps = {}
     for eps in EPS_GRID:
+        # The tangent control draws a fresh random direction at every step. That draw used to come
+        # from a bare `torch.randn_like`, so unlike the random-law null (seeded, line ~80) it was
+        # NOT reproducible: re-running gave different numbers, and the recorded `draw` index
+        # labelled the run without controlling it. Seeded here, and reset per eps so the same
+        # direction sequence is used at every step size -- which is what makes the eps comparison
+        # a comparison of magnitude rather than of magnitude confounded with direction.
+        tgen = torch.Generator().manual_seed(2000 + int(draw)) if tangent else None
         with torch.no_grad():
             h = hs[:, WARMUP].clone(); C0, _ = _C_and_grad((h - hm) @ P, coeffs); preds = []
             for _ in range(horizon):
@@ -114,7 +121,8 @@ def run(ckpt, data, horizon, random_law=False, draw=0, tangent=False, eval_data=
                     if tangent:
                         # equal-norm TANGENT control: a random direction with its normal
                         # component removed, so it cannot change C to first order
-                        rnd = torch.randn_like(z)
+                        rnd = torch.randn(z.shape, generator=tgen,
+                                          dtype=torch.float64).to(z.device, z.dtype)
                         rnd = rnd - (rnd * u).sum(-1, keepdim=True) * u
                         u = rnd / rnd.norm(dim=-1, keepdim=True).clamp_min(1e-12)
                         step = eps * u

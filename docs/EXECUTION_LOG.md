@@ -4598,3 +4598,84 @@ ever reappears in the paper and one asserting the prose's "one of three" matches
 count. **22/22 checks pass.** The evidence-base guard now reads E10b from the committed record.
 
 E10b was the last `n = 2` claim in the project. It is now n = 3 -- and negative.
+
+## 2026-08-28 -- **Provenance audit: 98 of 101 records had no recorded invocation; E9 reproduces; the tangent control did not**
+
+Loop iteration. No jobs running. One log matched a failure grep -- `runs/logs/e9.log`, a
+`RuntimeError: size of tensor a (200) must match tensor b (190)`. That is the historical horizon
+mismatch already fixed by clamping; the `_H190` filenames and the three intact `e9_disjoint_s*`
+records confirm it. No open failures.
+
+Continuing the reproducibility audit proposed at the end of the previous iteration. This is
+verification work under the standing instruction, not a new experiment, so no preregistration.
+
+### The audit, and my first two attempts at it being wrong
+
+First pass matched record filenames against script sources: 48 of 101 "orphans". Second pass with
+longest-prefix matching: 51. **Both were wrong**, and the way they were wrong is the finding. The
+second pass flagged `f4b_recovery.json` as an orphan -- a record I produced myself last session with
+`run_f4_recovery.py --out runs/f4b_recovery.json`. **32 scripts take `--out` on the command line**,
+so a record's filename never appears in any source file. Filename matching cannot detect provenance
+and the orphan counts are meaningless.
+
+The real measurement is simpler and worse:
+
+- **3 of 101 records carry a recorded invocation** (the three I stamped this session).
+- 32 analysis scripts take `--out`; only 6 write any provenance.
+- `docs/EXECUTION_LOG.md` contains **zero** recorded commands -- it stores prose.
+
+So for 98 of 101 records, the mapping from record back to (script, arguments) exists **nowhere in
+the repo**. E10b is the proven consequence, not a hypothetical one.
+
+### Fix: `latent_noether/provenance.py`, wired into eleven scripts
+
+Records argv, cwd, git HEAD, **git dirty state**, Python version, and the **sha256 of every
+path-like input**. Inputs are hashed rather than merely named because a path is not identity -- this
+project has already had checkpoints silently overwritten by an accidental retraining. Inputs are
+selected by file extension rather than by argument name, so it keeps working when a script grows a
+new flag. List-shaped records get a `.prov.json` sidecar, so raw rows stay byte-identical.
+
+Verified end to end on a **scratch copy** of the E18 record -- deliberately not the real one, since
+stamping it today would assert an invocation that did not produce its rows. argv, git state and four
+input hashes written; rows untouched.
+
+### E9 re-verification: the abstract's headline number reproduces
+
+Re-ran seed 3 to a **new path** (`e9_disjoint_s3_H190_verify.json`), leaving the original immutable.
+E9's record self-documents `ckpt`, `eval_data` and `horizon_used`, so unlike E10b its invocation was
+recoverable.
+
+| | original | re-run |
+|---|---|---|
+| recovered arm effect | **-75.92%** | **-75.92%** |
+| random null median | +8.78% | +8.78% |
+| random null range | [-16.27%, +20.84%] | [-16.27%, +20.84%] |
+| random draws beating recovered | **0/20** | **0/20** |
+
+The abstract's `55-76%` upper bound and its `0 of 60` null both reproduce. Residual differences are
+~1e-6 relative (`2.459409e-04` against `2.459418e-04`), i.e. GPU float non-determinism.
+
+### But the tangent control was not reproducible, and that is a real defect
+
+Tangent median moved **+2.72% -> +3.97%** across the two runs -- far outside the 1e-6 float floor.
+Cause: the random-law null draws from a **seeded** generator, but the tangent control used a bare
+`torch.randn_like`. Its recorded `draw` index labelled the run **without controlling it**, so the
+five "draws" were neither reproducible nor distinguishable.
+
+The paper cites **"0 of 15 equal-norm tangent directions"** in three places including the
+introduction. That verdict is a *counting* claim and it reproduced here -- tangent sits at `+2.7%`
+and `+4.0%` against the recovered arm's `-75.9%`, so 0 of 5 holds by an enormous margin either way.
+What was not reproducible is the specific values.
+
+**Fixed**: seeded from `draw`, and reset per `eps` so the same direction sequence is used at every
+step size -- which makes the eps sweep a comparison of magnitude rather than magnitude confounded
+with direction. Two runs at the same draw now agree to ~7 significant figures, i.e. down to the same
+float floor as the deterministic arms.
+
+**Existing tangent numbers in `runs/` predate this fix** and are reproducible only in distribution,
+not exactly. They are kept unchanged. The claim they support is unaffected.
+
+### Net
+
+Two reproducibility defects found and fixed; one headline claim (E9, in the abstract) independently
+re-derived and confirmed. No paper number changed.
