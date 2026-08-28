@@ -55,6 +55,14 @@
    "mse_zeros": 0.0038944047410041094,
    "ratio_true_over_shuffled": 0.7612145629482293,
    "ratio_true_over_zeros": 0.8677111150609688
+  },
+  {
+   "ckpt": "runs/f1_act_s5.pt",
+   "mse_true": 0.003212032141163945,
+   "mse_shuffled": 0.004338762257248163,
+   "mse_zeros": 0.0038188991602510214,
+   "ratio_true_over_shuffled": 0.7403107040027492,
+   "ratio_true_over_zeros": 0.8410884934057317
   }
  ],
  "provenance": {
@@ -146,6 +154,30 @@
      "runs/f1_act_s4.pt": {
       "sha256": "b1aaa0382fa6ca3267043f569c29e3634e433568c64dc0d2919a9ce40079dcaf",
       "mtime": "2026-08-28T20:05:00+00:00",
+      "bytes": 53830469
+     },
+     "runs/pendulum_actuated.npz": {
+      "sha256": "ea7b6c2e19522825188574425c85aca48ccbde520a31738c1a5821985f0b3583",
+      "mtime": "2026-08-28T16:44:03+00:00",
+      "bytes": 7269181
+     }
+    }
+   },
+   {
+    "argv": [
+     "scripts/run_f1_action_use.py",
+     "--ckpts",
+     "runs/f1_act_s5.pt"
+    ],
+    "cwd": "/home/rbao/world-model-invariants",
+    "utc": "2026-08-28T21:50:18+00:00",
+    "git": "3ac792b2b0485bcb99a6c9c77662eef5aa3cd94a",
+    "git_dirty": true,
+    "python": "3.13.13",
+    "inputs": {
+     "runs/f1_act_s5.pt": {
+      "sha256": "ce29356c326f1e24159287bfb20905d8aeb82a2034ad15fc60bd1480126bfc61",
+      "mtime": "2026-08-28T21:44:14+00:00",
       "bytes": 53830469
      },
      "runs/pendulum_actuated.npz": {

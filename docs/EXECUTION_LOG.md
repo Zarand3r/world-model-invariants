@@ -5491,3 +5491,53 @@ whose headline result had not been discovered yet.
 ### Net
 
 No experiment run, no paper number changed. 34/34 mechanical checks still pass.
+
+## 2026-08-28 -- **F1 training arm complete at n = 3; all three seeds accepted**
+
+Loop iteration. `run_f1_training.sh` reported `all seeds complete` at 21:44 UTC. No failures anywhere
+in `runs/logs/`.
+
+### Verification against `docs/F1_PREREG.md`
+
+The prereg specifies "3 independently trained seeds, step-capped exactly as in Stage 1, with the E8
+checkpoint grid". All three ran 60,000 optimizer steps on the guarded driver with the grid
+`{1k, 3k, 6.5k, 15k, 30k, 60k}`, and every seed passed every acceptance criterion:
+
+| seed | action use | raw KL | 1-step decode ratio | rollout |
+|---|---|---|---|---|
+| 3 | **0.746** | 1.20 | 0.004 | finite, std 0.0706 |
+| 4 | **0.791** | 1.11 | 0.004 | finite, std 0.0706 |
+| 5 | **0.791** | 1.21 | 0.004 | finite, std 0.0708 |
+
+### The one F1 result that *is* established, at n = 3
+
+Action-use measured independently on the final checkpoints (`run_f1_action_use.py`, 20-step open-loop
+rollout, true versus shuffled-across-trajectories actions):
+
+| seed | true / shuffled | true / zeros |
+|---|---|---|
+| 3 | 0.748 | 0.849 |
+| 4 | 0.761 | 0.868 |
+| 5 | 0.740 | 0.841 |
+
+**Median 0.748, range [0.740, 0.761], all three below the 0.9 bar.** The action-conditioned models
+demonstrably use their action input, and the effect is tight across seeds.
+
+The training-time trajectory (seed 3): `0.902 -> 0.813 -> 0.803 -> 0.739 -> 0.746 -> 0.748`. It
+improves to ~0.75 by step 15,000 and then **plateaus** -- the conditioning saturates well before the
+end of training rather than continuing to strengthen. Recorded because it bounds what the models
+could plausibly have learned about actuation: they use the action, but its influence on a 20-step
+rollout is a ~25% MSE effect, not a dominant one.
+
+### What remains blocked, unchanged
+
+The balance-law analysis is **not** run and F1 makes **no claim about the model**. The extractor is
+the established fault: the paper's validated search finds energy at `rho = 0.91` on the same latent
+where the balance fit returns 0.18. Redesigning it -- building the balance search inside the
+conserved basis `polynomial_invariants` produces, as `fit_hamiltonian_pair` is -- is a method
+redesign following three failed repairs, and that decision is Richard's.
+
+### Net
+
+F1's training arm is complete and fully accepted; one F1 finding (action-use, n = 3) is established;
+the balance question is untouched and remains open pending a design decision. No paper number changed.
