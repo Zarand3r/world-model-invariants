@@ -44,7 +44,7 @@ def main(a):
     while step < a.steps and (time.time() - t0) < a.max_hours * 3600:
         i = torch.randint(0, train.shape[0], (a.batch,), device=dev)
         t = torch.randint(0, train.shape[1] - a.seq, (1,)).item()
-        loss = model.loss(train[i, t:t + a.seq])
+        loss = model.loss(train[i, t:t + a.seq], open_loop=a.open_loop)
         opt.zero_grad(set_to_none=True); loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 100.0)
         opt.step(); step += 1
@@ -99,6 +99,8 @@ if __name__ == "__main__":
     p.add_argument("--batch", type=int, default=16)
     p.add_argument("--seq", type=int, default=64)
     p.add_argument("--lr", type=float, default=1e-4)
+    p.add_argument("--open-loop", type=int, default=8,
+                   help="steps of autonomous rollout in the loss; F4b raises this to 56")
     p.add_argument("--seed", type=int, default=3)
     p.add_argument("--out", default="runs/gru_ref_s3.pt")
     main(p.parse_args())

@@ -3850,3 +3850,65 @@ Either way, the honest scope is now: **an architecture whose transition is train
 under open-loop rollout develops a conserved quantity; one trained less so does not, or does so
 unreliably.** That is a weaker generality claim than "learned world models" and a more useful one
 than "DreamerV3".
+
+---
+
+## 2026-08-28 02:30–02:55 UTC — **E12c closes the dormant-pathway objection**
+
+Git at `dc4a007`. Preregistered in `docs/E12C_PREREG.md` before any quantity was computed.
+
+### The objection, and why the two earlier attempts did not close it
+
+Makelov, Lange & Nanda (ICLR 2024) show a subspace edit can produce the expected output change
+through a **dormant pathway the model does not normally use**. Level-set projection is a subspace
+intervention, so this has been the sharpest live objection to E1 and E4 since it was identified.
+
+**E12 failed as registered** — within-trajectory correlation had no power, because `C` varies by only
+3-4% of its across-trajectory spread inside a rollout. **E12b** gave on-pathway evidence but
+correlational. Neither performed an **interchange at depth**.
+
+### Design and result
+
+Roll autonomously for 50 steps, then set `C` to an independent donor's value by minimal displacement
+along the local normal, then roll free for 50 more. The distinction from E4 is the state being
+edited: E4 edits an **encoder-produced** state the model was trained to represent; E12c edits a state
+the model **reached on its own**, 50 steps into imagination. A dormant pathway should behave
+differently there.
+
+| seed | depth | Spearman(intended dC, realised dE) | random median | tangent median | controls beating |
+|---|---|---|---|---|---|
+| 3 | 0 | **+0.924** | +0.225 | -0.083 | 0/13 |
+| 3 | **50** | **+0.849** | +0.034 | +0.142 | **0/13** |
+| 4 | 0 | **+0.803** | -0.010 | -0.139 | 0/13 |
+| 4 | **50** | **+0.762** | +0.020 | +0.114 | **0/13** |
+| 5 | 0 | **+0.854** | +0.014 | -0.238 | 0/13 |
+| 5 | **50** | **+0.813** | -0.083 | -0.031 | **0/13** |
+
+Registered bar was `rho > 0.5` with a CI excluding 0, on all three seeds. **PASS at both depths on
+all three**, with 0 of 13 controls beating the recovered direction anywhere.
+
+The depth-0 values (+0.924/+0.803/+0.854) reproduce E4's independent measurement
+(+0.916/+0.838/+0.808), which is a useful internal consistency check across two separately written
+scripts.
+
+### What this establishes
+
+**The effect barely degrades with depth** — 0.92 -> 0.85, 0.80 -> 0.76, 0.85 -> 0.81. Editing the
+recovered subspace 50 steps into the model's own imagination steers its physics almost as well as
+editing a state produced by the encoder.
+
+That is the opposite of the dormant-pathway signature. A pathway reachable from encoder states but
+unused by the model's own dynamics would lose its effect precisely where E12c applies it. It does
+not, and the equal-norm tangent controls — which cannot change `C` to first order — sit at ~0 at both
+depths.
+
+**The Makelov objection is closed**, having been open since it was first identified and having
+survived two earlier attempts. It is the last of the three methodological gaps named in the venue
+assessment; E10 was shown unconstructable in its original form and answered obliquely by E10b, and
+E11 passed.
+
+### Scope
+
+Pendulum seeds 3/4/5 at step 6,500, 10 random and 3 tangent controls per seed per depth. The
+interpretation rule from `E4_PREREG` carries over unchanged: this shows the recovered **subspace** is
+causally deployed at depth, not that the model maintains an internal energy register.
