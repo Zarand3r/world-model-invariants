@@ -4186,3 +4186,51 @@ E18 --- a probe fitted to the true physical quantity at 0.9999 identifies a dire
 not use --- and that claim is untouched by F2.
 
 `docs/ROADMAP.md` F2 is marked **attempted and negative**, not pending.
+
+---
+
+## 2026-08-28 05:00–05:15 UTC — **F4b at n = 2: the conservation gap is not about training amount**
+
+Git at `7e6ebc3`. Both F4b seeds passed acceptance with rollout-motion ratios of 0.889 and 0.859.
+
+### Result
+
+| | open-loop steps | `|rho_E|` @60k | `rho_obs` @60k |
+|---|---|---|---|
+| F4 s3 | 8/64 | 0.9708 | 1.75 |
+| F4 s4 | 8/64 | 0.8879 | 5.33 |
+| F4 s5 | 8/64 | **0.1893** | 9.02 |
+| **F4b s3** | **56/64** | **0.9142** | **4.83** |
+| **F4b s4** | **56/64** | **0.9054** | **5.55** |
+| DreamerV3 RSSM, n = 3 | `kl_dyn`, every step | 0.930–0.973 | **6.3e-03 – 8.7e-03** |
+
+- open-loop 8: `rho_obs` median **5.33**, range [1.75, 9.02]
+- open-loop 56: `rho_obs` median **5.19**, range [4.83, 5.55]
+
+**Seven times more prior-training signal changed conservation by essentially nothing** — median 5.33
+to 5.19, against a registered threshold of 7e-02 that would have indicated training explains the gap.
+The measured value is **74x above** that threshold and the gap to the RSSM remains ~700x.
+
+**Registered verdict: architecture matters, not training amount.**
+
+### One thing longer training did fix
+
+Identification. F4's three seeds gave 0.971 / 0.888 / **0.189** — one outright failure. F4b's two give
+0.914 / 0.905, both clearing the 0.8 bar. More prior training makes the *search* more reliable while
+leaving what it finds no better conserved.
+
+That is coherent with everything else here: the search finds a well-conserved direction when one
+exists, and training the transition to roll out accurately makes the latent more consistent without
+making the transition conservative.
+
+### Scope, and the caveat that survives
+
+n = 2 on the F4b arm; seed 5 is training. The `F4B_PREREG` caveat stands and is not resolved by this
+result: an open-loop reconstruction term and a prior–posterior KL are different losses, not the same
+loss at different strengths. What has been ruled out is the **quantitative** explanation — that the
+ConvGRU simply received less prior training — since 7x more produced no movement. What remains
+possible is that some *other* property of the KL objective, rather than the categorical latent
+itself, is what produces conservation. That distinction is untested and the paper says so.
+
+`paper1.2/sections/boundaries.tex` already states "training the transition seven times longer did not
+close the gap"; that sentence was written from seed 3 alone and is now supported at n = 2.
