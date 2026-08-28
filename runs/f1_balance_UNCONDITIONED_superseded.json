@@ -1,0 +1,111 @@
+{
+ "models": [
+  {
+   "ckpt": "runs/f1_act_s3.pt",
+   "sweep": [
+    {
+     "power_degree": 1,
+     "n_power_terms": 12,
+     "residual_balance": 0.035134578141794374,
+     "residual_balance_in_sample": 0.00836415997323094,
+     "residual_conserved_only": 0.028836124694496264,
+     "residual_conserved_only_in_sample": 0.01193812149940879,
+     "ratio_vs_conserved": 0.8207334830696095,
+     "rho_C_energy": 0.7769744013523303,
+     "rho_power_thetadot": 0.5680432564619089,
+     "rho_conserved_only_energy": 0.38606723123351455
+    },
+    {
+     "power_degree": 2,
+     "n_power_terms": 90,
+     "residual_balance": 0.02433382197232474,
+     "residual_balance_in_sample": 0.00423118768911687,
+     "residual_conserved_only": 0.028836124694496264,
+     "residual_conserved_only_in_sample": 0.01193812149940879,
+     "ratio_vs_conserved": 1.1850224238219573,
+     "rho_C_energy": 0.782116566251468,
+     "rho_power_thetadot": 0.8141712674060859,
+     "rho_conserved_only_energy": 0.38606723123351455
+    },
+    {
+     "power_degree": 3,
+     "n_power_terms": 454,
+     "residual_balance": 0.019979508403475052,
+     "residual_balance_in_sample": 0.0026692647838744655,
+     "residual_conserved_only": 0.028836124694496264,
+     "residual_conserved_only_in_sample": 0.01193812149940879,
+     "ratio_vs_conserved": 1.4432849954146405,
+     "rho_C_energy": 0.7585834263886557,
+     "rho_power_thetadot": 0.428520716246007,
+     "rho_conserved_only_energy": 0.38606723123351455
+    },
+    {
+     "power_degree": 4,
+     "n_power_terms": 1819,
+     "residual_balance": 0.0853529933352775,
+     "residual_balance_in_sample": 1.1782854734333075e-08,
+     "residual_conserved_only": 0.028836124694496264,
+     "residual_conserved_only_in_sample": 0.01193812149940879,
+     "ratio_vs_conserved": 0.3378454998200739,
+     "rho_C_energy": 0.23719280753934194,
+     "rho_power_thetadot": 0.023431782598444844,
+     "rho_conserved_only_energy": 0.38606723123351455
+    }
+   ],
+   "random_residuals": [
+    0.38631176286057645,
+    0.34334903542361184,
+    0.5034512630345406,
+    0.4478981993425662,
+    0.3139535858142744,
+    0.3492267544938727,
+    0.4628965674462548,
+    0.5296075294475563,
+    0.39515580980707926,
+    0.4420970503451692,
+    0.4690864241205034,
+    0.4756755353086729,
+    0.45562929731586976,
+    0.42052411218751956,
+    0.36165614532968526,
+    0.3865353864847214,
+    0.4277852478919217,
+    0.37106411270687917,
+    0.4944590775575094,
+    0.48597247732825505
+   ],
+   "P1_pass": false,
+   "P2_pass": false,
+   "P3_pass": false,
+   "P4_pass": true
+  }
+ ],
+ "provenance": {
+  "runs": [
+   {
+    "argv": [
+     "scripts/run_f1_balance.py",
+     "--ckpts",
+     "runs/f1_act_s3.pt"
+    ],
+    "cwd": "/home/rbao/world-model-invariants",
+    "utc": "2026-08-28T18:40:55+00:00",
+    "git": "2b8a29ff808fbb9f09ce9a73c98fd103f1279aab",
+    "git_dirty": true,
+    "python": "3.13.13",
+    "inputs": {
+     "runs/f1_act_s3.pt": {
+      "sha256": "bc3b4c8156feaa4e0616d566c29c3a6ba67a2acdd2a5e883be7c4a6fb157f8f6",
+      "mtime": "2026-08-28T18:25:26+00:00",
+      "bytes": 53830469
+     },
+     "runs/pendulum_actuated.npz": {
+      "sha256": "ea7b6c2e19522825188574425c85aca48ccbde520a31738c1a5821985f0b3583",
+      "mtime": "2026-08-28T16:44:03+00:00",
+      "bytes": 7269181
+     }
+    }
+   }
+  ]
+ }
+}

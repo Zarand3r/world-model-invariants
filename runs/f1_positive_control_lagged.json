@@ -1,0 +1,60 @@
+{
+ "embed_dim": 32,
+ "seed": 0,
+ "sweep": [
+  {
+   "power_degree": 1,
+   "residual_balance": 0.2135014330285733,
+   "residual_conserved_only": 0.26592941559719646,
+   "ratio_vs_conserved": 1.2455626729287883,
+   "rho_C_energy": 0.077583333489924,
+   "rho_C_shadow": 0.07625136425571138,
+   "rho_power_thetadot": 0.2094656918990327
+  },
+  {
+   "power_degree": 2,
+   "residual_balance": 0.1862020408730664,
+   "residual_conserved_only": 0.26592941559719646,
+   "ratio_vs_conserved": 1.4281766964008737,
+   "rho_C_energy": 0.12756142713492385,
+   "rho_C_shadow": 0.13436854183046149,
+   "rho_power_thetadot": 0.033447900984991535
+  },
+  {
+   "power_degree": 3,
+   "residual_balance": 0.171752779835503,
+   "residual_conserved_only": 0.26592941559719646,
+   "ratio_vs_conserved": 1.5483267045336417,
+   "rho_C_energy": 0.018703682619850576,
+   "rho_C_shadow": 0.013453393123964529,
+   "rho_power_thetadot": 0.03711195526163736
+  },
+  {
+   "power_degree": 4,
+   "residual_balance": 0.14204590051368124,
+   "residual_conserved_only": 0.26592941559719646,
+   "ratio_vs_conserved": 1.872137208011739,
+   "rho_C_energy": 0.09012876709018654,
+   "rho_C_shadow": 0.09893340037292742,
+   "rho_power_thetadot": 0.03309216745117553
+  }
+ ],
+ "control_recovers": false,
+ "provenance": {
+  "runs": [
+   {
+    "argv": [
+     "scripts/run_f1_positive_control.py",
+     "--out",
+     "runs/f1_positive_control_lagged.json"
+    ],
+    "cwd": "/home/rbao/world-model-invariants",
+    "utc": "2026-08-28T18:58:11+00:00",
+    "git": "0d91115f7a1a338da52d0e00d7219b12ce2bfc15",
+    "git_dirty": true,
+    "python": "3.13.13",
+    "inputs": {}
+   }
+  ]
+ }
+}

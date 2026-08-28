@@ -5179,3 +5179,64 @@ same dissociation the paper documents for conservation, now under actuation.
 Because choosing between these changes what a claim asserts, and because the registered answer is
 the conservative one, this is Richard's call rather than mine. Seeds 4 and 5 continue regardless; the
 n = 3 read stands either way.
+
+### The positive control is not constructible by embedding, and `balance.py` had a conditioning bug
+
+Two attempts at the amendment-3/4 control both failed, for the same underlying reason.
+
+**Attempt 1 (random linear embedding)** collapsed to rank 3: a linear map cannot manufacture degrees
+of freedom the system does not have.
+
+**Attempt 2 (time-lagged coordinates, amendment 4)** reached rank 12 but recovered nothing
+(`rho(C, H~)` 0.08-0.13). Diagnosing that surfaced two separate problems:
+
+1. **A real bug in `latent_noether/balance.py`.** Degree-4 monomials over a 12-dimensional latent
+   span **~14 orders of magnitude** in column scale, giving **cond(T) = 9.9e38**. The residual ratio
+   could be made to read anything from **0.97x to 5445x** by changing the ridge alone, while
+   `rho(C, H~)` stayed below 0.1 throughout. `polynomial_invariants` already documents and solves
+   this -- "standardize features: raw monomials differ by orders of magnitude in scale", with a ridge
+   relative to the trace -- and `balance.py` **failed to carry that treatment over**. Fixed.
+   Ground-truth recovery is preserved after the fix (ratio 32-44x, `rho(C, H~)` 0.9999-1.0000).
+
+2. **The synthetic control is defective in principle.** Embedding 3 degrees of freedom into 32
+   dimensions and projecting to 12 creates **exact spurious linear invariants**. The paper's own
+   validated free-evolution search finds directions with invariance ratio **0.00e+00** on that
+   embedding while `rho(C, E)` is 0.13. No control built this way can validate anything.
+
+### Seed 3 recomputed with the fixed extractor
+
+The previously recorded numbers came from the unconditioned code and are superseded; the old record
+is kept as `runs/f1_balance_UNCONDITIONED_superseded.json` rather than deleted.
+
+| power degree | held-out residual | ratio | `rho(C, E)` | `rho(q, thetadot)` |
+|---|---|---|---|---|
+| 1 | 0.30470 | 1.1x | **0.1789** | 0.5277 |
+| 2 | 0.40085 | 0.8x | 0.0153 | 0.6106 |
+| 3 | 0.37060 | 0.9x | 0.1207 | 0.1316 |
+| 4 | 0.62230 | 0.5x | 0.0210 | 0.1473 |
+
+`P1 False, P2 False, P3 False, P4 False`. **The earlier "P1 passes, the model carries an energy-like
+scalar" was itself an artifact of the unconditioned fit** (`rho(C, E)` 0.777 -> 0.179). That claim is
+withdrawn; it was never asserted outside this log, having been flagged n = 1 throughout.
+
+### Registered verdict: F1 is INCONCLUSIVE
+
+Per amendments 3 and 4, a failed positive control means **no claim about the model may be made**. The
+control could not be built, so the two live explanations cannot be separated:
+
+- the model has not learned a balance law, or
+- the balance extraction does not work at `LD = 12` on a real latent.
+
+The extractor demonstrably recovers the law on rank-3 ground truth (`rho(C, H~) = 1.0000`) and
+demonstrably fails on the model. Nothing in between has been established.
+
+### Why I am stopping rather than patching further
+
+Three successive repairs -- power-basis degree, held-out evaluation, feature conditioning -- each
+fixed a real defect and none resolved the question. A fourth would be building the control out of
+`fit_hamiltonian_pair` on the actuated model rather than out of synthetic embeddings, which is a
+different experiment, not a repair. Continuing to patch a design that has failed three times is how a
+result gets manufactured.
+
+Seeds 4 and 5 continue training and cost nothing; the n = 3 read remains available once F1's analysis
+design is settled. **Nothing about F1 is claimed.**

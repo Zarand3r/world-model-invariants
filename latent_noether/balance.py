@@ -35,7 +35,7 @@ def _projector_complement(R: np.ndarray, rcond: float = 1e-10):
     return lambda X: X - Uk @ (Uk.T @ X)
 
 
-def fit_balance_pair(MZ: np.ndarray, MZn: np.ndarray, a: np.ndarray, MP=None, ridge: float = 1e-10):
+def fit_balance_pair(MZ: np.ndarray, MZn: np.ndarray, a: np.ndarray, MP=None, ridge: float = 1e-8):
     """Jointly fit (C, P). MZ/MZn are monomial features at z_t and z_{t+1}; `a` is the action.
 
     Returns dict with `c`, `q`, the balance residual, and the residual of the best CONSERVED scalar
@@ -50,12 +50,18 @@ def fit_balance_pair(MZ: np.ndarray, MZn: np.ndarray, a: np.ndarray, MP=None, ri
     # |rho(power coef, thetadot)| = 0.9973. `MP` defaults to MZ only to preserve the original call
     # signature; callers should pass a low-degree basis.
     MP = MZ if MP is None else np.asarray(MP, float)
-    # Centre the features. The constant monomial is exactly conserved and would otherwise be the
-    # trivial minimiser; centring removes it from contention along with any constant offset.
+    _mp_sd = MP.std(0, keepdims=True); _mp_sd[_mp_sd < 1e-12] = 1.0
+    # Centre AND STANDARDISE the features. Raw degree-4 monomials over a 12-dimensional latent span
+    # ~14 orders of magnitude in column scale, giving cond(T) ~ 1e39; the resulting eigenproblem is
+    # numerically meaningless, and the residual ratio could be made to read anything from 0.97x to
+    # 5445x by changing the ridge alone while recovering nothing. `polynomial_invariants` already
+    # documents and solves this ("raw monomials differ by orders of magnitude in scale"); this module
+    # failed to carry the treatment over. The ridge is likewise made RELATIVE to the trace, as there.
     mu = MZ.mean(0, keepdims=True)
-    MZc, MZnc = MZ - mu, MZn - mu
+    sd = MZ.std(0, keepdims=True); sd[sd < 1e-12] = 1.0
+    MZc, MZnc = (MZ - mu) / sd, (MZn - mu) / sd
     D = MZnc - MZc
-    R = a * (MP - MP.mean(0, keepdims=True))    # power basis: action times state monomials
+    R = a * ((MP - MP.mean(0, keepdims=True)) / _mp_sd)   # power basis, standardised too
 
     # GENERALISED eigenproblem, not an ordinary one. Minimising ||D c|| alone selects whichever
     # direction varies least in absolute terms -- a near-constant combination -- which on ground
@@ -63,7 +69,8 @@ def fit_balance_pair(MZ: np.ndarray, MZn: np.ndarray, a: np.ndarray, MP=None, ri
     # c' T c = 1 with T the total covariance makes the objective the *invariance ratio*: change under
     # the transition relative to the spread the scalar actually has. That is the same normalisation
     # the free-evolution search uses, so the P3 comparison stays like-for-like.
-    T = MZc.T @ MZc / max(len(MZc), 1) + ridge * np.eye(MZ.shape[1])
+    T = MZc.T @ MZc / max(len(MZc), 1)
+    T = T + ridge * float(np.trace(T)) / T.shape[0] * np.eye(T.shape[0])
     L = np.linalg.cholesky(T)
     Li = np.linalg.inv(L)
 

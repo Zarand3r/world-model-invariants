@@ -272,3 +272,38 @@ still recover the law.
 
 Recording this before running so the outcome cannot be reinterpreted afterwards. The second outcome
 is the more damaging one for the F1 programme and it is registered as freely as the first.
+
+---
+
+## Amendment 4, 2026-08-28 -- repairing the positive control so it reaches rank 12
+
+**The registered interpretation of amendment 3 is unchanged.** Only the control's *construction* is
+repaired, because as built it could not reach the operating point it was written to test.
+
+### Why the first control could not work
+
+Embedding `(cos th, sin th, thetadot)` through a random linear map preserves information but not
+rank: `effective_rank_basis` correctly collapsed it back to **3**, since a linear map cannot
+manufacture degrees of freedom the system does not have. The model's latent retains **12**.
+
+### The repair
+
+Build the control's latent from **time-lagged** ground-truth coordinates -- the state at
+`t, t-1, t-2, t-3`, giving 12 components. Lagged coordinates of a nonlinear system are *not*
+linearly dependent (`cos th_{t-1}` is a nonlinear function of the state at `t`), so the linear rank
+is genuinely higher while the information content is unchanged and the balance law remains exactly
+representable through the `t` block.
+
+This also matches the model more honestly than the first attempt: an RSSM's deterministic state
+encodes **history**, not the instantaneous physical state, so a lagged embedding is the closer
+analogue of what the model actually stores.
+
+### Interpretation, unchanged from amendment 3
+
+- **Control recovers** (`rho(C, H~) >= 0.8`, `rho(q, thetadot) >= 0.8`, held-out ratio `>= 5x`, at
+  the same power degree the model is read at): the extraction is adequate at rank 12 with ~2,860
+  training samples, and **F1's failure is a property of the model**. The negative stands.
+- **Control fails**: **F1 is inconclusive, not negative**, and no claim about the model is made.
+
+Registered before running, as before. Reported at power degrees 1 and 2, since the degree-1 read was
+calibrated at a 17x larger sample size and the rank-3 control recovered only at degree 2.
