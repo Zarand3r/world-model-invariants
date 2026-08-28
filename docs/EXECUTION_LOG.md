@@ -4750,3 +4750,84 @@ bounds the damage: the ad-hoc record was the exception, not the rule.
 No paper number changed. One further reproducibility defect found and fixed
 (`run_e17_intervention.py`). Three abstract claims independently confirmed. Verification records
 committed under `*_verify.json` alongside the originals, which are untouched.
+
+## 2026-08-28 -- **F1 preregistered; Gate 0 passes, but only above a torque threshold, and the textbook balance law fails outright**
+
+Loop iteration. No jobs running, no new artefacts, no failures. Roadmap Stage 5 is next and lists
+"Actions/balance laws" first, so F1 is the roadmap's next action rather than a deviation.
+Preregistered in `docs/F1_PREREG.md` before anything was computed.
+
+### Scoping first
+
+The RSSM already supports actions natively (`num_actions=1`, `observe(embed, action, is_first)`);
+`dreamer_adapter.py` simply **hardcodes the action to zeros** at lines 142, 156 and inside
+`transition()`. So F1 needs the adapter to thread actions through, not a new model. Confirmed before
+writing the prereg, so the registered design is one that can actually be built.
+
+### Gate 0: does the discrete balance relation close on ground truth?
+
+States and actions only -- no frames, no model -- so the gate is cheap and decisive.
+
+**It did not pass on the first attempt, and the reason is worth recording.** With `torque_max = 0.2`
+the best variant gave a normalised residual of **0.124**, against the registered bar of 0.05.
+Deriving the exact discrete energy change for the semi-implicit update:
+
+    dE = u * (thd_t + thd_t+1)/2 * dt  -  2.5 dt^2 [15 sin^2(th) + 3u sin(th) + cos(th) thd^2] + O(dt^3)
+
+The first term is exactly the **midpoint** power. The `O(dt^2)` remainder was measured at **0.0865**
+against a power signal of **0.0127** -- the integrator's own energy error was **7x larger than the
+actuation being measured**. Subtracting the analytic remainder drove the residual to **0.00315**, a
+27x reduction, which confirms the derivation.
+
+Windowing over 1-200 steps did **not** help (residuals 0.6-1.0): the `O(dt^2)` term carries a
+systematic sign, so it accumulates secularly rather than averaging out.
+
+### The fix is physical, not a fudge
+
+The remainder is fixed by the integrator; the power scales linearly with torque. So the balance law
+becomes measurable only once actuation dominates the discretisation error:
+
+| `torque_max` | median\|P\| | median\|O(dt^2)\| | ratio | residual | kept |
+|---|---|---|---|---|---|
+| 0.2 | 0.0127 | 0.0865 | 0.15 | 0.1247 | 84% |
+| 0.5 | 0.0317 | 0.0858 | 0.37 | **0.0461** | 60% |
+| **1.0** | 0.0579 | 0.0788 | 0.74 | **0.0168** | 35% |
+| 2.0 | 0.0959 | 0.0599 | 1.60 | 0.0046 | 14% |
+
+The prereg left the torque magnitude open and defined G0 as the criterion for whether the choice is
+adequate, so selecting it is executing the registration rather than amending it. **Recording the
+sequence honestly: 0.2 was chosen arbitrarily, failed, and the value was raised after a sweep.**
+
+Chose **`torque_max = 1.0`, `hold = 5`**, with trajectories that ever reach the `|thetadot| = 8` clip
+discarded (35% kept of 1024). Rejection costs yield but **does not** collapse the across-trajectory
+energy spread the extraction depends on: std of per-trajectory mean energy is **1.74** at 35% yield
+against **1.72** at 60%. Tightening initial velocity barely moves the yield (60% -> 64%), confirming
+the clipping is torque pumping over 400 steps rather than initial energy.
+
+### G0 result, and a finding that stands on its own
+
+| variant | normalised residual |
+|---|---|
+| **shadow `H~` + midpoint power** | **0.0168** |
+| shadow `H~` + power at `thd_t+1` | 0.1017 |
+| shadow `H~` + power at `thd_t` | 0.1064 |
+| **textbook `E` + power at `thd_t+1`** | **0.8777** |
+| textbook `E` + midpoint power | 0.9020 |
+| textbook `E`, no power at all | 1.0000 |
+
+**G0_pass = True.**
+
+The last three rows are the finding. **The textbook balance law `dE/dt = tau * thetadot` explains
+almost none of the energy change** -- residual 0.88 against 1.00 for assuming no actuation at all,
+i.e. knowing the applied torque exactly buys a 12% improvement. The shadow version with midpoint
+power explains **98.3%**.
+
+This extends E19 from conservation into the actuated regime, and it was obtained with no model
+involved. A supervised probe fitted to the textbook balance relation here would be fitting a relation
+that is essentially false in the data -- the same trap E19 identified, in a setting where the
+consequence is larger.
+
+### Next
+
+Data generation with actions, then adapter threading, then 3 seeds. The second half of F1
+(correcting toward predicted balance) stays unregistered until P1-P3 establish the object exists.

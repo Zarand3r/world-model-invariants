@@ -1,0 +1,46 @@
+{
+ "config": {
+  "n_traj": 1024,
+  "n_steps": 400,
+  "torque_max": 1.0,
+  "hold": 5,
+  "seed": 0,
+  "out": "runs/f1_gate0.json"
+ },
+ "n_kept": 356,
+ "energy_spread_across_traj": 1.7441314071361262,
+ "max_abs_thetadot": 7.9964879950404955,
+ "clip_fraction": 0.0,
+ "residuals": {
+  "textbook_E__power_at_thd_t": 0.9208993922583808,
+  "textbook_E__power_at_thd_t1": 0.8776860156487408,
+  "textbook_E__power_at_midpoint": 0.9019490320264211,
+  "textbook_E__no_power": 1.0,
+  "shadow_H__power_at_thd_t": 0.10637469908947356,
+  "shadow_H__power_at_thd_t1": 0.10165086813447921,
+  "shadow_H__power_at_midpoint": 0.016840852285125062,
+  "shadow_H__no_power": 1.0
+ },
+ "G0_pass": true,
+ "provenance": {
+  "runs": [
+   {
+    "argv": [
+     "scripts/run_f1_gate0.py",
+     "--n-traj",
+     "1024",
+     "--torque-max",
+     "1.0",
+     "--hold",
+     "5"
+    ],
+    "cwd": "/home/rbao/world-model-invariants",
+    "utc": "2026-08-28T16:18:44+00:00",
+    "git": "30910535f3c09ea1330dae97b02464b0c0dd876a",
+    "git_dirty": true,
+    "python": "3.13.13",
+    "inputs": {}
+   }
+  ]
+ }
+}
