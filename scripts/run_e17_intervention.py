@@ -69,6 +69,11 @@ def run(ckpt, data, horizon, b, random_law=False, draw=0, tangent=False, eval_da
 
     by_eps = {}
     for eps in EPS_GRID:
+        # Same defect the E1/E9 script carried: the tangent control drew from a bare
+        # `torch.randn_like`, so the recorded `draw` labelled the run without controlling it and the
+        # numbers were not regenerable. Seeded here, reset per eps so the sweep compares magnitude
+        # rather than magnitude confounded with direction.
+        tgen = torch.Generator().manual_seed(2000 + int(draw)) if tangent else None
         with torch.no_grad():
             h = hs[:, WARMUP].clone(); C0, _ = _C_and_grad((h - hm) @ P, coeffs); preds = []
             for _ in range(horizon):
@@ -77,7 +82,8 @@ def run(ckpt, data, horizon, b, random_law=False, draw=0, tangent=False, eval_da
                     z = (h - hm) @ P; Cv, g = _C_and_grad(z, coeffs)
                     u = g / g.norm(dim=-1, keepdim=True).clamp_min(1e-12)
                     if tangent:
-                        rnd = torch.randn_like(z)
+                        rnd = torch.randn(z.shape, generator=tgen,
+                                          dtype=torch.float64).to(z.device, z.dtype)
                         rnd = rnd - (rnd * u).sum(-1, keepdim=True) * u
                         u = rnd / rnd.norm(dim=-1, keepdim=True).clamp_min(1e-12)
                         step = eps * u

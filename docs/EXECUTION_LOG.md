@@ -4679,3 +4679,74 @@ not exactly. They are kept unchanged. The claim they support is unaffected.
 
 Two reproducibility defects found and fixed; one headline claim (E9, in the abstract) independently
 re-derived and confirmed. No paper number changed.
+
+## 2026-08-28 -- **All three remaining abstract claims re-derived; they reproduce. The unseeded-tangent defect is bounded to two scripts.**
+
+Loop iteration. No jobs running, no new artefacts, no failures in `runs/logs/`. Continuing the
+re-verification programme; this is verification under the standing instruction, not a new experiment,
+so no preregistration.
+
+### First: how widespread was the unseeded-tangent defect?
+
+Audited every analysis script for unseeded randomness rather than assuming last iteration's fix was
+the only site. Exactly **two** scripts used a bare `torch.randn_like`:
+
+- `run_e1_direction_matched_null.py` -- fixed last iteration.
+- `run_e17_intervention.py` -- **same defect, fixed now**, identically (seeded from `draw`, reset per
+  `eps`).
+
+`run_e4_dialing.py` (lines 83, 109, 114) and `run_e12c_interchange.py` (lines 50, 70, 80) were
+**already fully seeded by construction**, including their tangent draws. The defect is bounded and
+now closed.
+
+### Re-verification results
+
+Each re-run went to a **new path**, leaving the original record immutable.
+
+| claim (as stated in the abstract) | statistic | original | re-run |
+|---|---|---|---|
+| E9 -- drift cut on unseen trajectories | recovered effect | **-75.92%** | **-75.92%** |
+| | random draws beating it | 0/20 | 0/20 |
+| E4 -- setting `C` steers true energy | Spearman(intended d`C`, realised d`E`) | **+0.9161** | **+0.9161** |
+| | Spearman(realised d`E`, TRUE d`E`) | **+0.9137** | **+0.9137** |
+| | controls beating it | 0/25 | 0/25 |
+| E12c -- survives interchange at depth 50 | Spearman @ depth 0 | **+0.9239** | **+0.9239** |
+| | Spearman @ depth 50 | **+0.8487** | **+0.8487** |
+| | controls beating it | 0/13, 0/13 | 0/13, 0/13 |
+
+All three reproduce to every reported digit. Residual differences sit at ~1e-5 absolute, which is
+`3e-06` to `1.4e-05` of each array's own maximum -- the GPU float floor already seen in E9 -- with
+rank order preserved everywhere.
+
+### One diagnostic that misled me, recorded because it will mislead again
+
+E4's `a_realised_dE` showed a **max relative difference of 0.497**, which looks alarming next to a
+1e-6 float floor. It is an artifact of the metric: the worst element has magnitude `3.98e-07`,
+roughly six orders of magnitude below the array's median magnitude of `0.31`. Absolute differences
+are median `5.3e-07` and max `2.0e-05`, i.e. `7e-06` of the array's maximum, and the rank order is
+identical.
+
+**Max relative difference is the wrong diagnostic for an array whose values cross zero.** The right
+check is absolute difference normalised by the array's own scale, plus rank preservation. Used that
+for E12c and it behaved.
+
+### What the whole re-verification programme now shows
+
+Four headline records have been re-derived from scratch this session:
+
+| record | produced by | reproduces? |
+|---|---|---|
+| `e9_disjoint_s3_H190` | committed script | **yes** |
+| `e4_s3` | committed script | **yes** |
+| `e12c_interchange` | committed script | **yes** |
+| `e10b_matched_decodability` | **uncommitted ad-hoc script** | **no** (seed 0 failed; seed 1 reproduced) |
+
+The single failure is the single record produced by a script that was never committed. That is a
+clean empirical vindication of the provenance discipline rather than an argument for it, and it
+bounds the damage: the ad-hoc record was the exception, not the rule.
+
+### Net
+
+No paper number changed. One further reproducibility defect found and fixed
+(`run_e17_intervention.py`). Three abstract claims independently confirmed. Verification records
+committed under `*_verify.json` alongside the originals, which are untouched.
