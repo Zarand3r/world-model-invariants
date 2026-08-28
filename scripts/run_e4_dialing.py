@@ -36,6 +36,7 @@ from latent_noether.fit_cache import cached_fit
 from latent_noether.gauge import effective_rank_basis, pca_subspace
 from latent_noether.pixel_readout import decode_physics, energy
 from latent_noether.polynomial import monomial_features
+from latent_noether.provenance import attach, inputs_from_args
 
 DEGREE, LD, WARMUP = 4, 12, 10
 ANALYSIS = slice(204, None)
@@ -164,4 +165,6 @@ if __name__ == "__main__":
         out["random"].append(run(a.ckpt, a.data, a.horizon, True, dr)); save()
     for dr in range(len(out["tangent"]), a.n_tangent):
         out["tangent"].append(run(a.ckpt, a.data, a.horizon, tangent=True, seed=dr)); save()
+    attach(out, op, inputs=inputs_from_args(a))
+    op.write_text(json.dumps(out, indent=1) + "\n")
     print(f"wrote {op}")

@@ -20,6 +20,7 @@ from latent_noether.dreamer_adapter import DreamerV3Adapter
 from latent_noether.fit_cache import cached_fit
 from latent_noether.gauge import effective_rank_basis, pca_subspace
 from latent_noether.polynomial import monomial_features, polynomial_invariants
+from latent_noether.provenance import attach, inputs_from_args
 
 DEGREE, LD, WARMUP = 4, 12, 10
 ANALYSIS = slice(204, None)
@@ -79,4 +80,6 @@ if __name__ == "__main__":
         print(f"[E17] {ck}", flush=True)
         out["models"].append(run(ck, a.data, a.n_candidates))
         op.write_text(json.dumps(out, indent=1) + "\n")
+    attach(out, op, inputs=inputs_from_args(a))
+    op.write_text(json.dumps(out, indent=1) + "\n")
     print(f"wrote {op}")

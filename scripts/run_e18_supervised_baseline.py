@@ -18,6 +18,7 @@ from latent_noether.fit_cache import cached_fit
 from latent_noether.gauge import effective_rank_basis, pca_subspace
 from latent_noether.pixel_readout import decode_physics, energy
 from latent_noether.polynomial import monomial_features
+from latent_noether.provenance import attach, inputs_from_args
 
 DEG, LD, W, H = 4, 12, 10, 100
 ANALYSIS = slice(204, None)
@@ -113,4 +114,6 @@ if __name__ == "__main__":
         if ck in done or not pathlib.Path(ck).exists(): continue
         print(f"[E18] {ck}", flush=True)
         out["models"].append(run(ck, a.data, a.n_random)); op.write_text(json.dumps(out, indent=1) + "\n")
+    attach(out, op, inputs=inputs_from_args(a))
+    op.write_text(json.dumps(out, indent=1) + "\n")
     print(f"wrote {op}")

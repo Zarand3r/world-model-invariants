@@ -35,6 +35,7 @@ from latent_noether.dreamer_adapter import DreamerV3Adapter
 from latent_noether.gauge import effective_rank_basis, pca_subspace
 from latent_noether.fit_cache import cached_fit
 from latent_noether.polynomial import monomial_features
+from latent_noether.provenance import attach, inputs_from_args
 
 DEGREE, LD, WARMUP = 4, 12, 10
 DEPTH = 50                     # registered: k = 0..49, identical to E1's horizon
@@ -184,5 +185,7 @@ if __name__ == "__main__":
                 continue
             print(f"[B] {ck} draw {dr}", flush=True)
             out["B_random"].append(run(ck, a.conservative_data, True, dr, depth=a.depth)); save()
+    attach(out, op, inputs=inputs_from_args(a))
+    save()
     print(f"\nwrote {op}  A={len(out['A_conservative'])} B={len(out['B_random'])} "
           f"C={len(out['C_damped'])} D={len(out['D_untrained'])}")

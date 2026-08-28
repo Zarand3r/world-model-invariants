@@ -14,6 +14,7 @@ from latent_noether.fit_cache import cached_fit
 from latent_noether.gauge import effective_rank_basis, pca_subspace
 from latent_noether.pixel_readout import energy
 from latent_noether.polynomial import monomial_features
+from latent_noether.provenance import attach, inputs_from_args
 
 DEG, LD, W = 4, 12, 10
 ANALYSIS = slice(204, None)
@@ -87,4 +88,6 @@ if __name__ == "__main__":
         rec["degradation"] = rec["ood"]["rho_obs"] / rec["in_dist"]["rho_obs"]
         out["models"].append(rec)
         op.write_text(json.dumps(out, indent=1) + "\n")
+    attach(out, op, inputs=inputs_from_args(a))
+    op.write_text(json.dumps(out, indent=1) + "\n")
     print(f"wrote {op}")
