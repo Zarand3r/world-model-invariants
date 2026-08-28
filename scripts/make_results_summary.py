@@ -153,7 +153,9 @@ for s in (3, 4, 5):
 
 # ---- evidence-base guard ----
 section("Evidence base per claim (mechanical n-check)")
-print("This session recorded **five retractions**, every one from generalising an n = 1 observation.")
+print("This session recorded **eight corrections**. Six came from generalising an n = 1")
+print("observation; two came from re-reading what a statistic actually measures, and both of")
+print("those *removed* a stated weakness rather than narrowing a claim.")
 print("This table is generated from the run records so the evidence base behind each claim cannot")
 print("drift out of the prose. A claim resting on n = 1 is flagged, not omitted.\n")
 row("claim", "independent units", "n", "status")

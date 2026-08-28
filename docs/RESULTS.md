@@ -97,7 +97,9 @@ Source: `e4_s{3,4,5}.json`
 
 ## Evidence base per claim (mechanical n-check)
 
-This session recorded **five retractions**, every one from generalising an n = 1 observation.
+This session recorded **eight corrections**. Six came from generalising an n = 1
+observation; two came from re-reading what a statistic actually measures, and both of
+those *removed* a stated weakness rather than narrowing a claim.
 This table is generated from the run records so the evidence base behind each claim cannot
 drift out of the prose. A claim resting on n = 1 is flagged, not omitted.
 

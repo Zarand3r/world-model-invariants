@@ -4034,3 +4034,43 @@ substantially narrower claim than the paper currently makes and it must be state
 The residual caveat from `F4B_PREREG` stands: an open-loop reconstruction term and a prior-posterior
 KL are different losses, not the same loss at different strengths, so this narrows toward
 architecture without isolating it.
+
+---
+
+## 2026-08-28 03:55–04:10 UTC — Correctness and reproducibility audit
+
+Git at `79ce130`.
+
+| check | result |
+|---|---|
+| test suite | **51 passed** |
+| `docs/RESULTS.md` regenerates byte-identical from `runs/*.json` | **yes** |
+| immutable run records | 95 |
+| checkpoints, each carrying seed / steps / data path / data SHA-256 | 116 |
+| datasets | 9 |
+| preregistrations written before their results | 22 |
+| analysis scripts | 29 |
+| execution log | 4,036 lines |
+| commits | 62 |
+| uncommitted changes | 0 |
+
+**Preregistration-to-result traceability:** every prereg written this session has at least one
+matching run record. The three with none — `DISSIPATIVE`, `PHASE1`, `S4` — predate this session and
+belong to the original paper's work.
+
+**Documentation defect fixed.** The evidence-base guard's header text still read "five retractions".
+There have been **eight corrections**: six from generalising an n = 1 observation, and two from
+re-reading what a statistic actually measures — the bootstrap-invalidity finding and the
+`f_perp` mis-framing — both of which *removed* a stated weakness rather than narrowing a claim.
+Corrected in the generator so it regenerates accurately.
+
+**Known reproducibility caveats, all recorded in place:**
+
+1. Two central-arm checkpoints (step 3,000 and 6,500) were overwritten by an accidental retrain. Their
+   subspace values reproduce within 0.16; their joint-fit values do not. Marked illustrative, not
+   quotable. The degeneracy conclusion rests on steps 15,000/30,000/60,000, which were preserved.
+2. The pipeline is not bit-reproducible — GPU nondeterminism gives 9.0e-06 relative deviation, which
+   is 3.2e-09 in the reported statistic against effects of ~5e-04. Recorded so a re-run landing on
+   different final digits is not read as a defect.
+3. `runs/*.pt` and `runs/*.npz` are not committed (116 checkpoints, ~6 GB). Everything regenerates
+   from `docs/REPRODUCE.md` plus the scripts, and checkpoint provenance is recorded inside each file.
