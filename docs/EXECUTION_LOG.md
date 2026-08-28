@@ -4474,3 +4474,74 @@ This is now the third mechanical guard in the project, alongside the evidence-ba
 `make_results_summary.py` and the rollout-motion acceptance criterion in `train_gru_pendulum.py`.
 Every one of the three was added after a defect got past a manual reading, and every one has since
 caught something a manual reading missed.
+
+## 2026-08-27 -- **E10b at n = 3, and the ad-hoc seed-0 numbers do not reproduce**
+
+Loop iteration. No jobs running; `osc2d_ce_s2` finished (acceptance: raw KL 1.45 nats, 1-step decode
+MSE ratio 0.005, rollout finite, pixel std 0.0457 -- all OK). `E10B_PREREG` states the result is
+"reported as provisional **until central seed 2 finishes training**", so completing E10b was the
+registered next action and needed no new preregistration.
+
+### A reproducibility failure found first
+
+E10b's original n = 2 numbers were produced by an **ad-hoc script that was never committed**. A claim
+in the paper rested on code not in the repo. Wrote `scripts/run_e10b_matched_band.py` implementing
+the registered design exactly -- 150 candidates, band `|rho_E - ref| <= 0.10`, 20 stratified by
+quantiles of `log10(ratio)`, direction-matched at `eps = 0.02`, `H = 100` -- reusing the same
+direction-matched rollout code as E17/E18/E19.
+
+Every **deterministic selection quantity reproduces exactly**: band 147/150 (s0) and 148/150 (s1),
+reference `|rho_E|` 0.064 and 0.052, and every candidate's ratio and `rho_E` to four decimals. So the
+checkpoint, the data, the latent, the PCA frame and the candidate pool are all identical.
+
+**The repair values do not reproduce on seed 0.** Old vs new: `-5.1 -> +9.5`, `-17.2 -> -13.7`,
+`-10.8 -> -2.3`, `-9.9 -> +1.0`, `-7.4 -> +1.5`. PRIMARY Spearman **+0.707 -> +0.290**.
+
+Since the latent is bit-identical, the difference is entirely in the corrected rollout. A changed
+baseline was ruled out immediately: that would be a monotone transform and would leave Spearman
+unchanged. Tested four candidate update rules against the old numbers -- direction-matched,
+level-set projection at `alpha = 1.0` and `alpha = 0.5`, and `H = 200`. **None reproduces them**
+(e.g. rank 0: old `-5.1` against `+9.5`, `+12.9`, `+10.0`, `+38.0`).
+
+**Seed 1, however, reproduces well**: `+0.608` against the ad-hoc `+0.603`, and `-0.558` against
+`-0.638`, with band 148/150 matching. So the two ad-hoc runs were not consistent with each other, and
+seed 0 is the outlier. The committed implementation follows the prereg and reproduces seed 1; the
+uncommitted seed-0 rollout cannot be reconstructed and its numbers should not be trusted.
+
+### Result at n = 3
+
+| checkpoint | n | band | PRIMARY Spearman(ratio, repair) | 95% CI | CI excludes 0 | check Spearman(`rho_E`, repair) | recovered `C` repair |
+|---|---|---|---|---|---|---|---|
+| central s0 @ 60k | 20 | 147/150 | **+0.290** | [-0.175, +0.649] | **no** | -0.277 | **-16.6%** |
+| central s1 @ 30k | 20 | 148/150 | **+0.608** | [+0.226, +0.828] | **yes** | -0.558 | **-7.3%** |
+| central s2 @ 60k | 19 | **19/150** | **+0.189** | [-0.290, +0.593] | **no** | -0.214 | **-6.8%** |
+
+The prereg's registered falsifier for a relationship is **"a CI containing zero"**. It fires on
+**2 of 3 seeds**.
+
+### One caveat that is not a get-out but is real
+
+Seed 2's band is **19 of 150**, not ~148, because its reference `|rho_E|` is 0.111 rather than
+0.05-0.06. Its selected candidates span invariance ratios of only `1.8e-06` to `7.3e-04` -- under
+three orders of magnitude, against **five** on seeds 0 and 1. The design's whole point is to vary
+conservation widely at fixed decodability, and on seed 2 it barely varies conservation at all. So
+seed 2 is a **weak test**, and its null should not be weighted equally with a properly constructed
+one. That is a statement about constructibility, and it was not anticipated in the prereg.
+
+### What survives, and what does not
+
+**Survives.** The recovered `C` repairs on all three seeds (`-16.6%`, `-7.3%`, `-6.8%`), and the
+best-conserved in-band candidates still deliver the largest repairs on each seed individually
+(`-13.7%`, `-16.9%`, `-31.1%`, all at `|rho_E| <= 0.082`). The decodability check remains negative on
+all three, so the band does hold decodability roughly fixed.
+
+**Does not survive.** The paper currently states "repair magnitude tracks conservation (Spearman
+`+0.71` and `+0.60` on two models)". The `+0.71` is not reproducible and the correct figures are
+`+0.29`, `+0.61`, `+0.19`, with the CI excluding zero on one seed of three. **The claim as written
+overstates what the reimplementation supports and must be narrowed.**
+
+Because that is a change to what a claim asserts rather than a correction to a number, it is
+Richard's call, and I am pausing to ask rather than rewriting the claim unilaterally. Raw rows are
+committed immutably in `runs/e10b_matched_band.json` alongside the original
+`runs/e10b_matched_decodability*.json`, which are **kept, not deleted**, so the discrepancy stays
+inspectable.
