@@ -1,0 +1,58 @@
+{
+ "embed_dim": 32,
+ "seed": 0,
+ "sweep": [
+  {
+   "power_degree": 1,
+   "residual_balance": 0.5267871501854872,
+   "residual_conserved_only": 0.49943468524479034,
+   "ratio_vs_conserved": 0.9480768182536994,
+   "rho_C_energy": 0.43736162441716564,
+   "rho_C_shadow": 0.4419433859461456,
+   "rho_power_thetadot": 0.8766086937687008
+  },
+  {
+   "power_degree": 2,
+   "residual_balance": 0.032114030661380424,
+   "residual_conserved_only": 0.49943468524479034,
+   "ratio_vs_conserved": 15.551915314242965,
+   "rho_C_energy": 0.9858084616630899,
+   "rho_C_shadow": 0.9980948963190569,
+   "rho_power_thetadot": 0.9971047289762235
+  },
+  {
+   "power_degree": 3,
+   "residual_balance": 0.4892323898631649,
+   "residual_conserved_only": 0.49943468524479034,
+   "ratio_vs_conserved": 1.020853679341384,
+   "rho_C_energy": 0.4998005963730676,
+   "rho_C_shadow": 0.5088819413452642,
+   "rho_power_thetadot": 0.2686878483808309
+  },
+  {
+   "power_degree": 4,
+   "residual_balance": 0.22027084525340085,
+   "residual_conserved_only": 0.49943468524479034,
+   "ratio_vs_conserved": 2.267366272055831,
+   "rho_C_energy": 0.6855874712106099,
+   "rho_C_shadow": 0.6952489611236027,
+   "rho_power_thetadot": 0.2029702798842813
+  }
+ ],
+ "control_recovers": false,
+ "provenance": {
+  "runs": [
+   {
+    "argv": [
+     "scripts/run_f1_positive_control.py"
+    ],
+    "cwd": "/home/rbao/world-model-invariants",
+    "utc": "2026-08-28T18:41:56+00:00",
+    "git": "b211c2def1b52e3ea077f8cf9c8588eef6a627f9",
+    "git_dirty": true,
+    "python": "3.13.13",
+    "inputs": {}
+   }
+  ]
+ }
+}

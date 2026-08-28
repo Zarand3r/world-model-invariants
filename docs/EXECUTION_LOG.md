@@ -5103,3 +5103,79 @@ approximately conserved energy-like quantity even under actuation, and does not 
 negative, it bounds the method's generality, and it is what the roadmap's Stage 5 exists to find out.
 
 Nothing is concluded from one seed at half training.
+
+## 2026-08-28 -- **F1 seed 3 complete and failing; the positive control did not run at the model's operating point**
+
+Seed 3 finished all 60,000 steps and **passed every acceptance criterion**, including the new one:
+`action use: rollout MSE true/shuffled = 0.746 (OK)`, raw KL 1.20, 1-step decode ratio 0.004, rollout
+finite. Seed 4 training. Action-use across the full grid: 0.902, 0.813, 0.803, 0.739, 0.746, **0.748**
+-- it improved to ~0.75 by step 15,000 and then **plateaued**. Registered threshold (below 0.870) met.
+
+### Seed 3 at step 60,000, held out (n = 1, no claims)
+
+| power degree | held-out residual | ratio vs conserved | `rho(C, E)` | `rho(q, thetadot)` |
+|---|---|---|---|---|
+| **1** | 0.03513 | **0.8x** | **0.7770** | 0.5680 |
+| 2 | 0.02433 | 1.2x | 0.7821 | **0.8142** |
+| 3 | 0.01998 | 1.4x | 0.7586 | 0.4285 |
+| 4 | 0.08535 | 0.3x | 0.2372 | 0.0234 |
+
+`P1 False, P2 False, P3 False, P4 True`. `rho(C, E)` **fell** from 0.833 at step 30,000 to 0.777 at
+60,000 -- more training made the recovered scalar less energy-like.
+
+### The positive control failed, but not for the registered reason
+
+Amendment 3 embedded ground truth in 12 dimensions and ran the identical pipeline. **It did not
+test what it was designed to test**: `effective_rank_basis` collapsed the embedding back to **3
+dimensions**, because the ground-truth system genuinely has 3 degrees of freedom. The model's latent
+retains **12**. The two operating points cannot be matched by embedding, since the true system does
+not have 12 degrees of freedom to give.
+
+What the control did show, at matched sample size (2,860 train / 2,860 held out):
+
+| power degree | ratio | `rho(C, H~)` | `rho(q, thetadot)` |
+|---|---|---|---|
+| 1 | 0.95x | 0.4419 | 0.8766 |
+| **2** | **15.55x** | **0.9981** | **0.9971** |
+| 3 | 1.02x | 0.5089 | 0.2687 |
+| 4 | 2.27x | 0.6952 | 0.2030 |
+
+So the extraction **is** capable of recovering a balance law from 2,860 samples -- at power degree 2.
+Degree 1 worked only at the 17x larger sample size the original ground-truth validation used, so the
+registered "read P1-P3 at degree 1" was calibrated at an operating point the model never occupies.
+
+### Exploratory LD sweep (labelled exploratory; not a registered read)
+
+Since the control could not be matched by embedding, the complementary check is to move the *model*
+toward the control's operating point.
+
+| LD | pdeg 1 ratio | pdeg 2 ratio | best `rho(C, E)` | best `rho(q, thetadot)` |
+|---|---|---|---|---|
+| 3 | 1.00x | 1.01x | 0.082 | 0.122 |
+| 4 | 0.98x | 0.98x | 0.100 | 0.051 |
+| 6 | 0.98x | 1.09x | 0.378 | 0.429 |
+| 8 | 1.01x | **1.33x** | **0.852** | 0.746 |
+| 12 | 0.82x | 1.19x | 0.782 | **0.814** |
+
+**The ratio never exceeds 1.33x at any latent dimension or power degree.** Lowering `LD` does not
+rescue F1; it makes identification worse, because the model needs 8-12 components before its latent
+carries energy at all (`rho(C, E)` 0.08 at `LD = 3`, 0.85 at `LD = 8`).
+
+### Where this leaves F1, and the decision I am not making unilaterally
+
+Two readings are on the table and the registration points at the more conservative one:
+
+- **Inconclusive**, per amendment 3 as written: the control failed at the registered degree, so no
+  claim about the model may be made.
+- **Negative**, on the weight of evidence: at the configuration where the control *does* recover a
+  balance law (15.55x), the model's best configuration anywhere in the sweep gives 1.33x. The method
+  demonstrably detects balance laws at this sample size; the model does not present one.
+
+The second reading is the more interesting one and it would **extend rather than bound** the paper's
+thesis: the model carries an energy-like coordinate (`rho(C, E)` up to 0.85) while its transition
+does not implement the balance relation for it -- decodability without dynamical correctness, the
+same dissociation the paper documents for conservation, now under actuation.
+
+Because choosing between these changes what a claim asserts, and because the registered answer is
+the conservative one, this is Richard's call rather than mine. Seeds 4 and 5 continue regardless; the
+n = 3 read stands either way.
