@@ -3980,3 +3980,57 @@ This is the eighth correction of the session and the second that **removes** a s
 than narrowing a claim. Both removals came from re-reading what a statistic actually measures — the
 sample-size withdrawal came from noticing bootstrap is invalid for a within-versus-across variance
 decomposition, and this one from noticing the invariance ratio *is* normal error.
+
+---
+
+## 2026-08-28 03:40–03:55 UTC — **F4b, seed 3: more prior training does not close the conservation gap**
+
+Git at `75389c3`. F4b seed 3 trained with open-loop 56/64 (against F4's 8/64) and passed acceptance
+with a **better** rollout-motion ratio than F4 (0.889 against 0.772), confirming the transition is
+more thoroughly trained.
+
+### Result, seed 3 only
+
+| | open-loop steps | `|rho_E|` @60k | `rho_obs` @60k |
+|---|---|---|---|
+| F4 ConvGRU, seed 3 | 8 / 64 | 0.9708 | **1.75** |
+| **F4b ConvGRU, seed 3** | **56 / 64** | 0.9142 | **4.83** |
+| DreamerV3 RSSM, n = 3 | `kl_dyn`, every step | 0.930-0.973 | **6.3e-03 – 8.7e-03** |
+
+**Registered threshold was `rho_obs < 7e-02` for "training explains the gap".** Measured 4.83, which
+is **69x above** it. On the registered criterion: **architecture matters, not training amount.**
+
+Seven times more prior-training signal moved `rho_obs` from 1.75 to 4.83 — in the **wrong
+direction**, and nowhere near the RSSM. My registered prediction was "partial closure"; there was no
+closure at all.
+
+### Stated at n = 1, deliberately
+
+F4's three seeds spanned `rho_obs` 1.75-9.02. F4b's seed 3 at 4.83 sits **inside that range**, so at
+n = 1 I cannot distinguish "longer training made it worse" from "seed noise". Seeds 4 and 5 are
+training.
+
+What n = 1 **does** support, because the effect size dwarfs the seed spread: **7x more prior training
+did not move `rho_obs` within two orders of magnitude of the RSSM.** The gap is ~660x and the entire
+F4 seed range spans only 5x. Whatever produces the RSSM's conservation, it is not simply how many
+steps the transition is trained over.
+
+Given this session's record — seven claims stated from one seed and later narrowed — the directional
+conclusion is recorded and the magnitude claim waits for n = 3.
+
+### Identification is unaffected
+
+`|rho_E|` stays 0.91-0.96 across F4b's checkpoints, in line with F4's seeds 3 and 4. The split
+established in F4 holds: **identification transfers across architectures; conservation does not**,
+and now, does not transfer even when the transition is trained far more heavily.
+
+### What this leaves
+
+If seeds 4 and 5 confirm, the honest scope becomes: **the conserved quantity is a property of
+DreamerV3's RSSM specifically** — its categorical stochastic latent with KL balancing — rather than
+of learned pixel world models, or of any model whose transition is trained to roll out. That is a
+substantially narrower claim than the paper currently makes and it must be stated plainly.
+
+The residual caveat from `F4B_PREREG` stands: an open-loop reconstruction term and a prior-posterior
+KL are different losses, not the same loss at different strengths, so this narrows toward
+architecture without isolating it.
