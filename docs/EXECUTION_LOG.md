@@ -4446,3 +4446,31 @@ Figure 2 took three render-inspect cycles, each one finding a collision invisibl
 the legend sat on the data; then the blue reference line struck through the legend; then the
 relocated legend landed on the `label-free C` annotation. All three were only visible on sight, and
 the last two only at full page scale rather than at figure scale.
+
+## 2026-08-27 -- A mechanical number check for the paper, and the third defect it found
+
+Three number defects reached `paper1.2` in a single day, none catchable by reading prose:
+
+1. **An overclaim** -- "the supervised probe increases drift on 3 of 3 models" when one seed reduces
+   it by 0.3%. Caught only because Figure 1 was rendered and looked at.
+2. **A flattering-seed quote** -- the E19 wrong-sign control written as `14x`, which is seed 3 of
+   (14.07, 9.99, 12.41). Caught only because the numbers happened to be re-traced afterwards.
+3. **An arithmetic slip** -- the F4b degradation factor written as `768x`. The exact ratio is
+   `5.257452 / 0.00685090 = 767.41`, which rounds to **767**. Caught by the check below.
+
+Added `scripts/verify_paper_numbers.py`: it recomputes each headline number from `runs/*.json`,
+formats it exactly as the paper states it, and greps the `.tex` sources for that literal string. A
+FAIL means prose and run records have drifted; it does not say which is wrong. It also carries a
+standing overclaim guard that fails if the corpus ever again asserts the supervised probe increases
+drift "on 3 of 3" while the record says 2 of 3.
+
+17/17 checks pass after fixing `768 -> 767` in `dissociation.tex`, `introduction.tex`,
+`boundaries.tex` and `CLAIMS.md`.
+
+**Correction to the entry above** ("F4b at n = 3"): that entry states the gap as `768x`. The correct
+value is `767x`. The log is append-only, so the error stands there with this correction attached.
+
+This is now the third mechanical guard in the project, alongside the evidence-base seed counter in
+`make_results_summary.py` and the rollout-motion acceptance criterion in `train_gru_pendulum.py`.
+Every one of the three was added after a defect got past a manual reading, and every one has since
+caught something a manual reading missed.
