@@ -3524,3 +3524,64 @@ may not be separable by this design **on any system where the model has learned 
 
 `docs/RESULTS.md` regenerated: **ten claims, all at n >= 2, nine at n >= 3.** No claim is flagged
 DO NOT GENERALISE.
+
+---
+
+## 2026-08-28 00:35–01:00 UTC — **F4 launched: a second world-model family**
+
+Git at `bf96a36`. Preregistered in `docs/F4_PREREG.md` before any F4 model was trained.
+
+### Why now
+
+`docs/ROADMAP.md` gates F4 on its own condition — *"after the phenomenon is established in a second
+physical system"* — and the 2-DoF system is now established at n = 3 across recovery, repair and
+disjoint evaluation. F4 is therefore in order, not a jump ahead of it.
+
+It is also the largest remaining gap for a main-track submission. Every result in this project comes
+from **one architecture**, and the obvious reviewer question is whether the recovered invariant is a
+property of *learned world models* or of *DreamerV3's particular latent design*.
+
+### The contrast
+
+`latent_noether/gru_world_model.py` — a **deterministic conv-GRU autoencoder**: conv encoder -> GRU
+-> conv decoder, pure reconstruction loss. **No stochastic latent, no KL, no unimix, no free bits.**
+Every mechanism that makes an RSSM an RSSM is removed.
+
+| | DreamerV3 RSSM | ConvGRU |
+|---|---|---|
+| parameters | 13.5M | **5.7M** |
+| recurrent state | 512 | **512** (matched) |
+| stochastic latent | 32x32 categorical | none |
+| KL / unimix / free bits | yes | none |
+
+The recurrent state is matched at 512 so `LD = 12` means the same thing in both and the extraction
+operates on a latent of the same dimensionality. Parameter count is **not** matched — matching it
+would require changing the architecture, which is the thing under test — and is reported instead.
+
+The interface is exactly `encode` / `transition` / `readout_from_h`, so **every analysis script runs
+unchanged**. Any difference in result is attributable to the architecture and not to the measurement.
+
+### The test that matters most, written before training
+
+`tests/test_gru_world_model.py` pins the **timing convention**: state `k` must have consumed
+`obs[:k]`, so `readout_from_h(h[k])` is a one-step-ahead *prediction*, not an autoencoding. Getting
+this wrong would make every downstream number measure reconstruction rather than dynamics, and it is
+invisible from the numbers alone — which is exactly why the DreamerV3 adapter carries the same test,
+and why REPRODUCE.md records that two adapter bugs of this kind once presented as *model* failure.
+
+The test perturbs `obs[0]` and asserts `h[0]` is unchanged while `h[1]` is not. **3 passed.**
+
+### Registered falsifier, restated because it is the informative outcome
+
+If recovery **fails** on a model that passes the acceptance checks, the invariant is a property of
+the RSSM's latent structure rather than of learned world models generally, and **every claim in this
+project must be qualified to that architecture**. That is a significant negative result and will be
+reported as one.
+
+### Status
+
+Three seeds training on the pendulum under the identical step-capped contract (60,000 steps, same
+milestone grid, same M29 provenance). The ConvGRU trains ~5x faster than the RSSM — 4,000 steps in
+1.1 minutes — so all three seeds complete in under an hour rather than 4.5 hours.
+
+Central seed 2 continues in parallel; step-capping keeps the contention irrelevant to results.
