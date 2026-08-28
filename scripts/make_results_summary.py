@@ -206,7 +206,7 @@ CLAIMS = [
     ("OOD decodable-but-not-conserved (E14b)", "model seeds",
      ["e14b_ood_conservation.json"]),
     ("E10b conservation at matched decodability", "model seeds",
-     ["e10b_matched_decodability.json"]),
+     ["e10b_matched_decodability.json", "e10b_matched_decodability_s1.json"]),
 ]
 for name, unit, files in CLAIMS:
     n = _n_seeds(files)

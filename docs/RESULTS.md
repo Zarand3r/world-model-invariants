@@ -112,7 +112,7 @@ drift out of the prose. A claim resting on n = 1 is flagged, not omitted.
 | 2-DoF repair at convergence | model seeds | 3 | n>=3 |
 | Two-invariant degeneracy (central arm) | model seeds | 3 | n>=3 |
 | OOD decodable-but-not-conserved (E14b) | model seeds | 3 | n>=3 |
-| E10b conservation at matched decodability | model seeds | 1 | **n=1 — DO NOT GENERALISE** |
+| E10b conservation at matched decodability | model seeds | 2 | n=2 — provisional |
 
 ---
 

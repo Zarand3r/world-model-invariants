@@ -3479,3 +3479,48 @@ A mechanical check written two iterations ago to catch **under-powered claims** 
 **missing run record**, which is a different failure and one I would not have found by reading the
 log. That is an argument for the check being mechanical rather than a matter of discipline: it does
 not know what it is looking for, so it finds things the author was not looking for.
+
+---
+
+## 2026-08-28 00:10–00:35 UTC — **E10b replicates at n = 2, and so does its confound**
+
+Git at `15163e7`. Central seed 2 training at step 14,000.
+
+| | central s0 @ 60k | **central s1 @ 30k** |
+|---|---|---|
+| reference `|rho_E|` | 0.064 | 0.052 |
+| band size | 147 / 150 | **148 / 150** |
+| `rho_E` range in selection | [0.000, 0.112] | **[0.000, 0.075]** |
+| ratio range | 4.1e-06 – 9.3e-01 | **9.2e-06 – 9.4e-01** |
+| **PRIMARY Spearman(ratio, repair)** | **+0.707** | **+0.603** |
+| registered check Spearman(`|rho_E|`, repair) | -0.621 | **-0.638** |
+| best repair in selection | -17.2% | **-20.6%** |
+
+**The result replicates**: among candidates with essentially no energy correlation, better-conserved
+ones repair better, and the best delivers -20.6% at `|rho_E| = 0.075`.
+
+**The confound replicates too**, at almost the same magnitude (-0.638 against -0.621). That is worth
+more than a repeated caveat. A confound that reproduces this precisely across two independently
+trained models is not sampling noise — it says that **within this latent, conservation quality and
+energy correlation are intrinsically linked**: the better-conserved candidates systematically retain
+slightly more energy correlation, even at `rho_E` values of 0.05-0.11.
+
+That is arguably the substantive finding rather than a nuisance. On a system whose transition
+conserves energy, the well-conserved directions in the latent *are* the energy-like ones — which is
+why E10's original form could never be constructed on the pendulum (1 of 250 candidates above
+`rho_E` 0.3) and why the matched band here can only be built at low decodability. The two properties
+may not be separable by this design **on any system where the model has learned the physics**.
+
+### What can be claimed, at n = 2
+
+- Conservation quality tracks repair magnitude across five orders of magnitude of invariance ratio,
+  at `|rho_E| <= 0.11`, on two independently trained models.
+- The separation between conservation and decodability is **not clean**, and the residual coupling is
+  reproducible rather than incidental.
+- E10 in its original high-decodability form remains **unconstructed on any system tested**, and this
+  entry now offers a structural reason why it may be unconstructable in principle here.
+
+### Evidence base
+
+`docs/RESULTS.md` regenerated: **ten claims, all at n >= 2, nine at n >= 3.** No claim is flagged
+DO NOT GENERALISE.
