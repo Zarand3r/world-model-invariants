@@ -5593,3 +5593,30 @@ Paper recompiles at 14 pages with no errors; the three regenerated appendix figu
 but the build is unchanged; archive rebuilt and re-verified in a clean extraction (14 pages, 0
 errors); **34/34 mechanical checks pass**; `paper/` restored to its committed state apart from the
 intentional README warning.
+
+## 2026-08-28 -- **No-op iteration: nothing to run, and the previous repair verified**
+
+Loop iteration, recorded because a log that only contains eventful iterations misrepresents the pace
+of the work.
+
+**(1) Jobs and logs.** No processes running. No log file modified since the previous entry. All F1
+training complete; seeds 3, 4 and 5 accepted.
+
+**(2) Artefacts to verify.** None new. Working tree clean.
+
+**(3) Next roadmap action.** None available without a decision. The execution-status table added
+earlier today records every planned item as DONE, NEGATIVE, WITHDRAWN, NOT CONSTRUCTIBLE, or -- for
+F1 -- IN PROGRESS with its analysis blocked on a method-design decision that is Richard's. The
+remaining unattempted items (F3, contacts, multiple objects, a downstream planner demonstration) are
+all substantial new experiments requiring approval rather than continuations.
+
+**What was checked instead.** The previous iteration fixed a defect I had introduced -- a generator
+writing the current manuscript's figures into the superseded manuscript's directory. Verified that
+repair rather than assuming it: `paper/` builds clean at 10 pages, all five of its original figures
+are present under their original names, and `git diff` against HEAD is empty apart from a rebuild of
+`main.pdf` (identical size), which was restored.
+
+**Assessment, recorded honestly.** The last two iterations produced no new evidence. One found real
+documentation defects; the other's main finding was damage traceable to my own earlier edit.
+Continuing to wake every 30 minutes with no decision pending is now more likely to generate churn
+than findings, and that has been communicated. **Nothing was invented to fill this iteration.**
