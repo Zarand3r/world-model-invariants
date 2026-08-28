@@ -5240,3 +5240,65 @@ result gets manufactured.
 
 Seeds 4 and 5 continue training and cost nothing; the n = 3 read remains available once F1's analysis
 design is settled. **Nothing about F1 is claimed.**
+
+## 2026-08-28 -- **The paper's extraction is sound; F1's failure is the extractor, established without a control**
+
+Loop iteration. Seed 4 at step 26,000. The F1 control-design decision is still with Richard, so no
+F1 patching; instead audited the conditioning question the `balance.py` bug raised.
+
+### The paper's core extraction is well-conditioned -- verified, not assumed
+
+`balance.py` had `cond(T) = 9.9e38` because it used raw monomials. The obvious worry is whether the
+paper's own extraction shares the defect, since it uses the same degree-4 / `LD = 12` basis. It does
+not:
+
+- `polynomial_invariants` standardises features, uses a ridge **relative to the trace**, and
+  **escalates it up to 12 times** if the Cholesky fails.
+- Critically, it returns `c_raw = c_std / sd` -- coefficients converted **back to raw monomial
+  space** -- so every consumer applying them to raw `monomial_features` is consistent.
+- `fit_hamiltonian_pair` searches inside that conserved basis, so it inherits the conditioning.
+
+**Confirmed numerically:** the pair-fit on `dreamer_ref_s3_step6500` gives `|rho(C, E)| = 0.9730`,
+which is exactly the value E18 records for that seed. The paper's pipeline reproduces from a cold
+start.
+
+### My probe from the previous iteration was wrong, and its number is withdrawn
+
+That iteration reported "free model, free data (control) = 0.5776" and read it as a warning sign. It
+was **my probe that was broken**: I applied the returned coefficients to *standardised* features when
+`polynomial_invariants` already converts them to raw space. Applied correctly the same model gives
+**0.9730**. The 0.5776 figure is withdrawn; it was never used for any claim.
+
+### And this settles F1's inconclusive-versus-negative question, without a control
+
+Running the paper's **validated** extraction on the F1 actuated model's own latent:
+
+| | pair-fit `\|rho(C, E)\|` | best eigen-candidate |
+|---|---|---|
+| free model (paper's setting) | **0.9730** | 0.9623 |
+| **F1 actuated model** | 0.7196 | **0.9107** |
+
+**The F1 latent contains an energy-correlated direction at `rho = 0.9107`.** The balance extractor,
+on that same latent, returned `rho(C, E) = 0.179`. The energy is there and the balance code cannot
+find it.
+
+That is direct evidence for the branch amendments 3-4 could not reach: **F1's failure is a property
+of the extraction, not of the model.** It is stronger evidence than the synthetic control would have
+given, because it uses the real latent and a tool already validated across the whole paper, rather
+than an embedding that turned out to admit spurious exact invariants.
+
+**F1 remains not-a-negative-about-the-model.** What has changed is that the reason is now identified
+rather than merely suspected, and it points at a concrete fix: the balance search should be built
+*inside* the conserved basis that `polynomial_invariants` already produces -- which is exactly how
+`fit_hamiltonian_pair` is built, and why that one works -- rather than as a from-scratch eigenproblem
+over raw monomials.
+
+Not building that unilaterally: it is a method redesign following three failed repairs, and the
+decision to attempt it rather than park F1 is Richard's. Recorded here so the evidence is in place
+whenever that call is made.
+
+### Net
+
+No paper number changed; one paper-critical piece of machinery audited and confirmed sound; one of my
+own previously-logged numbers withdrawn; F1's failure attributed with evidence rather than left
+ambiguous.
