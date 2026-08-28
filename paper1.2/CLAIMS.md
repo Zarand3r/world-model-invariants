@@ -39,7 +39,7 @@ dynamics do not use.
 **Decisive evidence.** E18: a supervised polynomial probe fitted to true energy reaches
 `|rho_E| = 0.9999` and is **6.3x less conserved** by the transition than the label-free scalar
 (4.58e-02 vs 7.26e-03); enforcing it **harms** rollouts (+20.0%) where enforcing the label-free
-scalar repairs them (-41.8%). 3/3 seeds, all three registered predictions passed.
+scalar repairs them (median -42.2%, per-seed -50.9/-42.2/-32.2). 3/3 seeds, all three registered predictions passed.
 
 **Supporting, each an independent axis:** untrained models (`rho_obs` 74x worse at `rho_E` up to
 0.908); out of distribution (free probe 0.999, conservation 55-267x worse); a second architecture
@@ -112,5 +112,5 @@ general. The supportable scope is RSSM-like models, in-distribution.
 
 `probe finds it -> operator says the model does not use it -> intervening confirms the operator`.
 Panel A: supervised probe `rho_E` 0.9999 vs label-free 0.956. Panel B: `rho_obs` 4.58e-02 vs
-7.26e-03. Panel C: repair +20.0% vs -41.8%. One figure, one message: the right answer, fitted
+7.26e-03. Panel C: repair +26.8% vs -42.2% (medians; supervised is +26.8/+33.4/-0.3 per seed -- it never repairs, but it only *increases* drift on 2 of 3). One figure, one message: the right answer, fitted
 perfectly, does not work.

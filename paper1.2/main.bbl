@@ -1,0 +1,152 @@
+\begin{thebibliography}{23}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Alain and Bengio(2017)]{alain2017probing}
+Guillaume Alain and Yoshua Bengio.
+\newblock Understanding intermediate layers using linear classifier probes.
+\newblock In \emph{ICLR Workshop}, 2017.
+
+\bibitem[Alet et~al.(2021)Alet, Doblar, Zhou, Tenenbaum, Kawaguchi, and
+  Finn]{alet2021noether}
+Ferran Alet, Dylan Doblar, Allan Zhou, Joshua Tenenbaum, Kenji Kawaguchi, and
+  Chelsea Finn.
+\newblock Noether networks: Meta-learning useful conserved quantities.
+\newblock In \emph{Advances in Neural Information Processing Systems}, 2021.
+
+\bibitem[Arnold(1989)]{arnold1989mathematical}
+V.~I. Arnold.
+\newblock \emph{Mathematical Methods of Classical Mechanics}.
+\newblock Springer, 1989.
+
+\bibitem[Belinkov(2022)]{belinkov2022probing}
+Yonatan Belinkov.
+\newblock Probing classifiers: Promises, shortcomings, and advances.
+\newblock \emph{Computational Linguistics}, 48, 2022.
+
+\bibitem[Cranmer et~al.(2020)Cranmer, Greydanus, Hoyer, Battaglia, Spergel, and
+  Ho]{cranmer2020lnn}
+Miles Cranmer, Sam Greydanus, Stephan Hoyer, Peter Battaglia, David Spergel,
+  and Shirley Ho.
+\newblock Lagrangian neural networks.
+\newblock In \emph{ICLR Workshop}, 2020.
+
+\bibitem[Fu et~al.(2023)Fu, Wu, Wang, Xie, Keten, Gomez-Bombarelli, and
+  Jaakkola]{fu2023forces}
+Xiang Fu, Zhenghao Wu, Wujie Wang, Tian Xie, Sinan Keten, Rafael
+  Gomez-Bombarelli, and Tommi Jaakkola.
+\newblock Forces are not enough: Benchmark and critical evaluation for machine
+  learning force fields with molecular simulations.
+\newblock \emph{Transactions on Machine Learning Research}, 2023.
+
+\bibitem[Greydanus et~al.(2019)Greydanus, Dzamba, and
+  Yosinski]{greydanus2019hnn}
+Samuel Greydanus, Misko Dzamba, and Jason Yosinski.
+\newblock Hamiltonian neural networks.
+\newblock In \emph{NeurIPS}, 2019.
+
+\bibitem[Gruver et~al.(2022)Gruver, Finzi, Stanton, and
+  Wilson]{gruver2022deconstructing}
+Nate Gruver, Marc Finzi, Samuel Stanton, and Andrew~Gordon Wilson.
+\newblock Deconstructing the inductive biases of hamiltonian neural networks.
+\newblock In \emph{International Conference on Learning Representations}, 2022.
+
+\bibitem[Ha and Schmidhuber(2018)]{ha2018world}
+David Ha and J{\"u}rgen Schmidhuber.
+\newblock Recurrent world models facilitate policy evolution.
+\newblock In \emph{NeurIPS}, 2018.
+
+\bibitem[Ha and Jeong(2021)]{ha2021conservnet}
+Seungwoong Ha and Hawoong Jeong.
+\newblock Discovering conservation laws from trajectories via machine learning.
+\newblock \emph{Physical Review Research}, 3\penalty0 (4):\penalty0 L042035,
+  2021.
+
+\bibitem[Hafner et~al.(2023)Hafner, Pasukonis, Ba, and
+  Lillicrap]{hafner2023dreamerv3}
+Danijar Hafner, Jurgis Pasukonis, Jimmy Ba, and Timothy Lillicrap.
+\newblock Mastering diverse domains through world models.
+\newblock \emph{arXiv:2301.04104}, 2023.
+
+\bibitem[Hairer et~al.(2006{\natexlab{a}})Hairer, Lubich, and
+  Wanner]{hairer2006geometric}
+Ernst Hairer, Christian Lubich, and Gerhard Wanner.
+\newblock \emph{Geometric Numerical Integration}.
+\newblock Springer, 2006{\natexlab{a}}.
+
+\bibitem[Hairer et~al.(2006{\natexlab{b}})Hairer, Lubich, and
+  Wanner]{hairer2006geometric2}
+Ernst Hairer, Christian Lubich, and Gerhard Wanner.
+\newblock \emph{Geometric Numerical Integration: Structure-Preserving
+  Algorithms for Ordinary Differential Equations}.
+\newblock Springer, 2nd edition, 2006{\natexlab{b}}.
+
+\bibitem[Hewitt and Liang(2019)]{hewitt2019control}
+John Hewitt and Percy Liang.
+\newblock Designing and interpreting probes with control tasks.
+\newblock In \emph{EMNLP}, 2019.
+
+\bibitem[Li et~al.(2023)Li, Hopkins, Bau, Vi{\'e}gas, Pfister, and
+  Wattenberg]{li2023othello}
+Kenneth Li, Aspen~K Hopkins, David Bau, Fernanda Vi{\'e}gas, Hanspeter Pfister,
+  and Martin Wattenberg.
+\newblock Emergent world representations: Exploring a sequence model trained on
+  a synthetic task.
+\newblock In \emph{ICLR}, 2023.
+
+\bibitem[Liu and Tegmark(2021)]{liu2021aipoincare}
+Ziming Liu and Max Tegmark.
+\newblock Machine learning conservation laws from trajectories.
+\newblock \emph{Physical Review Letters}, 126\penalty0 (18):\penalty0 180604,
+  2021.
+
+\bibitem[Locatello et~al.(2019)Locatello, Bauer, Lucic, R{\"a}tsch, Gelly,
+  Sch{\"o}lkopf, and Bachem]{locatello2019challenging}
+Francesco Locatello, Stefan Bauer, Mario Lucic, Gunnar R{\"a}tsch, Sylvain
+  Gelly, Bernhard Sch{\"o}lkopf, and Olivier Bachem.
+\newblock Challenging common assumptions in the unsupervised learning of
+  disentangled representations.
+\newblock In \emph{ICML}, 2019.
+
+\bibitem[Makelov et~al.(2024)Makelov, Lange, and Nanda]{makelov2024illusion}
+Aleksandar Makelov, Georg Lange, and Neel Nanda.
+\newblock Is this the subspace you are looking for? an interpretability
+  illusion for subspace activation patching.
+\newblock In \emph{International Conference on Learning Representations}, 2024.
+
+\bibitem[Matsubara and Yaguchi(2023)]{matsubara2023finde}
+Takashi Matsubara and Takaharu Yaguchi.
+\newblock {FINDE}: Neural differential equations for finding and preserving
+  invariant quantities.
+\newblock In \emph{International Conference on Learning Representations}, 2023.
+
+\bibitem[Nanda et~al.(2023)Nanda, Lee, and Wattenberg]{nanda2023othello}
+Neel Nanda, Andrew Lee, and Martin Wattenberg.
+\newblock Emergent linear representations in world models of self-supervised
+  sequence models.
+\newblock In \emph{BlackboxNLP}, 2023.
+
+\bibitem[Schrittwieser et~al.(2020)]{schrittwieser2020muzero}
+Julian Schrittwieser et~al.
+\newblock Mastering atari, go, chess and shogi by planning with a learned
+  model.
+\newblock \emph{Nature}, 588, 2020.
+
+\bibitem[Towers et~al.(2024)]{towers2024gymnasium}
+Mark Towers et~al.
+\newblock Gymnasium: A standard interface for reinforcement learning
+  environments.
+\newblock \emph{arXiv:2407.17032}, 2024.
+
+\bibitem[Zhang et~al.(2023)Zhang, Weng, Das, Megretski, Daniel, and
+  Nguyen]{zhang2023concernet}
+Wang Zhang, Tsui-Wei Weng, Subhro Das, Alexandre Megretski, Luca Daniel, and
+  Lam~M. Nguyen.
+\newblock {ConCerNet}: A contrastive learning based framework for automated
+  conservation law discovery and trustworthy dynamical system prediction.
+\newblock In \emph{International Conference on Machine Learning}, 2023.
+
+\end{thebibliography}

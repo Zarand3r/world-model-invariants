@@ -21,27 +21,42 @@ degree-4 polynomial readout to \emph{true} pendulum energy by ridge regression o
 then use it to drive the identical correction. It reaches $|\rho|_E = 0.9999$: as a probe it is
 essentially perfect.
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig1_probe_vs_operator.pdf}
+\caption{A perfect probe is not a conserved quantity. Colour is the constraint; marker is the model
+seed (all three shown, never averaged). \textbf{Left:} the supervised probe reads true energy almost
+perfectly. \textbf{Centre:} the model's own transition preserves it an order of magnitude worse than
+the label-free scalar. \textbf{Right:} acting on it fails to reduce rollout energy drift, while the
+label-free scalar cuts drift on every seed. Probe quality and dynamical relevance rank the three
+constraints differently.}
+\label{fig:probe_vs_operator}
+\end{figure}
+
 \begin{table}[t]
 \centering\small
-\caption{The correct physical quantity, fitted optimally, is worse conserved and harms rollouts.
-Three independently trained models; 20 magnitude-matched random constraints per model.}
+\caption{The correct physical quantity, fitted optimally, is worse conserved and does not repair
+rollouts. Median across three independently trained models, with the per-seed range in brackets;
+20 magnitude-matched random constraints per model (60 total, pooled).}
 \label{tab:supervised}
 \begin{tabular}{lccc}
 \toprule
 constraint & $|\rho|_E$ & $\rho_{\mathrm{obs}}$ & change in energy drift \\
 \midrule
-label-free $C$ & 0.930--0.973 & \textbf{6.3--8.7$\times10^{-3}$} & \textbf{$-$41.8\%} \\
-supervised energy probe & \textbf{0.9999} & 4.6$\times10^{-2}$ & $+$20.0\% \\
-random, magnitude-matched & $\sim$0.12 & $\sim$1.0 & $+$6.4\% \\
+label-free $C$ & 0.966 \,[0.930, 0.973] & \textbf{6.9\,[6.3, 8.7]$\times10^{-3}$} & \textbf{$-$42.2\% \,[$-$50.9, $-$32.2]} \\
+supervised energy probe & \textbf{0.9999} & 4.58\,[4.57, 4.59]$\times10^{-2}$ & $+$26.8\% \,[$-$0.3, $+$33.4] \\
+random, magnitude-matched & 0.126 & 1.07 & $+$4.0\% \,[$-$20.7, $+$42.6] \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Table~\ref{tab:supervised} shows the outcome. The supervised probe tracks energy better than the
-label-free scalar on every seed, is $6.3\times$ less preserved by the transition, and \emph{increases}
-rollout energy drift where the label-free scalar reduces it by 41.8\%. All three comparisons hold on
-3 of 3 models. The direction that best predicts the physical variable and the direction the model's
-dynamics actually respect are not the same direction.
+Table~\ref{tab:supervised} and Figure~\ref{fig:probe_vs_operator} show the outcome. The supervised
+probe tracks energy better than the label-free scalar on every seed, and is $6.7\times$ less preserved
+by the transition ($5.3$--$7.3\times$ per seed); both hold on 3 of 3 models. It also never repairs the
+rollout: its effect on energy drift is $+26.8\%$ and $+33.4\%$ on two models and $-0.3\%$ on the third,
+against a $32$--$51\%$ reduction from the label-free scalar on all three. The direction that best
+predicts the physical variable and the direction the model's dynamics actually respect are not the
+same direction.
 
 This also answers the practical objection to a label-free method. The search is not a workaround for
 missing labels: it finds something a supervised fit on perfect labels does not, because it optimises

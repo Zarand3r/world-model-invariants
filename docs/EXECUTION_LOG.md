@@ -4234,3 +4234,42 @@ itself, is what produces conservation. That distinction is untested and the pape
 
 `paper1.2/sections/boundaries.tex` already states "training the transition seven times longer did not
 close the gap"; that sentence was written from seed 3 alone and is now supported at n = 2.
+
+## 2026-08-27 -- Figure 1 for paper1.2, and two defects it exposed
+
+Built `paper1.2/make_fig1.py` -> `figures/fig1_probe_vs_operator.pdf` from a single run record,
+`runs/e18_supervised_baseline.json`. Grammar: colour = arm, marker = model seed (all three plotted,
+never averaged), three panels, no dual axis.
+
+Rendering the figure and *looking at it* caught two things that were invisible in the code:
+
+1. **Inverted axis label.** The first draft labelled panel 3 "harms <- -> helps", which put "harms"
+   at the bottom -- exactly where the label-free arm sits at -42%, i.e. where the correction works.
+   The label asserted the opposite of the result. Replaced with in-panel "drift reduced" /
+   "drift increased" annotations at the correct ends.
+
+2. **An overclaim in `dissociation.tex`, and a mean/median mismatch.** Panel 3 showed the supervised
+   red square sitting just *below* the zero line. Tracing to source: seed 4's supervised effect is
+   **-0.33%** -- a tiny reduction, not an increase. The sentence "increases rollout energy drift ...
+   All three comparisons hold on 3 of 3 models" was therefore false for the third comparison.
+
+   Separately, Table 1 aggregated by **mean** (-41.76 -> -41.8%, +19.97 -> +20.0%, mean-of-per-model-
+   medians 6.36 -> +6.4%, ratio-of-means 6.31 -> 6.3x) while the figure aggregated by **median**.
+   Both are defensible; presenting one in the table and the other in the figure is not.
+
+**Resolution.** Unified on median with the per-seed range in brackets, matching the figure and the
+median convention used for D_sec and rho_obs elsewhere. Corrected the claim to what the data support:
+
+  - |rho|_E higher for supervised: 3/3.
+  - rho_obs worse for supervised: 3/3 (per-seed 7.3x, 5.31x, 6.68x; median ratio 6.68x).
+  - Effect on drift: supervised *never repairs* (3/3), and *increases* drift on 2/3
+    (+26.8, +33.4, -0.3). Label-free reduces on 3/3 (-50.9, -42.2, -32.2).
+
+The contrast survives the correction with room to spare -- label-free cuts drift 32-51% on every
+seed while the optimal supervised probe cuts it on none -- but "increases on 3/3" was not true and
+is now stated as "never repairs; increases on 2 of 3". Propagated the median figure to
+`abstract.tex`, `introduction.tex` (41.8% -> 42%) and `CLAIMS.md`.
+
+This is the second time a claim-calibration error has been caught by a mechanical check rather than
+by re-reading prose (the first was the evidence-base seed guard in `make_results_summary.py`).
+Rendering every figure and inspecting it is now part of the paper checklist.
