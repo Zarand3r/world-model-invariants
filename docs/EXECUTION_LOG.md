@@ -4335,3 +4335,96 @@ breach of M29. Added a `provenance.runs` list recording data path, data sha256, 
 analysis slice, git HEAD and UTC time per invocation, appended rather than overwritten because the
 script is resumable across sessions. The s3/s4 entries predate this and carry no provenance; per the
 05:00 entry they used the same defaults, which is recorded here rather than back-filled into the JSON.
+
+## 2026-08-27 -- **E19: the shadow Hamiltonian explains E18. All four predictions pass 3/3.**
+
+Git at the E19 prereg commit. Pre-registered in `docs/E19_PREREG.md`, written before any E19 number
+existed. Richard approved running this as a deviation from the roadmap; the hypothesis itself has
+been sitting untested in `scripts/make_pendulum_pixels.py`'s docstring since the data was generated.
+
+### The hypothesis
+
+The data comes from gymnasium's semi-implicit (symplectic) Euler. A symplectic integrator does not
+conserve textbook `H`; it conserves a shadow `H~ = H + O(dt)`. If the model learned the integrator's
+map, its transition preserves `H~`, and E18's supervised probe is fitting **the wrong target with
+perfect precision**.
+
+First-order derivation for this system (`I = ml^2/3`, `V = mg(l/2)cos q`, Lie-Trotter kick-then-drift):
+the correction is proportional to `thetadot * sin(theta)` with magnitude `(dt/2)*mg(l/2) = 0.125`.
+The sign was **not** asserted from a BCH convention -- it was fixed empirically by P1.
+
+### Design: a sweep, not a two-point test
+
+The obvious test (probe fitted to `E` vs probe fitted to `H~`) has an obvious confound: `H~` is a
+different function and might simply be easier to represent in the degree-4 basis. So the registered
+design sweeps `T_c = E + c * thetadot * sin(theta)` over a grid containing the predicted coefficient,
+**both signs**, and wrong magnitudes at 2x and 4x either way. The prediction is the **location of a
+minimum**, which no representational-ease artifact produces. `c = 0` is exactly E18's supervised probe.
+
+### P1 -- physics validation, no model (PASS)
+
+Invariance ratio of `T_c` on ground-truth states:
+
+| c | -0.125 | -0.0625 | 0 | +0.0625 | **+0.125** | +0.25 | +0.5 |
+|---|---|---|---|---|---|---|---|
+| ratio | 1.28e-1 | 7.59e-2 | 3.52e-2 | 9.06e-3 | **5.95e-5** | 3.48e-2 | 2.43e-1 |
+
+Sharp minimum at exactly the predicted `c* = +0.125`, **591x** better conserved than textbook `E`
+(registered bar: 2x). The derivation is right and the sign is positive.
+
+### P2, P3, P4 -- the model (all PASS, 3/3)
+
+`rho_obs` by target coefficient, three independently trained models:
+
+| c | s3 | s4 | s5 |
+|---|---|---|---|
+| -0.125 | 0.09324 | 0.09381 | 0.09327 |
+| 0 (= E18 supervised) | 0.04578 | 0.04592 | 0.04573 |
+| **+0.125 (shadow)** | **0.00663** | **0.00939** | **0.00752** |
+| +0.25 | 0.04480 | 0.04519 | 0.04544 |
+
+- **P2** argmin at `c*` on **3/3** seeds (bar: 2/3). The curve is V-shaped, not monotone in `|c|` --
+  the artifact this design exists to detect does not occur. The decisive control is the wrong-sign,
+  right-magnitude point: `c = -0.125` is **14x worse** than `c = +0.125`.
+- **P3** reduction from `c = 0`: **6.91x, 4.89x, 6.08x** (bar: 2x on 2/3). 3/3.
+- **P4** repair effect flips sign: `+26.8 / -0.3 / +33.4` -> **`-49.5 / -31.5 / -29.3`**. All three
+  now repair, comparable to the label-free arm's `-50.9 / -42.2 / -32.2`. 3/3.
+
+**Harness regression test.** The `c = 0` column reproduces E18's supervised probe to five decimals
+(0.04578 / 0.04592 / 0.04573 against E18's 0.04579 / 0.04592 / 0.04573). The sweep is measuring what
+E18 measured.
+
+### The residual, which the prereg required reporting
+
+Label-free median `rho_obs` 0.00685; shadow-probe median 0.00752. **Remaining gap: 1.10x.** The
+shadow Hamiltonian accounts for essentially the whole of E18's 6.7x gap.
+
+### Post-hoc refinement (labelled exploratory)
+
+Not registered. A fine grid over `c` in [0.090, 0.170] step 0.005 puts the argmin at exactly
+**0.1250** on all three seeds and on the ground-truth physics -- confirming the *quantitative*
+prediction to within +/-0.005, with no fitted parameter. `runs/e19_fine_grid.json`.
+
+### What this licenses, per the registered interpretation
+
+The prereg fixed this in advance, and I am holding to it. E19 establishes:
+
+1. Textbook `E` is the **wrong conservation target** for a symplectically generated dataset, and a
+   probe inherits that error however well it fits. A probe reaching `rho_E = 0.9999` is fitting a
+   quantity the generating process does not conserve.
+2. The label-free method's advantage now has a **name**: it optimises conservation by the learned
+   transition, so it is not restricted to targets a human knows how to write down. Here it
+   rediscovered an `O(dt)` integrator correction nobody supplied.
+3. The sharpest one-line restatement of the paper's thesis is now internal to a single sweep:
+   at `c*` the probe correlates with textbook energy **worse** (`rho_E` 0.977 vs 0.9999) while being
+   conserved **6x better** and repairing instead of harming.
+
+It does **not** establish that the model conserves `H~` exactly -- the model is a learned
+approximation whose own invariant is its own modified quantity, and the 1.10x residual is the
+measure of that. Reported, not glossed.
+
+### Consequence for the paper
+
+This is a mechanism, not another phenomenon. It upgrades the central claim from "decodability and
+conservation dissociate" to "they dissociate, and here is why, quantitatively, with the location of
+a minimum predicted from the integrator and hit to +/-0.005 with no free parameters."
