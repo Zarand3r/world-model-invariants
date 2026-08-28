@@ -4273,3 +4273,65 @@ is now stated as "never repairs; increases on 2 of 3". Propagated the median fig
 This is the second time a claim-calibration error has been caught by a mechanical check rather than
 by re-reading prose (the first was the evidence-base seed guard in `make_results_summary.py`).
 Rendering every figure and inspecting it is now part of the paper checklist.
+
+## 2026-08-27 -- F4b at n = 3: the main verdict strengthens, a secondary claim of mine is falsified
+
+Git at `9517a85`. Seed 5 passed acceptance (1-step decode MSE ratio 0.010, rollout finite, rollout
+motion ratio **0.868**), so all three F4b seeds clear the criteria added after F4's first run.
+Ran `run_f4_recovery.py` on `gru56_ref_s5_step60000.pt`; the resumable path correctly skipped the
+four already-analysed checkpoints and computed only seed 5.
+
+### The registered verdict holds, now at matched n = 3
+
+| arm | open-loop steps | `rho_obs` median | range | n |
+|---|---|---|---|---|
+| F4  | 8 / 64  | 5.33 | [1.75, 9.02] | 3 |
+| F4b | 56 / 64 | **5.26** | **[4.83, 5.55]** | **3** |
+| RSSM | KL every step | 6.85e-03 | [6.3e-3, 8.7e-3] | 3 |
+
+Seven times more prior training moved median conservation from 5.33 to 5.26 -- against a registered
+threshold of 7e-02 that would have indicated training explains the gap. The gap to the RSSM is
+**768x**. This is now a clean n = 3 vs n = 3 comparison rather than n = 3 vs n = 2, and the
+longer-trained arm's range *tightened* (4.83-5.55 against 1.75-9.02), which strengthens rather than
+weakens the reading. **Architecture matters, not training amount.**
+
+### What this falsifies -- my own n = 2 claim
+
+The 05:00-05:15 entry said, of F4b at n = 2:
+
+> Identification. F4's three seeds gave 0.971 / 0.888 / **0.189** -- one outright failure. F4b's two
+> give 0.914 / 0.905, both clearing the 0.8 bar. **More prior training makes the search more
+> reliable** while leaving what it finds no better conserved.
+
+Seed 5 gives `rho_E` = **0.1939**. So the two arms identify at exactly the same rate:
+
+- F4  (open-loop 8):  0.971 / 0.888 / **0.189** -- 2 of 3
+- F4b (open-loop 56): 0.914 / 0.905 / **0.194** -- 2 of 3
+
+**"More prior training makes the search more reliable" is withdrawn.** It was generalised from n = 2
+and is false at n = 3. This is the seventh correction in this project traceable to generalising from
+a small sample, and the fifth where the additional seed was the thing that caught it.
+
+One detail worth keeping: the failure lands on **seed 5 in both arms**, at 0.189 and 0.194 -- nearly
+the same value under a 7x change in training budget. That is unlikely to be coincidence and points at
+the initialisation, not the training amount. Not investigated; recorded as an observation, n = 1 in
+the sense that only one seed has ever failed, so no claim is made from it.
+
+### Paper updates
+
+- `boundaries.tex`: replaced the one-line "seven times longer did not close the gap" with the matched
+  n = 3 comparison, including the withdrawn identification claim now stated correctly (2 of 3 under
+  *both* budgets) and the same-seed observation.
+- `dissociation.tex` axis table: `|rho|_E` 0.89--0.97 -> `0.91 (2 of 3 seeds)`; 660x -> 768x.
+- `introduction.tex`, `CLAIMS.md`: 660x -> 768x, and the n = 3 scope recorded.
+
+The 660x figure came from a single checkpoint (4.83 / 7.3e-3). 768x is median-over-3 / median-over-3,
+matching the aggregation convention adopted earlier today for E18.
+
+### Reproducibility fix
+
+`run_f4_recovery.py` wrote no provenance -- `f4b_recovery.json` had nothing outside `models`, in
+breach of M29. Added a `provenance.runs` list recording data path, data sha256, DEG/LD/warmup/n_basis,
+analysis slice, git HEAD and UTC time per invocation, appended rather than overwritten because the
+script is resumable across sessions. The s3/s4 entries predate this and carry no provenance; per the
+05:00 entry they used the same defaults, which is recorded here rather than back-filled into the JSON.

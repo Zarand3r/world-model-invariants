@@ -4,7 +4,7 @@ Pre-registered in `docs/F4_PREREG.md`. Identical pipeline to `run_e17_recovery.p
 degree 4, n_basis = 8, WARMUP = 10 — with only the model class swapped, so any difference is
 attributable to the architecture rather than to the measurement.
 """
-import argparse, json, pathlib
+import argparse, datetime, hashlib, json, pathlib, subprocess
 import numpy as np, torch
 from latent_noether.fit_cache import cached_fit
 from latent_noether.gauge import effective_rank_basis, pca_subspace
@@ -60,9 +60,19 @@ if __name__ == "__main__":
     op = pathlib.Path(a.out)
     out = json.loads(op.read_text()) if op.exists() else {"models": []}
     done = {r["ckpt"] for r in out["models"]}
+    # M29 provenance. Recorded per invocation; `runs` accumulates because this script is
+    # resumable, so a record written across several sessions keeps one entry per session.
+    prov = {"data": a.data, "data_sha256": hashlib.sha256(pathlib.Path(a.data).read_bytes()).hexdigest(),
+            "deg": DEG, "ld": LD, "warmup": W, "n_basis": 8,
+            "analysis_slice": [ANALYSIS.start, ANALYSIS.stop],
+            "git": subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip(),
+            "utc": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
+            "ckpts_requested": list(a.ckpts)}
+    out.setdefault("provenance", {}).setdefault("runs", []).append(prov)
     for ck in a.ckpts:
         if ck in done or not pathlib.Path(ck).exists():
             continue
         print(f"[F4] {ck}", flush=True)
         out["models"].append(run(ck, a.data)); op.write_text(json.dumps(out, indent=1) + "\n")
+    op.write_text(json.dumps(out, indent=1) + "\n")
     print(f"wrote {op}")

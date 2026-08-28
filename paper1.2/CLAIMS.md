@@ -43,7 +43,7 @@ scalar repairs them (median -42.2%, per-seed -50.9/-42.2/-32.2). 3/3 seeds, all 
 
 **Supporting, each an independent axis:** untrained models (`rho_obs` 74x worse at `rho_E` up to
 0.908); out of distribution (free probe 0.999, conservation 55-267x worse); a second architecture
-(`rho_E` 0.89-0.97, conservation 660x worse); an untrained transition (`rho_E` 0.97, conservation
+(`rho_E` 0.91 on 2 of 3 seeds, conservation 768x worse, n=3 at both training budgets); an untrained transition (`rho_E` 0.97, conservation
 ~10,000x worse).
 
 **Strongest alternative.** The supervised probe is worse simply because it is *different* from the
