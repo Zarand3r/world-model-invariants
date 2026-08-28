@@ -5041,3 +5041,65 @@ the physical action coupling -- with the degree-2 numbers shown as sensitivity a
 stated as the leading explanation to test next, not as a result.
 
 Training: seed 3 at step 32,000; seeds 4 and 5 queued behind the guarded driver.
+
+## 2026-08-28 -- **F1's registered analysis was invalid: the balance fit memorises. Amendment 2 forces held-out evaluation.**
+
+Loop iteration. Seed 3 at step ~50,000; seeds 4 and 5 queued. No failures.
+
+### Chasing down why P3 was only 1.5x found something worse
+
+The preliminary smoke test showed the conserved-only fit reaching `rho(consC, E) = 0.86` with residual
+0.0141 -- a scalar that is both energy-like **and** nearly conserved, in a system where energy is not
+conserved. Investigating that raised a validity question: degree-4 monomials in `LD = 12` give
+**1,819 coefficients for `C`** against ~5,720 samples, where the ground-truth validation had 35
+coefficients against 47,600.
+
+Split the analysis trajectories in half, fit on one, evaluate on the other:
+
+| power degree | balance in-sample | balance held-out | conserved in | conserved held-out | ratio in | ratio **held-out** |
+|---|---|---|---|---|---|---|
+| 1 | 0.00635 | 0.02594 | 0.00949 | 0.00939 | 1.49x | **0.36x** |
+| 2 | 0.00365 | 0.02127 | 0.00949 | 0.00939 | 2.60x | **0.44x** |
+| 4 | **0.00000** | 0.04128 | 0.00949 | 0.00939 | **711764x** | **0.23x** |
+
+At degree 4 the balance fit is **exact in sample** -- residual 0.00000, ratio 7e5 -- and useless out
+of sample. **The entire apparent advantage of the balance term was memorisation.** The conserved-only
+fit generalises essentially perfectly (0.00949 -> 0.00939), so the defect is specific to the extra
+freedom the power term adds, not to the extraction in general.
+
+Had this not been checked, F1 would have reported a large in-sample "balance law beats conservation"
+effect that does not exist.
+
+### Amendment 2
+
+All F1 residuals are now fitted on half the analysis trajectories and evaluated on the other half.
+**This is not a new discipline here:** E9 already established disjoint evaluation -- fit `C` and the
+whole coordinate frame on one set, score on another -- and the F1 registration simply failed to apply
+a control the project uses elsewhere.
+
+**The amendment makes F1 harder to pass, not easier**, and that is recorded in the prereg: in sample
+the balance term looked like a 1.5x-4.6x improvement; held out it is a 0.2x-0.4x degradation. The
+change moves the expected result *against* the hypothesis F1 was written to test.
+
+### Preliminary held-out picture (n = 1, step 30,000, NO CLAIMS)
+
+| power degree | held-out residual | ratio vs conserved | `rho(C, E)` | `rho(q, thetadot)` |
+|---|---|---|---|---|
+| **1** | 0.02594 | **0.4x** | **0.8333** | 0.6878 |
+| 2 | 0.02127 | 0.4x | 0.8926 | 0.7136 |
+| 3 | 0.01821 | 0.5x | 0.4659 | 0.1811 |
+| 4 | 0.04128 | 0.2x | 0.1779 | 0.0056 |
+
+`P1 True, P2 False, P3 False, P4 True`.
+
+`P1` survives the held-out test: the model **does** carry an energy-like scalar under actuation, which
+is not trivial -- nothing in the objective mentions energy and the quantity is no longer conserved.
+`P2` and `P3` fail, and `P3` fails in the strong sense that adding the action term makes generalisation
+**worse**.
+
+The likely finding, to be confirmed at step 60,000 across 3 seeds: **the model represents an
+approximately conserved energy-like quantity even under actuation, and does not learn a balance law**
+-- it has not internalised that the action is a source term for that quantity. That is a legitimate
+negative, it bounds the method's generality, and it is what the roadmap's Stage 5 exists to find out.
+
+Nothing is concluded from one seed at half training.

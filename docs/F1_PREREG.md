@@ -182,3 +182,57 @@ The change was made on ground-truth states with no model involved, the failure i
 original registration had already named, and the fix is frozen here before any checkpoint is
 analysed. The ground-truth numbers are committed in this document so the reference curve cannot be
 retro-fitted.
+
+---
+
+## Amendment 2, 2026-08-28 -- residuals must be evaluated on HELD-OUT trajectories
+
+**Written before the registered step-60,000 read. Forced by a validity failure, not by a result.**
+
+### What went wrong
+
+The registered analysis evaluates the balance residual **in sample**, on the same trajectories the
+`(C, P)` pair was fitted to. At the latent dimension this project uses that is not sound. Degree-4
+monomials in `LD = 12` give **1,819 coefficients for `C`**, against 5,720 available samples -- and
+2,860 if the data is split. Measured on `f1_act_s3_step30000`:
+
+| power degree | balance in-sample | balance held-out | conserved in | conserved held-out | ratio in | ratio **held-out** |
+|---|---|---|---|---|---|---|
+| 1 | 0.00635 | 0.02594 | 0.00949 | 0.00939 | 1.49x | **0.36x** |
+| 2 | 0.00365 | 0.02127 | 0.00949 | 0.00939 | 2.60x | **0.44x** |
+| 4 | **0.00000** | 0.04128 | 0.00949 | 0.00939 | **711764x** | **0.23x** |
+
+At degree 4 the fit is **exact in sample** -- residual 0.00000, ratio 7e5 -- and useless out of
+sample. The apparent advantage of the balance term is **entirely memorisation**. The conserved-only
+fit, by contrast, generalises essentially perfectly (0.00949 -> 0.00939), so the defect is specific
+to the extra freedom the power term adds.
+
+The ground-truth validation could not have caught this: there `LD = 3` gives 35 coefficients against
+47,600 samples, oversampled by three orders of magnitude more than the model setting.
+
+### The change
+
+**All F1 residuals -- balance, conserved-only and random -- are fitted on one half of the analysis
+trajectories and evaluated on the other half.** `P3` and `P4` are read from held-out residuals.
+`P1` and `P2` are correlations of a frozen `C` and `q` against labels and are reported on the
+held-out half for consistency.
+
+This is not a new discipline for this project. **E9 already established disjoint evaluation** -- "fit
+`C` and the whole coordinate frame on `data`, score on `eval_data`" -- and the F1 registration simply
+failed to apply a control the project uses elsewhere. Applying it is consistency, not a moved
+goalpost.
+
+### Direction of the change, stated plainly
+
+This amendment makes F1 **harder to pass, not easier**. In sample the balance term looked like a
+1.5x-4.6x improvement; held out it is a 0.2x-0.4x *degradation*. The change is being made because
+the measurement was invalid, and it moves the expected result against the hypothesis F1 was written
+to test. Recording that here so the direction cannot be misread later.
+
+### What is now expected, and registered
+
+On the evidence so far -- one seed, half training -- `P3` will **fail**, and F1's likely finding is
+that the model represents an approximately conserved, energy-like scalar even under actuation, with
+the action term adding nothing that generalises. That is a legitimate negative and it will be
+reported as one. The registered read remains step 60,000 across 3 seeds; nothing is concluded from
+the preliminary checkpoint.
