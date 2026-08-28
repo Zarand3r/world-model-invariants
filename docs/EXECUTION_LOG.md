@@ -4074,3 +4074,55 @@ Corrected in the generator so it regenerates accurately.
    different final digits is not read as a defect.
 3. `runs/*.pt` and `runs/*.npz` are not committed (116 checkpoints, ~6 GB). Everything regenerates
    from `docs/REPRODUCE.md` plus the scripts, and checkpoint provenance is recorded inside each file.
+
+---
+
+## 2026-08-28 04:10–04:40 UTC — **paper1.2 forked and rewritten around the current evidence**
+
+Git at `e940504`. Written under the `research-paper-integrity` skill, following its build order:
+claims first, prose last.
+
+### The fork
+
+`paper1.2/` from `paper/`, dropping the stale build artefacts and the packaged arXiv bundle.
+`paper1.2/CLAIMS.md` (not part of the manuscript) states the claim architecture before any prose was
+written: one central claim, three supporting claims, each with its decisive evidence and its
+strongest alternative.
+
+### What changed, and why
+
+**The central claim moved up a level.** Paper 1.0 argued *"a world model learns a physical constraint
+yet violates it when imagining forward."* That survives as claim 2. Above it now sits
+**decodability is not dynamical structure**, because E18 makes it decisive and it is the more
+transferable statement.
+
+**A defect in paper 1.0 is fixed and stated.** Its null is described as random constraints "matched
+in norm", but the correction is invariant under `C -> lambda C`, so coefficient norm has no effect on
+the edit; random draws took steps 29x larger. Paper 1.2 uses a fixed-step-size null, says plainly why
+the norm-matched one controls nothing, and reports the consequence: specificity improves from 2/3
+seeds to 3/3.
+
+**Sections restructured to the claims.** `recovery`/`refusal`/`intervention` are replaced by
+`dissociation` / `causality` / `boundaries`. The old files are deleted rather than orphaned.
+
+**New results incorporated:** E18 (supervised probe, the new lead), E4 (causal dialing), E9 (disjoint
+evaluation), E12c (depth-50 interchange), E14b (OOD decodable-not-conserved), E17 (2-DoF), F4/F4b
+(second architecture), plus the magnitude-matched null throughout.
+
+**Boundaries are a section, not a caveat.** Distribution-boundedness and architecture-dependence are
+presented as measurements with matched controls, because that is what they are.
+
+**Related work rebuilt.** Paper 1.0 had 17 references and no contact with the conservation-discovery
+literature. Added ConCerNet, AI Poincare, ConservNet, FINDE, Noether Networks, Gruver et al.,
+Fu et al., Hairer, Makelov et al. — the last because the depth-50 interchange exists to answer it.
+
+**Limitations state what the mechanism section does not.** Including that low normal error is the
+extraction's *objective* rather than a finding — the correction recorded on 2026-08-28 — so the
+paper cannot present it as one.
+
+### State
+
+11 pages, compiles clean, **0 broken references** after repairing three that pointed at deleted
+sections. 5,625 words across sections. Figure 1 is specified in `CLAIMS.md` but **not yet built** —
+the existing `fig1_three_claims.pdf` belongs to paper 1.0's argument and does not show the supervised
+comparison the new lead rests on.

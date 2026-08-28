@@ -1,0 +1,59 @@
+\section{The privileged direction is causally deployed}
+\label{sec:causality}
+
+If the recovered scalar is only a descriptive correlate, enforcing it has no reason to help and
+setting it has no reason to steer. Three interventions test the alternative, each with matched
+controls.
+
+\paragraph{A magnitude-matched null, and why the obvious one fails.}
+The natural correction projects the latent back toward the level set,
+$z \leftarrow z - \alpha (C(z) - C_0)\,\nabla C / \lVert \nabla C \rVert^2$. This is a Newton step, so
+its size grows with how badly the constraint is violated --- and a random constraint is violated far
+more than a conserved one. Matching random draws in \emph{coefficient} norm, as one might expect to
+control for scale, controls nothing: the step is invariant under $C \to \lambda C$. Measured, random
+draws take steps $29\times$ larger than the recovered constraint, so the comparison conflates
+direction with magnitude.
+
+We therefore fix the step size and vary only direction,
+$z \leftarrow z - \varepsilon\,\mathrm{sign}(C - C_0)\,\nabla C / \lVert \nabla C \rVert$, over a
+frozen $\varepsilon$ grid. Arms then differ in where they push, never in how hard.
+
+\paragraph{Correcting the invariant repairs the imagined physics.}
+We evaluate on decoded physical energy, not pixels: a non-learned geometric readout recovers
+$\theta$ from the rendered frame by image moments and $\dot\theta$ by backward differences, matching
+the simulator's semi-implicit convention, with a median decoded-energy error of 1.6\% of the
+across-trajectory spread. The statistic is the secular drift of decoded energy over a rollout.
+
+At $H = 100$ the recovered direction reduces drift by 32--51\% across three models. On 512
+trajectories from a disjoint generator seed, with $C$ and the entire coordinate frame frozen, the
+effect does not shrink: $-54.6\%$, $-58.8\%$, $-75.9\%$ at $H = 190$. Across both horizons
+\textbf{0 of 60} magnitude-matched random directions and \textbf{0 of 15} equal-norm tangent
+directions beat the recovered one on any model.
+
+\paragraph{Setting the invariant steers the imagined physics.}
+Restoring $C$ shows drift is costly; it does not show $C$ is a control variable. We take a recipient
+state and an independent donor trajectory, move the recipient minimally along the local $C$-normal
+until $C(z) = C(z_{\mathrm{donor}})$, and let the rollout run free. The intervention never sees true
+energy --- the target is read from the model's own latent.
+
+The imagined world's \emph{true decoded} energy moves toward the donor trajectory's \emph{true}
+energy, with rank correlation $0.802$--$0.914$ across three models and \textbf{0 of 75} random and
+tangent controls beating it. A preregistered offset sweep is monotone in both directions on every
+model.
+
+\paragraph{The subspace is used by the model's own dynamics, not only reachable from encoder states.}
+A subspace edit can produce the expected output change through a pathway the model does not normally
+use \citep{makelov2024illusion}. We therefore repeat the donor interchange \emph{50 steps into an
+autonomous rollout}, on a state the model reached by itself rather than one the encoder produced.
+
+The effect barely degrades: rank correlation $0.762$--$0.849$ at depth 50 against $0.803$--$0.924$ at
+depth 0, with 0 of 13 controls beating it at either depth on any model. Equal-norm tangent edits,
+which cannot change $C$ to first order, sit near zero at both depths. A dormant pathway would lose
+its effect precisely where this test applies it.
+
+\paragraph{The same pipeline refuses when there is nothing to find.}
+On matched dissipative models, where no nontrivial first integral exists, the extraction returns a
+direction that is not distinguished from a random one: 24 of 60 random draws beat it, and it harms
+rollouts on 2 of 3 models. Its operator statistic sits at $3.4$--$3.7\times10^{-1}$, in the same range
+as an untrained network and $39\times$ worse than any conservative model, with no overlap between the
+two groups.

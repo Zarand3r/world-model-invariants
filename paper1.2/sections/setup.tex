@@ -1,0 +1,120 @@
+\section{Recovering a latent invariant}
+\label{sec:setup}
+
+\paragraph{Model and data.} We analyze the published DreamerV3 architecture
+\citep{hafner2023dreamerv3}: 13.5M parameters, categorical $32\times32$ stochastic latents, a
+convolutional encoder and decoder, Kullback--Leibler balancing, and unimix. We train only the world
+model, with no actor or critic.
+
+The data come from Gymnasium's \texttt{Pendulum-v1} \citep{towers2024gymnasium}. Each simulator step
+renders a $500\times500$ frame, which we crop to $448\times448$ and block-average to $64\times64$. We
+set the simulator state directly, sampling $\theta\sim U[-1.8,1.8]$ and
+$\dot\theta\sim U[-2.2,2.2]$, and reject any trajectory that reaches the simulator's
+$|\dot\theta|=8$ speed clip, since clipping would break conservation. Actions are always zero. A
+single frame does not reveal velocity, so the model must infer $\dot\theta$ from the sequence.
+
+We train on 204 trajectories of 120 frames using Adam at $10^{-4}$, batch size 16, and sequence
+length 64, capped at 30 minutes of wall-clock time, which gives about 6{,}500 gradient steps. The
+remaining 52 trajectories are reserved as a post-training \emph{analysis set}. Three independently
+trained seeds pass checks fixed before analysis: KL divergence above 1 nat, one-step decoding at
+least $4\times$ better than predicting the dataset mean, and finite rollouts.
+Appendix~\ref{sec:details} gives the remaining training details. Our claims concern a DreamerV3
+world model trained on pendulum video, not DreamerV3 as a full reinforcement-learning agent.
+
+\paragraph{Three kinds of latent trajectories.} We use three latent trajectories and keep them
+separate throughout.
+
+An \emph{observation-conditioned} trajectory is the sequence of deterministic recurrent states
+produced when the model receives the next real frame at every step. This is what the encoder returns
+on the analysis set.
+
+The \emph{one-step transition} $T$ is the model's autonomous recurrent update with zero action and
+no new observation.
+
+An \emph{imagination rollout} starts from one encoded state and repeatedly applies $T$ without
+supplying any later frames.
+
+We estimate the latent flow by applying $T$ once at each state of an observation-conditioned
+trajectory, so the transition is autonomous even though the states come from real video.
+Section~\ref{sec:dissociation} measures conservation along observation-conditioned trajectories.
+Section~\ref{sec:causality} tests what happens to the same scalar under autonomous imagination.
+
+\paragraph{Latent coordinates.} After training we freeze the model. Let $h$ denote the deterministic
+recurrent state on the analysis set and $\bar h$ its mean. We take the top 12 principal directions
+of $h$, remove any direction with no support in the data, and let $P$ denote the resulting
+orthonormal map. All extraction, projection, and perturbation operate on
+\begin{equation}
+z = P^\top(h-\bar h).
+\label{eq:z}
+\end{equation}
+Let $F(z)$ be the projection through $P$ of the model's one-step displacement $T(h)-h$. Using the
+model's own displacement avoids fitting a separate vector field and then analyzing that surrogate.
+
+\paragraph{The candidate family.} We look for the invariant among degree-4 polynomials in $z$.
+Writing $\varphi(z)$ for the vector of monomials up to degree 4 in the 12 latent coordinates, a
+candidate is $C(z) = a^\top\varphi(z)$, and the search is over the coefficient vector $a$. There are
+1819 such monomials, from $z_1$ through $z_1z_2z_3z_4$, excluding the constant term, which is
+conserved trivially. The pendulum's energy is quadratic in $\dot\theta$ and needs polynomial terms
+to approximate $\cos\theta$, and the latent is an unknown nonlinear encoding of
+$(\theta, \dot\theta)$ rather than those coordinates themselves, so the family must be rich enough
+to express energy through that distortion while staying small enough to fit.
+
+\paragraph{The invariance criterion.} An invariant is constant along any one trajectory and differs
+between trajectories. We score a candidate by
+\begin{equation}
+\text{ratio}(C) \;=\;
+\frac{\text{mean within-trajectory variance of } C}{\text{total variance of } C},
+\label{eq:ratio}
+\end{equation}
+which is $0$ for a perfectly conserved scalar and near $1$ for one that wanders as much within a
+trajectory as across the dataset. The denominator keeps the criterion non-trivial: without it,
+$C = 0$ would score perfectly while distinguishing nothing.
+
+Both variances are quadratic forms in $a$. With $W$ the mean within-trajectory covariance of the
+features and $T$ their total covariance, Equation~\ref{eq:ratio} is $a^\top W a / a^\top T a$, a
+Rayleigh quotient. Its minimiser is the eigenvector of the generalized problem
+$W a = \lambda\, T a$ with the smallest eigenvalue, and $\lambda$ is the invariance ratio itself. One
+eigendecomposition returns the whole family, ranked from most to least conserved.
+
+\paragraph{Selecting among conserved candidates.} Conservation alone does not pick out a unique
+scalar. If $C$ is conserved then so is any function of it, so $E$, $E^2$ and mixtures of $E$ with
+other conserved quantities all sit near the top of the ranking, and the leading eigenvector is
+generally some combination of them. We therefore use flow alignment as a secondary criterion among
+the leading candidates, fitting $C$ jointly with an antisymmetric operator $B$ such that
+\begin{equation}
+F \approx B\nabla C, \qquad B^\top = -B.
+\label{eq:pair}
+\end{equation}
+This mirrors the Hamiltonian relation between a conserved quantity and the flow it generates: an
+antisymmetric operator maps the gradient of $C$ to a direction tangent to its level set
+\citep{arnold1989mathematical}. Because $\nabla C^\top B \nabla C = 0$ for any antisymmetric $B$, a
+scalar satisfying Equation~\ref{eq:pair} is constant along the flow by construction. The criterion
+also separates candidates the invariance ratio cannot: $E^2$ is exactly as conserved as $E$ but does
+not pair with the same $B$.
+
+The fit is bilinear, so fixing either $a$ or $B$ makes the other a least-squares problem and we
+alternate. It searches within the top eight eigenvectors from Equation~\ref{eq:ratio}, so the
+recovered $C$ has eight effective degrees of freedom rather than 1819. That matters for a search run
+on 52 trajectories, where a free fit over the full basis could drive the in-sample ratio to zero by
+overfitting. Appendix~\ref{sec:details} isolates the contribution of the flow criterion:
+conservation drives most of the recovery and intervention effect, while flow alignment mainly
+reduces variation across seeds.
+
+\paragraph{Reference energy.} We compare $C$ with the textbook pendulum energy
+$E = \tfrac{1}{6}\dot\theta^2 + 5\cos\theta$. Gymnasium uses a semi-implicit integrator, so it
+conserves a nearby shadow Hamiltonian $\tilde H = H + O(\Delta t)$ rather than $E$ itself
+\citep{hairer2006geometric}. In our trajectories this produces about 12\% relative oscillation in
+$E$ without secular drift, which we treat as a noise floor.
+
+The search sees only latent states and the model's own one-step transition. It never sees $\theta$,
+$\dot\theta$ or $E$, and nothing in Equations~\ref{eq:ratio} and~\ref{eq:pair} refers to them. Ground
+truth enters afterward, when we score the recovered $C$ against $E$. We selected the extraction
+dimension on three development models and fixed it before evaluating the three models reported here.
+
+\paragraph{Code and data.} The extraction code, the run logs behind every figure and table, and
+the source of this paper are at \url{https://github.com/Zarand3r/world-model-invariants}. The figures
+regenerate from the committed logs without a GPU.
+
+\paragraph{Preliminary experiments.} We developed the extraction procedure in preliminary
+experiments on smaller recurrent models. Those experiments motivated the untrained, dissipative, and
+intervention controls used here, and we do not use them as evidence for the DreamerV3 results.

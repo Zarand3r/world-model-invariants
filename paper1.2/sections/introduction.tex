@@ -1,0 +1,65 @@
+\section{Introduction}
+\label{sec:intro}
+
+Probing is how we ask whether a model represents something. Fit a readout from the representation to
+the property of interest; if it succeeds, the property is there. The method's known weakness is that
+probe accuracy mixes what the representation stores with what the probe can learn, and the accepted
+remedy is better probe hygiene --- control tasks, selectivity, randomly initialised baselines
+\citep{hewitt2019control,belinkov2022probing}.
+
+We show that the remedy addresses the wrong failure. On a DreamerV3 world model trained only on
+pendulum video, we fit a polynomial readout to \emph{true} physical energy. It reaches a correlation
+of $0.9999$: as a probe it could not do better. Yet the direction it identifies is one the model's
+own transition does not preserve, and enforcing it during imagination makes the model's physics
+\emph{worse}. A label-free search that tracks energy slightly less well, but is $6.3\times$ better
+preserved by the transition, improves it by 41.8\%.
+
+The failure is not in the probe. It is that whether a latent \emph{encodes} a quantity and whether
+the model's dynamics \emph{preserve} it are different properties of the same representation, and no
+amount of probe methodology separates them --- because the probe is already perfect.
+
+\paragraph{Measuring the operator instead.}
+The discriminating measurement is not on the representation but on the transition: apply one
+autonomous step at a real encoded state and ask how much a candidate scalar moves
+(Equation~\ref{eq:rhoobs}). This single statistic separates trained from untrained models
+($74\times$), conservative from dissipative ($39\times$, no overlap), in-distribution from out
+($55$--$267\times$), one architecture from another ($660\times$), and a label-free scalar from a
+supervised probe of the same quantity ($6.3\times$). On every one of those contrasts a probe reports
+success.
+
+The dissociation is directional in each case we can construct: decodability is retained where
+conservation fails. Probing therefore over-reports, and it over-reports in the situations that
+matter --- outside the training distribution, in architectures that predict well without conserving,
+and when the quantity is supplied by supervision rather than found in the dynamics.
+
+\paragraph{The quantity the operator selects is used by the model.}
+A conserved-looking scalar could be an artifact of the search. Three interventions say otherwise.
+Projecting the latent back toward its level set during imagination reduces drift in \emph{decoded
+physical energy} by 55--76\% at long horizon on trajectories the method never saw, with 0 of 60
+magnitude-matched random directions and 0 of 15 equal-norm tangent directions beating it. Setting the
+scalar to an independent trajectory's value moves the imagined world's true energy toward that
+trajectory's true energy (rank correlation $0.80$--$0.91$, 0 of 75 controls). The same interchange
+applied 50 steps into an autonomous rollout --- on a state the model reached by itself --- works
+nearly as well, which is what a dormant pathway would not do \citep{makelov2024illusion}.
+
+\paragraph{And it has boundaries worth stating.}
+Outside the training energy band a freely fitted probe still recovers energy at $0.999$ while the
+transition conserves it $55$--$267\times$ worse: the representation generalises, the conservation does
+not. On a deterministic conv-GRU world model, identification transfers on 2 of 3 seeds and
+conservation on none, and training its transition seven times longer does not close the gap. The
+supportable scope is RSSM-like models, in distribution.
+
+\paragraph{Contributions.}
+\begin{enumerate}
+\item \textbf{A demonstration that probing over-reports, with a decisive control.} A supervised probe
+of the true physical quantity, at $|\rho| = 0.9999$, identifies a direction the dynamics do not use
+and that harms rollouts when enforced. The dissociation appears on four further independent axes and
+is directional in all of them.
+\item \textbf{An operator statistic that discriminates where probes cannot}, together with the
+matched controls --- magnitude-matched rather than norm-matched --- that make its intervention
+interpretable. We show the norm-matched null used in prior work on this system controls nothing,
+because the correction is scale-invariant in the constraint.
+\item \textbf{Causal evidence that the selected direction is deployed}, including an interchange 50
+steps into autonomous imagination, and \textbf{a boundary condition}: the phenomenon is bounded to
+the training distribution and does not transfer to a deterministic recurrent architecture.
+\end{enumerate}

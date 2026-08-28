@@ -1,0 +1,18 @@
+\begin{abstract}
+Probing asks whether a model represents a quantity by fitting a readout to it. Its known weakness is
+that accuracy mixes what the representation stores with what the probe can learn, and the accepted
+remedy is better probe hygiene. We show the remedy addresses the wrong failure. In a DreamerV3 world
+model trained only on pendulum video, a polynomial readout fitted to \emph{true} physical energy
+reaches a correlation of $0.9999$ --- yet the direction it identifies is one the model's own
+transition does not preserve, and enforcing it during imagination makes the model's physics worse. A
+label-free search that tracks energy slightly less well, but is $6.3\times$ better preserved by the
+transition, improves it by 41.8\%. Whether a latent encodes a quantity and whether the dynamics
+preserve it are different properties, and they dissociate on four further axes --- untrained models,
+out-of-distribution states, a second architecture, and an untrained transition --- always in the same
+direction, with decodability surviving where conservation fails. A statistic on the transition
+operator separates them in every case. The quantity that statistic selects is causally deployed:
+enforcing it cuts drift in decoded physical energy by 55--76\% on unseen trajectories, with 0 of 60
+magnitude-matched random directions beating it; setting it steers the imagined world's true energy
+(rank correlation 0.80--0.91); and the effect survives an interchange 50 steps into autonomous
+imagination. It is also bounded --- to the training distribution, and to RSSM-like architectures.
+\end{abstract}

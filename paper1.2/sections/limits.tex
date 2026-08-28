@@ -1,0 +1,31 @@
+\section{Limitations}
+\label{sec:limits}
+
+Two physical systems, both smooth and Hamiltonian: a pendulum and a two-degree-of-freedom anharmonic
+oscillator. No contacts, no multiple interacting objects, no actions. Whether any of this survives
+discontinuous dynamics is untested.
+
+Three trained models per arm. We report ranges rather than confidence intervals for model-level
+statistics throughout, because three is too few for a precise effect size, and we take the model seed
+rather than the trajectory as the independent unit for every model-level claim.
+
+The extraction searches a degree-4 polynomial family in a 12-dimensional principal subspace. The
+invariance ratio it minimises \emph{is} the normal component of one-step error, so the recovered
+scalar having low normal error is the objective being met rather than a finding; the empirical
+content is that the resulting direction coincides with physical energy, which
+Section~\ref{sec:dissociation} shows supervision does not reproduce.
+
+The architecture comparison does not isolate architecture. An open-loop reconstruction term and a
+prior--posterior KL are different losses, not the same loss at different strengths, so the conv-GRU
+result narrows the explanation toward the latent design without establishing it.
+
+We show no downstream consequence. Whether invariant drift predicts rollout failure usefully, or
+whether the correction helps a planner, is untested, and the effect on pixel error alone at short
+horizon is small (1.7\% at $H=50$). The large effects reported here are on decoded physical energy, a
+metric we introduce because it measures the property in question.
+
+Finally, the two-invariant case exposes a limitation of the extraction rather than of the model. On a
+system conserving both energy and angular momentum, the conserved subspace reliably contains both
+(angular-momentum correlation 0.94--0.98 in every measurement) while the joint fit isolates either in
+only 1 of 7 measurements across three models. The flow-alignment criterion, which selects a single
+direction inside the conserved subspace, has no unique answer when two independent invariants exist.

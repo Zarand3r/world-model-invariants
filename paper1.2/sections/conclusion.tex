@@ -1,0 +1,15 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+A probe fitted to the correct physical quantity, at a correlation of $0.9999$, identifies a direction
+a world model's dynamics do not use --- and enforcing it degrades the model's imagined physics, while
+a label-free scalar that is better conserved and slightly less accurate improves it. Decodability and
+dynamical structure are different properties of a representation, they come apart in every setting we
+could construct, and only a measurement on the transition operator tells them apart.
+
+The practical consequence is narrow and concrete. Finding that a physical variable is decodable from
+a world model's latent says little about whether the model's rollouts respect it, and it says least
+in the situations that matter most: outside the training distribution, in architectures that predict
+well without conserving, and when the variable is supplied by supervision rather than found in the
+dynamics. Reporting a probe result in those settings will overstate what the model has learned. The
+operator statistic costs one autonomous step per state to compute.
