@@ -49,7 +49,7 @@ scalar repairs them (median -42.2%, per-seed -50.9/-42.2/-32.2). 3/3 seeds, all 
 **Strongest alternative.** The supervised probe is worse simply because it is *different* from the
 recovered scalar, not because it is less conserved. Addressed by E10b: across candidates matched in
 decodability and spanning five orders of magnitude of conservation, repair tracks conservation
-(Spearman +0.71, +0.60, n = 2). The residual confound — conservation and decodability remain
+(Spearman +0.19, +0.57, +0.19 at n = 3; 95% CI excludes zero on 1 of 3, so NOT established. The +0.71 previously reported came from an uncommitted script and does not reproduce.) The residual confound — conservation and decodability remain
 rank-correlated even inside a matched band — is reported, replicates at nearly identical magnitude
 across seeds, and is argued to be structural rather than incidental.
 

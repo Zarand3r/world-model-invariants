@@ -210,7 +210,7 @@ CLAIMS = [
     ("OOD decodable-but-not-conserved (E14b)", "model seeds",
      ["e14b_ood_conservation.json"]),
     ("E10b conservation at matched decodability", "model seeds",
-     ["e10b_matched_decodability.json", "e10b_matched_decodability_s1.json"]),
+     ["e10b_matched_band_pool400.json"]),
     ("Supervised-probe dissociation (E18)", "model seeds",
      ["e18_supervised_baseline.json"]),
     ("Second architecture, conv-GRU (F4)", "model seeds", ["f4_recovery.json"]),

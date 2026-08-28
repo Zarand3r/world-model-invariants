@@ -22,6 +22,7 @@ def load(n): return json.loads((RUNS / n).read_text())
 
 e18, e19 = load("e18_supervised_baseline.json"), load("e19_shadow_sweep.json")
 f4b = load("f4b_recovery.json")
+e10b = load("e10b_matched_band_pool400.json")
 lf  = [m["unsupervised"] for m in e18["models"]]
 sup = [m["supervised"] for m in e18["models"]]
 at  = lambda m, c: next(r for r in m["sweep"] if r["c"] == c)
@@ -60,6 +61,20 @@ for m in e19["models"]:
 term = [m["recovered"]["rho_obs"] for m in f4b["models"] if m["ckpt"].endswith("step60000.pt")]
 check("F4b degradation vs RSSM",
       st.median(term) / st.median(r["rho_obs"] for r in lf), fmt="{:.0f}")
+
+# --- E10b (400-pool, the matched-design primary set) ---
+import math
+def _ci(r, n):
+    z = math.atanh(r); se = 1 / math.sqrt(n - 3)
+    return math.tanh(z - 1.96 * se), math.tanh(z + 1.96 * se)
+for m in e10b["models"]:
+    check(f"E10b Spearman {m['ckpt'][-16:-3]}", m["spearman_ratio_repair"], fmt="{:+.2f}")
+n_excl = sum(1 for m in e10b["models"]
+             if (lambda t: t[0] * t[1] > 0)(_ci(m["spearman_ratio_repair"], len(m["rows"]))))
+CHECKS.append((f"E10b CI excludes zero on {n_excl} of 3 (paper must say 'one of')",
+               "-", ("one of" in CORPUS.lower()) == (n_excl == 1)))
+CHECKS.append(("E10b: no unreproducible +0.71 anywhere in the paper",
+               "-", "+0.71" not in CORPUS))
 
 # --- an overclaim guard: any "N of N" claim about the supervised probe increasing drift ---
 inc = sum(1 for r in sup if r["effect_pct"] > 0)

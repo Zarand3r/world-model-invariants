@@ -4545,3 +4545,56 @@ Richard's call, and I am pausing to ask rather than rewriting the claim unilater
 committed immutably in `runs/e10b_matched_band.json` alongside the original
 `runs/e10b_matched_decodability*.json`, which are **kept, not deleted**, so the discrepancy stays
 inspectable.
+
+## 2026-08-28 -- **E10b pool amendment: A1 fails, and the claim is narrowed to a negative**
+
+Ran the approved amendment: pool 150 -> 400 on all three central seeds, everything else frozen.
+
+### A1 FAILS, and informatively
+
+| seed | ref `|rho_E|` | band @150 | band @400 | ratio span @400 | primary | 95% CI |
+|---|---|---|---|---|---|---|
+| s0 @60k | 0.064 | 147/150 | **397/400** | 4.1e-06 - 1.0e+00 | **+0.186** | [-0.279, +0.581] |
+| s1 @30k | 0.052 | 148/150 | **398/400** | 9.2e-06 - 1.0e+00 | **+0.574** | [+0.177, +0.811] |
+| s2 @60k | 0.111 | 19/150 | **19/400** | 1.8e-06 - 7.3e-04 | **+0.189** | [-0.290, +0.593] |
+
+Registered prediction A1 was that s2's band would populate to at least 100/400 spanning at least four
+orders of magnitude. **It populated to 19 of 400** -- adding 250 candidates put *not one* of them in
+the band, and s2's ratio span, selection and Spearman are bit-identical to the 150-pool run. Per the
+amendment's registered response, s2 is **not constructible at this pool size either**, reported as a
+property of the seed, and **not retried at a larger pool**.
+
+### The registered instability warning also fired
+
+The amendment registered that s0 and s1 should barely move, and that if they did, the metric is
+unstable to pool size. **s0 moved `+0.290 -> +0.186`**; s1 moved `+0.608 -> +0.574`. So the point
+estimate is not stable to a design choice that should be immaterial. The **verdict is** stable:
+the CI excludes zero on **1 of 3 seeds under both pool sizes**.
+
+### Registered reporting rule applied
+
+The rule fixed in advance was that the 400-pool set is primary (matched design) and the 150-pool set
+is kept and reported alongside, with the claim written to the weaker if they disagree. They agree.
+Both records are committed.
+
+### Claim narrowed
+
+`dissociation.tex`'s paragraph is retitled from "Conservation, not decodability, predicts the
+intervention" to **"Whether conservation \emph{alone} predicts the intervention is not
+established"**, and now reports `+0.19 / +0.57 / +0.19`, the 1-of-3 CI verdict, the pool instability,
+and s2's unconstructible band. The unreproducible `+0.71` is gone from the paper.
+
+**What survives and is now stated as the durable part:** the recovered scalar repairs on all three
+seeds (`-16.7%`, `-7.3%`, `-6.8%`), and the band's failure to populate on s2 is itself evidence for
+the structural point the section already made -- on a system whose transition conserves energy, the
+well-conserved directions *are* the energy-like ones, so this control may not be constructible on any
+such system. That is a statement about the difficulty of the control, not about the dissociation,
+which the supervised probe (E18) and the shadow-Hamiltonian mechanism (E19) establish directly.
+
+### Guards
+
+Added five E10b checks to `verify_paper_numbers.py`, including a standing guard that fails if `+0.71`
+ever reappears in the paper and one asserting the prose's "one of three" matches the recomputed CI
+count. **22/22 checks pass.** The evidence-base guard now reads E10b from the committed record.
+
+E10b was the last `n = 2` claim in the project. It is now n = 3 -- and negative.
