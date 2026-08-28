@@ -5620,3 +5620,8 @@ are present under their original names, and `git diff` against HEAD is empty apa
 documentation defects; the other's main finding was damage traceable to my own earlier edit.
 Continuing to wake every 30 minutes with no decision pending is now more likely to generate churn
 than findings, and that has been communicated. **Nothing was invented to fill this iteration.**
+
+> **Recurred 2026-08-28, later:** the loop fired again against an identical state -- no jobs, no
+> modified logs, no new artefacts, 34/34 checks green. Deliberately **not** written up as a second
+> entry: a log that repeats "nothing changed" every thirty minutes degrades the record it exists
+> to preserve. Subsequent no-op firings will be counted here rather than appended as entries.
