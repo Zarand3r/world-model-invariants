@@ -4428,3 +4428,21 @@ measure of that. Reported, not glossed.
 This is a mechanism, not another phenomenon. It upgrades the central claim from "decodability and
 conservation dissociate" to "they dissociate, and here is why, quantitatively, with the location of
 a minimum predicted from the integrator and hit to +/-0.005 with no free parameters."
+
+### E19 write-up, and one number I quoted wrong
+
+Added `paper1.2/sections/mechanism.tex` (Section 4, between the dissociation and the causal section),
+`paper1.2/make_fig2.py` -> `figures/fig2_shadow_sweep.pdf`, and rewrote the abstract to carry the
+mechanism. Also corrected a stale `6.3x` -> `6.7x` in the abstract, left over from the mean/median
+unification earlier today.
+
+**Caught while tracing numbers to the run record:** I wrote the wrong-sign control as "$14\times$
+worse". That is **seed 3's value alone** -- the per-seed ratios are 14.07, 9.99, 12.41, median
+**12.41**. Quoting 14 was selecting the most flattering seed, which is precisely what the median
+convention adopted this morning exists to prevent. Corrected to `12x` with the range `10-14x` stated,
+in the section, the figure caption and the abstract.
+
+Figure 2 took three render-inspect cycles, each one finding a collision invisible in the code:
+the legend sat on the data; then the blue reference line struck through the legend; then the
+relocated legend landed on the `label-free C` annotation. All three were only visible on sight, and
+the last two only at full page scale rather than at figure scale.
