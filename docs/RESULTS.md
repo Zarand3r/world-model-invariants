@@ -97,11 +97,17 @@ Source: `e4_s{3,4,5}.json`
 
 ## Evidence base per claim (mechanical n-check)
 
-This session recorded **ten corrections**. Seven came from generalising a small-n
+This session recorded **twelve corrections**. Seven came from generalising a small-n
 observation; two came from re-reading what a statistic actually measures, and both of
 those *removed* a stated weakness rather than narrowing a claim; one was an overclaim
 caught only by rendering a figure and looking at it (E18: the supervised probe was
-stated to increase drift on 3 of 3 models, but on one it reduces it by 0.3%).
+stated to increase drift on 3 of 3 models, but on one it reduces it by 0.3%); one was
+an arithmetic slip (F4b 768x, correctly 767x); and one was a result that could not be
+reproduced at all (E10b's +0.71 came from an uncommitted script, and the committed
+reimplementation gives +0.19, turning a supporting control into a negative result).
+
+Three of the twelve were found by a mechanical guard rather than by reading prose, and
+each guard was added *after* a defect had already slipped past a manual reading.
 This table is generated from the run records so the evidence base behind each claim cannot
 drift out of the prose. A claim resting on n = 1 is flagged, not omitted.
 
