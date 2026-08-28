@@ -5625,3 +5625,50 @@ than findings, and that has been communicated. **Nothing was invented to fill th
 > modified logs, no new artefacts, 34/34 checks green. Deliberately **not** written up as a second
 > entry: a log that repeats "nothing changed" every thirty minutes degrades the record it exists
 > to preserve. Subsequent no-op firings will be counted here rather than appended as entries.
+
+
+## 2026-08-28 -- **F5 preregistered: does the privileged direction improve control return? (not yet run)**
+
+Loop iteration. No jobs, no new artefacts, 34/34 checks green. Richard asked whether a planning or
+control demonstration had ever been explored. **It has not** -- verified rather than recalled: there
+is no reward, policy, planner, MPC or CEM code anywhere in the repo, and
+`train_dreamer_pendulum.py:3` states the reason ("World model only -- no actor, no critic"). Every
+"control" hit in the codebase is an *experimental* control.
+
+The loop instruction is to preregister before running any new major experiment. Writing the
+registration is that precondition, is decision-free, and makes the go/no-go concrete. **F5 is
+registered and NOT approved to run.**
+
+### The obstacle the design surfaced, which is itself worth recording
+
+The recovered `C` is a **conserved** quantity defined for **free** evolution. Under actuation,
+enforcing `C = const` during planning would **cancel the action's own legitimate effect on energy**
+-- the correction would fight the task. A naive "apply the paper's method to a planner" experiment
+would therefore have been mis-specified, and would likely have produced a negative for the wrong
+reason.
+
+**F5 does not need F1 to succeed.** A planner *knows its own action*, so the source term can be
+**supplied** rather than learned: `Delta C = tau * thetadot * dt`, with `tau` from the plan and
+`thetadot` from the validated readout. F1's Gate 0 already established -- on ground truth, no model
+-- that this relation closes to **1.7%**. F1's blocked extraction was about *discovering* the balance
+law without labels; a planner does not need to.
+
+### Design summary
+
+Task is **energy targeting inside the training band** (`[-2.58, 5.07]`), chosen for two reasons that
+make it a hard test rather than a flattering one: it **requires changing** the quantity the naive
+correction conserves, and it stays in-distribution, so a failure cannot be blamed on the shift that
+swing-up would have invited.
+
+Five arms share one CEM planner: no correction; naive conservation (expected to **hurt**);
+balance-aware on the label-free `C`; the same on E18's **supervised probe**; and a magnitude-matched
+random null. Gate 0 requires plain imagination to beat random actions before any arm is compared.
+
+**P3 -- does the probe-versus-operator dissociation survive contact with a task? -- is registered as
+the prediction most likely to fail**, and as the one that would most change what the paper can claim.
+P1 failing is registered as a real possibility that would be reported as the headline negative, in
+the same terms as F2.
+
+### Status
+
+Awaiting approval. Estimated 2-4 GPU-hours, no training required.
