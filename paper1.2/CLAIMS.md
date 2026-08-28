@@ -37,9 +37,11 @@ physical quantity, reaching essentially perfect correlation, still identifies a 
 dynamics do not use.
 
 **Decisive evidence.** E18: a supervised polynomial probe fitted to true energy reaches
-`|rho_E| = 0.9999` and is **6.3x less conserved** by the transition than the label-free scalar
-(4.58e-02 vs 7.26e-03); enforcing it **harms** rollouts (+20.0%) where enforcing the label-free
-scalar repairs them (median -42.2%, per-seed -50.9/-42.2/-32.2). 3/3 seeds, all three registered predictions passed.
+`|rho_E| = 0.9999` and is **6.7x less conserved** by the transition than the label-free scalar
+(median 4.58e-02 vs 6.85e-03); it **never repairs** rollouts (+26.8/-0.3/+33.4 per seed, so it
+increases drift on 2 of 3 and reduces it on none) where the label-free scalar repairs on 3 of 3
+(median -42.2%, per-seed -50.9/-42.2/-32.2). All aggregates are medians across the three seeds,
+matching the figures. <!-- superseded: the mean-based 6.3x / +20.0% quoted here before 2026-08-27 -->
 
 **Supporting, each an independent axis:** untrained models (`rho_obs` 74x worse at `rho_E` up to
 0.908); out of distribution (free probe 0.999, conservation 55-267x worse); a second architecture
@@ -47,11 +49,21 @@ scalar repairs them (median -42.2%, per-seed -50.9/-42.2/-32.2). 3/3 seeds, all 
 ~10,000x worse).
 
 **Strongest alternative.** The supervised probe is worse simply because it is *different* from the
-recovered scalar, not because it is less conserved. Addressed by E10b: across candidates matched in
-decodability and spanning five orders of magnitude of conservation, repair tracks conservation
-(Spearman +0.19, +0.57, +0.19 at n = 3; 95% CI excludes zero on 1 of 3, so NOT established. The +0.71 previously reported came from an uncommitted script and does not reproduce.) The residual confound — conservation and decodability remain
-rank-correlated even inside a matched band — is reported, replicates at nearly identical magnitude
-across seeds, and is argued to be structural rather than incidental.
+recovered scalar, not because it is less conserved.
+
+**This alternative is NOT closed by E10b, and the paper says so.** E10b matched candidates on
+decodability and varied conservation over five orders of magnitude; the rank correlation with repair
+is +0.19, +0.57, +0.19 at n = 3, with the 95% CI excluding zero on only 1 of 3 seeds.
+<!-- superseded: the +0.71 reported before 2026-08-28 came from an uncommitted script and does not reproduce; see the execution log -->
+On a third seed the matched band cannot be built at all — 19 of 400 candidates — and
+conservation and decodability stay rank-correlated even inside the band.
+
+**What closes it instead is E19.** The shadow-Hamiltonian sweep shows the supervised probe is worse
+for an identified reason rather than an unexplained one: it is fitted to a quantity the generating
+integrator does not conserve. `rho_obs` is minimised at exactly the coefficient the integrator
+predicts, on 3 of 3 seeds, 12x better than the wrong-sign control, and correcting that O(dt) term
+flips the intervention from harmful to repairing on every seed. That is a mechanism, not a
+correlation, and it does not depend on E10b.
 
 ---
 
@@ -111,6 +123,6 @@ general. The supportable scope is RSSM-like models, in-distribution.
 ## Figure 1 structure
 
 `probe finds it -> operator says the model does not use it -> intervening confirms the operator`.
-Panel A: supervised probe `rho_E` 0.9999 vs label-free 0.956. Panel B: `rho_obs` 4.58e-02 vs
-7.26e-03. Panel C: repair +26.8% vs -42.2% (medians; supervised is +26.8/+33.4/-0.3 per seed -- it never repairs, but it only *increases* drift on 2 of 3). One figure, one message: the right answer, fitted
+Panel A: supervised probe `rho_E` 0.9999 vs label-free 0.966. Panel B: `rho_obs` 4.58e-02 vs
+6.85e-03. Panel C: repair +26.8% vs -42.2% (medians; supervised is +26.8/+33.4/-0.3 per seed -- it never repairs, but it only *increases* drift on 2 of 3). One figure, one message: the right answer, fitted
 perfectly, does not work.

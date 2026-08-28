@@ -13,7 +13,14 @@ import json, pathlib, re, statistics as st, sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 RUNS, TEX = ROOT / "runs", ROOT / "paper1.2" / "sections"
+# CLAIMS.md is checked too: it carried stale mean-based numbers for a full day because this
+# verifier only ever globbed sections/*.tex, and nothing else compared the two.
 _RAW = "\n".join(p.read_text() for p in sorted(TEX.glob("*.tex")))
+_RAW += "\n" + (TEX.parent / "CLAIMS.md").read_text()
+# Lines marked `<!-- superseded: ... -->` deliberately NAME an old value in order to record that it
+# was wrong. A repo that documents its own corrections will otherwise trip every stale-value guard
+# it owns, so those annotations are excluded from the corpus the guards read.
+_RAW = "\n".join(l for l in _RAW.split("\n") if "<!-- superseded:" not in l)
 # LaTeX writes a minus as `$-$`, so a literal "-42.2" never appears in the source.
 CORPUS = _RAW.replace("$-$", "-").replace("--", "-")
 CS = 0.125
@@ -75,10 +82,17 @@ CHECKS.append((f"E10b CI excludes zero on {n_excl} of 3 (paper must say 'one of'
                "-", ("one of" in CORPUS.lower()) == (n_excl == 1)))
 CHECKS.append(("E10b: no unreproducible +0.71 anywhere in the paper",
                "-", "+0.71" not in CORPUS))
+for stale, why in (("6.3x", "E18 ratio is 6.7x (median), not the mean-based 6.3x"),
+                   ("7.26e-03", "label-free rho_obs median is 6.85e-03, not the mean"),
+                   ("+20.0", "supervised effect median is +26.8%, not the mean +20.0%")):
+    CHECKS.append((f"no stale mean-based value {stale!r} ({why})", "-", stale not in CORPUS))
 
 # --- an overclaim guard: any "N of N" claim about the supervised probe increasing drift ---
 inc = sum(1 for r in sup if r["effect_pct"] > 0)
-bad = re.search(r"increases[^.]{0,80}?3 of 3", CORPUS, re.S | re.I)
+# Catch "the supervised probe increases drift on 3 of 3" while allowing the CORRECT sentence,
+# which says it increases on 2 of 3 and that the label-free scalar repairs on 3 of 3. The negated
+# span rejects any match with an intervening "2 of 3".
+bad = re.search(r"increases(?:(?!2 of 3)[^.]){0,80}?3 of 3", CORPUS, re.S | re.I)
 CHECKS.append((f"no 'increases on 3 of 3' claim (actual: {inc} of {len(sup)} increase)",
                "-", bad is None))
 
