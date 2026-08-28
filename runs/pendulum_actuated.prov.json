@@ -1,0 +1,20 @@
+{
+ "runs": [
+  {
+   "argv": [
+    "scripts/make_pendulum_actuated.py"
+   ],
+   "cwd": "/home/rbao/world-model-invariants",
+   "utc": "2026-08-28T16:44:03+00:00",
+   "git": "4a8e3db48dc49e5f70ca323ef74a7cb5c2fb726e",
+   "git_dirty": true,
+   "python": "3.13.13",
+   "inputs": {},
+   "torque_max": 1.0,
+   "hold": 5,
+   "seed": 0,
+   "n_traj": 256,
+   "n_steps": 120
+  }
+ ]
+}

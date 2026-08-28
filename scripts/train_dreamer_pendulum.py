@@ -42,7 +42,11 @@ def _sha256(path: str) -> str:
 def load(path, device):
     d = np.load(path)
     frames = torch.as_tensor(d["frames"]).float().div_(255.0).sub_(0.5)   # (B,T,H,W,3) NHWC
-    return frames.to(device), torch.as_tensor(d["states"]).float(), torch.as_tensor(d["energy"]).float()
+    # F1 datasets carry actions; free-evolution ones do not. `None` keeps the old zero-action path
+    # bit-for-bit, so this loader stays valid for every checkpoint trained before F1.
+    acts = torch.as_tensor(d["actions"]).float().to(device) if "actions" in d.files else None
+    return (frames.to(device), torch.as_tensor(d["states"]).float(),
+            torch.as_tensor(d["energy"]).float(), acts)
 
 
 def true_energy_from_states(th, thd, g=10.0, m=1.0, l=1.0):
@@ -51,7 +55,9 @@ def true_energy_from_states(th, thd, g=10.0, m=1.0, l=1.0):
 
 def main(a):
     dev = "cuda" if torch.cuda.is_available() else "cpu"
-    frames, states, energy = load(a.data, dev)
+    frames, states, energy, actions = load(a.data, dev)
+    act_train = actions[:int(0.8 * frames.shape[0])] if actions is not None else None
+    act_val = actions[int(0.8 * frames.shape[0]):] if actions is not None else None
     n_train = int(0.8 * frames.shape[0])
     train, val = frames[:n_train], frames[n_train:]
     print(f"  data {tuple(frames.shape)} on {dev}   train {n_train}  val {frames.shape[0]-n_train}")
@@ -81,7 +87,8 @@ def main(a):
         i = torch.randint(0, n_train, (a.batch,), device=dev)
         t = torch.randint(0, train.shape[1] - a.seq, (1,)).item()
         batch = train[i, t:t + a.seq]
-        recon, kl, kl_raw = model.loss(batch, kl_free=a.free_bits)
+        ab = act_train[i, t:t + a.seq] if act_train is not None else None
+        recon, kl, kl_raw = model.loss(batch, actions=ab, kl_free=a.free_bits)
         loss = recon + kl
         opt.zero_grad(set_to_none=True)
         loss.backward()
@@ -94,8 +101,10 @@ def main(a):
             print(f"  [ckpt] {cp}  step {step}  [{hrs*60:.1f} min]", flush=True)
         if step % 2000 == 0 or step == 1:
             with torch.no_grad():
-                vb = val[torch.randint(0, val.shape[0], (a.batch,), device=dev), :a.seq]
-                vr, vk, vkr = model.loss(vb, kl_free=a.free_bits)
+                vi = torch.randint(0, val.shape[0], (a.batch,), device=dev)
+                vb = val[vi, :a.seq]
+                va = act_val[vi, :a.seq] if act_val is not None else None
+                vr, vk, vkr = model.loss(vb, actions=va, kl_free=a.free_bits)
             el = time.time() - t0
             hist.append({"step": step, "recon": float(recon), "kl": float(kl),
                          "kl_raw": kl_raw, "val_recon": float(vr), "hours": el / 3600})
@@ -111,23 +120,46 @@ def main(a):
     with torch.no_grad():
         vb = val[:, :a.seq]
         var = float(vb.var())
-        vr, _, vkr = model.loss(vb, kl_free=a.free_bits)
-        # open-loop rollout stability
-        hs = model.encode(val[:, :10])
+        vav = act_val[:, :a.seq] if act_val is not None else None
+        vr, _, vkr = model.loss(vb, actions=vav, kl_free=a.free_bits)
+        # open-loop rollout stability, driven by the true actions when the dataset has them
+        hs = model.encode(val[:, :10], actions=act_val[:, :10] if act_val is not None else None)
         h = hs[:, -1]
         outs = []
-        for _ in range(60):
+        for k in range(60):
             outs.append(model.readout_from_h(h))
-            h = model.transition(h)
+            h = model.transition(h, a=act_val[:, 9 + k] if act_val is not None else None)
         roll = torch.stack(outs, 1)
         finite = bool(torch.isfinite(roll).all())
         spread = float(roll.std())
     with torch.no_grad():
-        hh = model.encode(val[:, :20])[:, -1]
+        hh = model.encode(val[:, :20], actions=act_val[:, :20] if act_val is not None else None)[:, -1]
         pred = model.readout_from_h(hh)
         mse_model = float(((pred - val[:, 19]) ** 2).mean())
         mse_mean = float(((val[:, 19].mean(dim=0, keepdim=True) - val[:, 19]) ** 2).mean())
+
+    # ---- F1 acceptance: does the model actually USE the action? ----
+    # Added for F1 for the same reason the rollout-motion criterion was added after F4's first run:
+    # a model that silently ignores its action input passes every other check here, and every F1
+    # result computed on it would be meaningless. Compare a 20-step open-loop rollout driven by the
+    # TRUE actions against one driven by the same actions shuffled across the batch.
+    act_ratio = None
+    if act_val is not None:
+        with torch.no_grad():
+            h0 = model.encode(val[:, :10], actions=act_val[:, :10])[:, -1]
+            perm = torch.randperm(val.shape[0], device=val.device)
+            errs = {}
+            for tag, av in (("true", act_val), ("shuffled", act_val[perm])):
+                h, outs = h0.clone(), []
+                for k in range(20):
+                    outs.append(model.readout_from_h(h))
+                    h = model.transition(h, a=av[:, 9 + k])
+                errs[tag] = float(((torch.stack(outs, 1) - val[:, 10:30]) ** 2).mean())
+            act_ratio = errs["true"] / max(errs["shuffled"], 1e-12)
     print(f"\n  ACCEPTANCE")
+    if act_ratio is not None:
+        print(f"    action use: rollout MSE true/shuffled = {act_ratio:.3f}  "
+              f"({'OK' if act_ratio < 0.9 else 'FAIL — the model ignores its action input'})")
     print(f"    raw KL {vkr:.2f} nats  ({'OK' if vkr > 1.0 else 'FAIL — posterior collapsed'})")
     print(f"    1-step decode MSE {mse_model:.5f} vs predict-the-mean {mse_mean:.5f}   "
           f"ratio {mse_model/max(mse_mean,1e-12):.3f}  "

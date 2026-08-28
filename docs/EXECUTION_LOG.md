@@ -4831,3 +4831,75 @@ consequence is larger.
 
 Data generation with actions, then adapter threading, then 3 seeds. The second half of F1
 (correcting toward predicted balance) stays unregistered until P1-P3 establish the object exists.
+
+## 2026-08-28 -- **F1 build: actuated data, action-conditioned adapter, training launched**
+
+Loop iteration. No jobs running at start, no failures. G0's artefact re-checked against
+`F1_PREREG`: `G0_pass=True`, 356 kept, zero clipping, best variant `shadow_H + midpoint power` at
+0.0168, provenance stamped. Proceeding per the registration.
+
+### G0 re-checked at the real trajectory length
+
+G0 was run at `n_steps = 400`, but the free-evolution dataset is `(256, 120)`. Re-ran at 120:
+residual **0.02305** (still under the 0.05 bar), clipping zero, yield **63%** against 35% at 400
+steps, energy spread 1.79. The gate holds at the length the data will actually have -- worth checking
+rather than assuming, since both yield and residual depend on horizon.
+
+### Data
+
+`scripts/make_pendulum_actuated.py`, deliberately **separate** from `make_pendulum_pixels.py`: that
+script documents that its RNG consumption is bit-exact so the free-evolution `data_sha256` chain the
+existing checkpoints record stays valid, and adding actions to it would break that. The free
+generator already rejects clipped trajectories, so the F1 rejection rule matches existing practice
+rather than inventing one.
+
+Generated `runs/pendulum_actuated.npz`: `(256, 120)`, 0.38 GB, torque `|tau| <= 1.0` held 5 steps,
+actions stored. **Its textbook balance residual is 0.9024**, against G0's states-only prediction of
+~0.9 -- the rendered dataset behaves exactly as the gate said it would.
+
+### Readout validation on the actuated data
+
+The E1 readout is unchanged and still works:
+
+| | actuated | free-evolution reference |
+|---|---|---|
+| theta | 0.00289 rad | -- |
+| thetadot | 0.03577 rad/s | -- |
+| energy | **2.09%** of across-traj spread | 1.6% |
+
+Slightly worse, as expected from higher velocities, and well inside usable range.
+
+### Adapter: actions threaded, with the indexing stated rather than inferred
+
+`RSSM.observe` scans `obs_step(prev_state, prev_act, embed[t], ...)`, so its `action[:, t]` is the
+action that led **into** state `t`. `img_step(prev_state, prev_action)` applies the action **at** the
+current state. The F1 data stores `actions[t]` as the torque applied at state `t`. Therefore:
+
+- `encode` / `loss` **shift and zero-pad**: `rssm_action[:, t] = data_action[:, t-1]`.
+- `transition(h, a)` does **not** shift.
+
+Both conventions are written into the docstrings. Getting this backwards would have made F1 measure
+the model's response to the wrong action while every other check still passed.
+
+**Backward compatibility verified, not assumed:** `encode(no actions) == encode(zeros)` and
+`transition(h) == transition(h, 0)` are exactly equal on a loaded checkpoint, so every experiment
+already run is unaffected; and `transition(h, a=1)` does differ, so the action reaches the dynamics.
+
+### A new acceptance criterion, for the same reason F4 needed one
+
+F4's first run trained a transition that was never in the loss and produced a frozen rollout that
+passed every acceptance check then in place. An action-conditioned model that **silently ignores its
+action input** would likewise pass every existing check, and every F1 number computed on it would be
+meaningless. Added to `train_dreamer_pendulum.py`:
+
+    action use: 20-step open-loop rollout MSE with TRUE actions / with actions SHUFFLED across the
+    batch, must be < 0.9
+
+### Training
+
+`scripts/run_f1_training.sh`, using the guarded `step()` pattern from `run_stage1_bootstrap.sh` --
+an inline loop without that guard is what silently retrained over analysed `ce_s0` checkpoints on
+2026-08-27. Three seeds, step-capped at 60,000 with the E8 checkpoint grid, matching the Stage 1
+contract. Seed 3 running.
+
+Nothing is claimed yet: P1-P3 are unevaluated and the balance-law extraction is not written.

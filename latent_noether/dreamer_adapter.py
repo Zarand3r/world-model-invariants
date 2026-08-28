@@ -92,10 +92,21 @@ class DreamerV3Adapter(nn.Module):
         z = (oh + probs - probs.detach()) if straight_through else oh
         return z.reshape(h.shape[0], self.stoch * self.discrete)
 
-    def transition(self, h):
-        """One autonomous step: a pure, differentiable function of `h` alone."""
+    def transition(self, h, a=None):
+        """One autonomous step. With `a=None` this is free evolution, exactly as before.
+
+        ACTION CONVENTION, read off `RSSM.img_step(prev_state, prev_action)`: the action passed here
+        is the one applied *at* the current state `h`, producing the next state. That is the same
+        indexing the F1 data uses (`actions[t]` is the torque applied at state `t`), so no shift is
+        needed here -- unlike `encode`, which does need one. Getting this backwards would make F1
+        measure the model's response to the wrong action, so the two conventions are stated
+        explicitly rather than inferred at each call site.
+        """
         z = self.prior_stoch(h)
-        a = torch.zeros(h.shape[0], 1, dtype=h.dtype, device=h.device)   # free evolution
+        if a is None:
+            a = torch.zeros(h.shape[0], 1, dtype=h.dtype, device=h.device)   # free evolution
+        else:
+            a = a.reshape(h.shape[0], -1).to(dtype=h.dtype, device=h.device)
         x = self.rssm._img_in_layers(torch.cat([z, a], -1))
         _, deter = self.rssm._cell(x, [h])
         return deter[0]
@@ -129,7 +140,21 @@ class DreamerV3Adapter(nn.Module):
         finally:
             self.rssm.obs_step = orig
 
-    def encode(self, obs, deterministic: bool = True):
+    @staticmethod
+    def _rssm_actions(actions, B, T, device, dtype):
+        """Data convention -> RSSM convention.
+
+        `RSSM.observe` scans `obs_step(prev_state, prev_act, embed[t], is_first[t])`, so its
+        `action[:, t]` is the action that led INTO state `t`. The F1 data stores `actions[t]` as the
+        torque applied AT state `t`. The two differ by one step, so shift and zero-pad the first.
+        `obs_step` already zeroes `prev_action` wherever `is_first`, so the pad is consistent.
+        """
+        if actions is None:
+            return torch.zeros(B, T, 1, device=device, dtype=dtype)
+        a = actions.reshape(B, T, -1).to(device=device, dtype=dtype)
+        return torch.cat([torch.zeros_like(a[:, :1]), a[:, :-1]], dim=1)
+
+    def encode(self, obs, actions=None, deterministic: bool = True):
         """Teacher-forced pass. obs: (B, T, H, W, 3) in [-0.5, 0.5] -> deter states (B, T, deter).
 
         INDEXING, verified empirically 2026-08-11 (an earlier docstring said obs[:k+1] and was
@@ -139,7 +164,7 @@ class DreamerV3Adapter(nn.Module):
         """
         B, T = obs.shape[:2]
         embed = self.encoder({"image": obs})
-        action = torch.zeros(B, T, 1, device=obs.device, dtype=obs.dtype)
+        action = self._rssm_actions(actions, B, T, obs.device, obs.dtype)
         is_first = torch.zeros(B, T, device=obs.device, dtype=obs.dtype)
         is_first[:, 0] = 1.0
         ctx = self._deterministic_posterior() if deterministic else contextlib.nullcontext()
@@ -149,11 +174,11 @@ class DreamerV3Adapter(nn.Module):
 
     # ---- training ---------------------------------------------------------------------
 
-    def loss(self, obs, kl_free: float = 1.0, dyn_scale: float = 0.5, rep_scale: float = 0.1):
+    def loss(self, obs, actions=None, kl_free: float = 1.0, dyn_scale: float = 0.5, rep_scale: float = 0.1):
         """Reference DreamerV3 world-model loss at published defaults."""
         B, T = obs.shape[:2]
         embed = self.encoder({"image": obs})
-        action = torch.zeros(B, T, 1, device=obs.device, dtype=obs.dtype)
+        action = self._rssm_actions(actions, B, T, obs.device, obs.dtype)
         is_first = torch.zeros(B, T, device=obs.device, dtype=obs.dtype)
         is_first[:, 0] = 1.0
         post, prior = self.rssm.observe(embed, action, is_first)
