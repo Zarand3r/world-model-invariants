@@ -3655,3 +3655,73 @@ place by the relaunched job. `runs/f4_recovery.json` deleted — its numbers des
 longer exists.
 
 **F4's registered predictions are untested.** The first run does not bear on them.
+
+---
+
+## 2026-08-28 01:40–02:00 UTC — **F4: identification transfers across architectures, conservation does not**
+
+Git at `cad6bc1`. ConvGRU seed 3 retrained with the open-loop term and **passed the tightened
+acceptance checks**: decode ratio 0.005, rollout pixel std 0.058 (was 0.021), and the new
+**rollout-motion check at 0.772x the data's frame-to-frame motion** (was 0.00084, frozen).
+
+### A stale-result near-miss, caught by the numbers being too identical
+
+The first re-run returned values identical to the flawed model **to four decimal places**. Cause:
+`rm -f runs/f4_recovery.json` had been inside the earlier command block that failed, so the file
+survived, and `run_f4_recovery.py` — which is resumable by design — skipped every checkpoint as
+already done and rewrote the old file.
+
+Caught only because four independent numbers matching to 4 dp after a retrain is impossible.
+**Resumability worked against correctness here**, and the same property that makes long runs
+restartable makes stale results invisible. Worth a guard: resumable scripts should record the
+checkpoint hash, not just its path.
+
+### The genuine result, corrected model
+
+| step | \|rho_E\| | invariance ratio | **`rho_obs`** |
+|---|---|---|---|
+| 6,500 | 0.9326 | 3.87e-04 | **8.64** |
+| 15,000 | 0.9541 | 1.51e-04 | **3.67** |
+| 30,000 | 0.9131 | 1.95e-04 | **3.75** |
+| 60,000 | **0.9708** | 7.35e-05 | **1.75** |
+| **DreamerV3 RSSM** | 0.930 – 0.973 | ~1e-04 | **6.3e-03 – 8.7e-03** |
+| ConvGRU, untrained transition | ~0.97 | ~1e-04 | 64 – 238 |
+
+**Prediction 1 PASSES on both clauses.** `|rho_E|` reaches 0.97, matching the RSSM, and the
+invariance ratio (7.35e-05 to 3.87e-04) is within an order of magnitude of the RSSM's ~1e-04 —
+registered tolerance was two orders.
+
+**Conservation does not transfer.** `rho_obs` is **200-1000x worse** than the RSSM at every
+checkpoint. Training the transition improved it 10-40x from the untrained case (64-238 -> 1.75-8.64)
+and it improves monotonically with training, but it does not approach the RSSM.
+
+### What this establishes, and the confound that limits it
+
+Across **two architectures with completely different latent structure** — 32x32 categorical
+stochastic with KL balancing, versus a deterministic GRU state — the extraction recovers a scalar
+that tracks energy at 0.91-0.97 and is nearly constant along observation-conditioned trajectories in
+both. **Identification is architecture-independent.**
+
+**Whether the transition conserves that scalar is not.** The RSSM does it ~200x better.
+
+**The confound, stated plainly:** the ConvGRU's open-loop term trains its transition over 8 steps of
+a 64-step sequence, while DreamerV3's `kl_dyn` trains its prior at **every** step. So the two are not
+matched on *how much* prior-training signal they receive, and this comparison cannot separate "the
+architecture" from "the amount the transition is trained". Given that the untrained-to-trained change
+was itself 10-40x, the remaining 200x gap could plausibly close further with a stronger open-loop
+term. **That is untested**, and the result should be stated as *conservation depends strongly on how
+the transition is trained*, which is what all three measurements support, rather than as a claim
+about stochastic versus deterministic latents.
+
+### This is the fourth independent route to the same dissociation
+
+Decodability and conservation come apart across **regions of state space** (E14b), across **candidate
+directions** (E10b), across **training objectives** (the untrained-transition run), and now across
+**architectures**. The recurring finding of this project is not the repair — it is that these two
+properties are separable, and that only the operator statistic sees the difference.
+
+### Status
+
+Seed 3 only; seeds 4 and 5 training. F4 prediction 2 (repair) is untested — with `rho_obs` of 1.75,
+one autonomous step changes `C` by 1.75x its across-trajectory spread, so a level-set projection has
+little to lock onto. That is an expectation, not a measurement.
