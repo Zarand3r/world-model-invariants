@@ -3912,3 +3912,71 @@ E11 passed.
 Pendulum seeds 3/4/5 at step 6,500, 10 random and 3 tangent controls per seed per depth. The
 interpretation rule from `E4_PREREG` carries over unchanged: this shows the recovered **subspace** is
 causally deployed at depth, not that the model maintains an internal energy register.
+
+---
+
+## 2026-08-28 03:10–03:25 UTC — **The "mechanism is unexplained" claim was my own mis-framing, and is withdrawn**
+
+Git at `d02bbdc`. F4b training (seed 3, step 44,000).
+
+### What I have been saying, and why it was wrong
+
+Since E3 I have described the project as having an open mechanism gap: *"the repair works and is
+highly specific, but both natural geometric accounts were falsified, so we can say that it works and
+not why."* That was stated to Richard in the venue assessment as a weakness that "caps enthusiasm".
+
+E3 registered the prediction that one-step error would be preferentially **normal** to the level set
+(`f_perp > 1/12`), and measured 0.020-0.024 — four times **below** isotropic. I recorded the
+falsifier as fired and the geometric account as dead.
+
+**The prediction was backwards, and I should have seen it when writing the prereg.**
+
+The invariance ratio the extraction minimises is `within-trajectory var(C) / total var(C)`.
+Within-trajectory variation in `C` **is** `grad(C) . dz` — the normal component of the step. So
+**minimising the invariance ratio is minimising normal error by construction.** A successful fit
+must produce low `f_perp`. E3 predicted the opposite of what the method optimises.
+
+### Confirmed empirically
+
+| seed | recovered `f_perp` | best achievable in family | random `C` | isotropic |
+|---|---|---|---|---|
+| 3 | 0.0197 | **0.0182** | 0.0475 | 0.0833 |
+| 4 | 0.0214 | **0.0183** | 0.0453 | 0.0833 |
+| 5 | 0.0238 | **0.0202** | 0.0454 | 0.0833 |
+
+The recovered `C` sits within 8-18% of the **minimum the polynomial family allows**. Low `f_perp` is
+the objective being met, not a property requiring explanation.
+
+Note random constraints also fall below isotropic (0.045 against 0.083): the latent's one-step error
+is anisotropic, so any polynomial gradient partially aligns with low-error directions. The recovered
+`C` achieves **2.4x lower than random**, which is the part that is not automatic.
+
+### The mechanism, stated completely
+
+There is no gap. The chain is:
+
+1. The extraction **searches for** the direction whose normal error is minimal — that is what the
+   invariance ratio measures.
+2. It finds one achieving 2.4x lower normal error than a random polynomial, and near the family
+   minimum.
+3. **That direction turns out to correlate 0.97 with true physical energy.** This is the finding.
+   Nothing in the objective mentions energy.
+4. Only the normal component changes `C`, so projecting along `grad C` removes the residual — 2% of
+   total error energy but **100% of the C-error**.
+5. Because `C ~ E`, removing C-drift removes energy drift.
+
+Steps 1, 2, 4 and 5 are mechanical. **Step 3 is the empirical content**, and E18 is what makes it
+non-trivial: fitting to energy *directly* gives a scalar that is 6.3x worse conserved and repairs
++20% instead of -42%. The model's best-conserved direction and the true physical energy coincide,
+and that coincidence is neither guaranteed nor reproducible by supervision.
+
+### Consequence for the paper
+
+The venue assessment listed "mechanism unexplained" as one of the objections that would draw fire.
+**It is withdrawn.** The remaining honest weaknesses are the architecture-dependence F4 exposed at
+n = 3, the confinement of the invariant to the training distribution (E14/E14b), and two toy systems.
+
+This is the eighth correction of the session and the second that **removes** a stated weakness rather
+than narrowing a claim. Both removals came from re-reading what a statistic actually measures — the
+sample-size withdrawal came from noticing bootstrap is invalid for a within-versus-across variance
+decomposition, and this one from noticing the invariance ratio *is* normal error.
