@@ -1,0 +1,82 @@
+{
+ "models": [
+  {
+   "ckpt": "runs/f1_act_s3_step1000.pt",
+   "mse_true": 0.0037215417250990868,
+   "mse_shuffled": 0.004126435611397028,
+   "mse_zeros": 0.003800914855673909,
+   "ratio_true_over_shuffled": 0.9018780554385382,
+   "ratio_true_over_zeros": 0.9791173615856361
+  },
+  {
+   "ckpt": "runs/f1_act_s3_step3000.pt",
+   "mse_true": 0.0034880931489169598,
+   "mse_shuffled": 0.004289071541279554,
+   "mse_zeros": 0.0039099338464438915,
+   "ratio_true_over_shuffled": 0.8132513331489828,
+   "ratio_true_over_zeros": 0.8921105281843583
+  },
+  {
+   "ckpt": "runs/f1_act_s3_step6500.pt",
+   "mse_true": 0.003531449707224965,
+   "mse_shuffled": 0.0043965172953903675,
+   "mse_zeros": 0.003882134333252907,
+   "ratio_true_over_shuffled": 0.8032379881520305,
+   "ratio_true_over_zeros": 0.9096670553040608
+  },
+  {
+   "ckpt": "runs/f1_act_s3_step15000.pt",
+   "mse_true": 0.0032238243147730827,
+   "mse_shuffled": 0.004360336810350418,
+   "mse_zeros": 0.0038024887908250093,
+   "ratio_true_over_shuffled": 0.7393521314960072,
+   "ratio_true_over_zeros": 0.8478195445445675
+  }
+ ],
+ "provenance": {
+  "runs": [
+   {
+    "argv": [
+     "scripts/run_f1_action_use.py",
+     "--ckpts",
+     "runs/f1_act_s3_step1000.pt",
+     "runs/f1_act_s3_step3000.pt",
+     "runs/f1_act_s3_step6500.pt",
+     "runs/f1_act_s3_step15000.pt"
+    ],
+    "cwd": "/home/rbao/world-model-invariants",
+    "utc": "2026-08-28T17:11:10+00:00",
+    "git": "b2a8aa19d3f9a5cb0621b9195c8742aa2fdbd9c4",
+    "git_dirty": true,
+    "python": "3.13.13",
+    "inputs": {
+     "runs/f1_act_s3_step1000.pt": {
+      "sha256": "a0f47be1f974cf76c1a233541ae2f37dafecf6605db39effdb10aaddd08301a9",
+      "mtime": "2026-08-28T16:46:32+00:00",
+      "bytes": 53828341
+     },
+     "runs/f1_act_s3_step3000.pt": {
+      "sha256": "084d16fb38aea4d7351cbbc25d7e08bafd38e5f322535afd5bcb4e9be97c59ee",
+      "mtime": "2026-08-28T16:49:47+00:00",
+      "bytes": 53828405
+     },
+     "runs/f1_act_s3_step6500.pt": {
+      "sha256": "7e9741895d90e52a873a06d5949b7c2645116749f84bb8bd4e917555442ce3bc",
+      "mtime": "2026-08-28T16:55:30+00:00",
+      "bytes": 53828597
+     },
+     "runs/f1_act_s3_step15000.pt": {
+      "sha256": "a49e67d6052ca70badf1292621b15a22c15afa45e6c7efff358d7e755d2de5df",
+      "mtime": "2026-08-28T17:09:36+00:00",
+      "bytes": 53828965
+     },
+     "runs/pendulum_actuated.npz": {
+      "sha256": "ea7b6c2e19522825188574425c85aca48ccbde520a31738c1a5821985f0b3583",
+      "mtime": "2026-08-28T16:44:03+00:00",
+      "bytes": 7269181
+     }
+    }
+   }
+  ]
+ }
+}

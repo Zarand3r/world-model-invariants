@@ -124,3 +124,61 @@ coefficient norm.
 All records carry the `latent_noether.provenance` stamp: argv, git HEAD and dirty state, and the
 sha256 of every input. This is the first experiment in the project preregistered *after* the
 provenance audit, and it is expected to be reproducible from the record alone.
+
+---
+
+## Amendment, 2026-08-28 -- the power basis, fixed on GROUND TRUTH before any model was touched
+
+**Written after validating the extractor on ground-truth states, and before it has been applied to
+any trained checkpoint.** No F1 model quantity exists yet.
+
+### What the validation found
+
+The registered method parameterised the power term over "the same degree-4 monomial family" as `C`.
+Validated on ground-truth states -- where the answer is known exactly and is representable -- that
+method **fails**:
+
+| power basis degree | terms | residual | ratio vs conserved-only | `rho(C, E)` | `rho(C, H~)` | `rho(q, thetadot)` |
+|---|---|---|---|---|---|---|
+| 1 | 3 | 0.00111 | **55.6x** | 0.9849 | **1.0000** | **0.9973** |
+| 2 | 9 | 0.00085 | 72.8x | 0.9848 | 1.0000 | 0.9972 |
+| 3 | 19 | 0.00236 | 26.2x | 0.7813 | 0.7959 | 0.7460 |
+| **4 (as registered)** | 34 | 0.00273 | 22.6x | **0.5068** | **0.5107** | **0.0745** |
+
+At degree 4 the fit achieves a *low residual while recovering nothing*. This is exactly the failure
+the original registration named as most dangerous -- "the fit is absorbing the action as a nuisance
+term rather than learning power" -- and P2 is what detects it. A 34-term power basis multiplied by
+the action has enough freedom to explain `Delta C` for the wrong reasons.
+
+Two further notes from the validation, both worth recording:
+
+- An earlier version of the solver used an ordinary rather than **generalised** eigenproblem and
+  returned `rho(C, E) = 0.02`: minimising `||D c||` alone selects a near-constant direction. The
+  objective must be the invariance ratio, normalised by the spread `C` actually has.
+- The validation must be done in **periodic coordinates** `(cos th, sin th, thetadot)`, not raw
+  `theta`. The pendulum rotates so `theta` is unbounded, and `cos theta` is not a polynomial in it.
+  The model never sees `theta` either -- a frame determines orientation. Using raw `theta` made the
+  extractor look broken when the harness was.
+
+### The change
+
+**The reported object becomes the power-degree sweep itself, degrees 1 to 4, not a single choice.**
+
+Picking one degree and reporting it would be indistinguishable from tuning, and the ground-truth
+sweep above is the natural reference: a correct extraction should look like the top rows and degrade
+toward the bottom. The model's sweep is reported against it.
+
+`P1`, `P2` and `P3` are evaluated at **power degree 1**, the minimal basis containing the true form
+(`tau * thetadot`, linear in the coordinates), with degrees 2-4 reported as sensitivity.
+
+**Registered now, so it cannot be decided later:** if degree 1 fails on the model, we do **not** climb
+the degree ladder looking for a pass. A higher degree that "works" after degree 1 fails is the
+degeneracy above, not a discovery. The response to failure at degree 1 is to report it, with the
+sweep, as a negative.
+
+### Why this is not tuning
+
+The change was made on ground-truth states with no model involved, the failure it fixes is one the
+original registration had already named, and the fix is frozen here before any checkpoint is
+analysed. The ground-truth numbers are committed in this document so the reference curve cannot be
+retro-fitted.

@@ -4928,3 +4928,79 @@ E8 checkpoint grid. If it has not fallen meaningfully below the step-3000 value 
 60,000, the action conditioning is too weak for F1's question to be answerable on this dataset, and
 the honest move is to report that as a boundary and raise the torque -- **not** to proceed to the
 balance-law fit and interpret whatever it returns. A fit will always return something.
+
+## 2026-08-28 -- **F1: action-use rises to 0.739; the balance extractor fails on ground truth and is fixed there**
+
+Loop iteration. Seed 3 training at step ~15,000; seeds 4 and 5 queued behind the guarded driver.
+
+### Action-use across the checkpoint grid (the registered criterion)
+
+`scripts/run_f1_action_use.py`, committed rather than run inline this time.
+
+| checkpoint | true | shuffled | zeros | ratio |
+|---|---|---|---|---|
+| step 1,000 | 0.003722 | 0.004126 | 0.003801 | 0.902 |
+| step 3,000 | 0.003488 | 0.004289 | 0.003910 | 0.813 |
+| step 6,500 | 0.003531 | 0.004397 | 0.003882 | 0.803 |
+| step 15,000 | 0.003224 | 0.004360 | 0.003802 | **0.739** |
+
+Monotone and already **well below the registered 0.870 threshold** at a quarter of training. The
+first of the two readings registered yesterday holds: the conditioning was still strengthening, not
+plateauing. F1's question is answerable on this dataset.
+
+### The balance extractor failed on ground truth -- twice -- before touching a model
+
+`latent_noether/balance.py` implements the registered `(C, P)` fit. Validating it on ground-truth
+states, where the answer is known and exactly representable, caught two defects:
+
+1. **Ordinary instead of generalised eigenproblem.** Minimising `||D c||` alone selects whichever
+   direction varies least in absolute terms -- a near-constant combination. Returned
+   `|rho(C, E)| = 0.02`. The objective has to be the invariance ratio, normalised by the spread `C`
+   actually has, which is the normalisation the free-evolution search already uses.
+2. **A broken validation harness, which looked like a broken extractor.** The first harness used raw
+   `theta`. The pendulum rotates, so `theta` is unbounded and `cos theta` is not a polynomial in it;
+   energy was not representable at all. The model never sees `theta` either -- a rendered frame
+   determines orientation. In `(cos th, sin th, thetadot)` the problem is polynomial and the picture
+   changed completely.
+
+### And then a real methodological failure, which is the substantive finding
+
+With the harness fixed, the registered method still failed: residual 0.0027 and a 22.6x gain over the
+conserved-only fit, but `|rho(C, E)| = 0.51` and `|rho(power coef, thetadot)| = 0.07`. **A low
+residual while recovering nothing** -- exactly the failure the original registration named as most
+dangerous, and exactly what P2 exists to detect.
+
+Cause: the registered power basis was the full degree-4 family, 34 terms multiplied by the action,
+which has enough freedom to explain `Delta C` for the wrong reasons. Sweeping the power degree:
+
+| power degree | residual | ratio vs conserved | `rho(C, E)` | `rho(C, H~)` | `rho(q, thetadot)` |
+|---|---|---|---|---|---|
+| **1** | 0.00111 | **55.6x** | 0.9849 | **1.0000** | **0.9973** |
+| 2 | 0.00085 | 72.8x | 0.9848 | 1.0000 | 0.9972 |
+| 3 | 0.00236 | 26.2x | 0.7813 | 0.7959 | 0.7460 |
+| 4 (as registered) | 0.00273 | 22.6x | 0.5068 | 0.5107 | 0.0745 |
+
+At degree 1 -- the minimal basis containing the true form, since `tau * thetadot` is linear in these
+coordinates -- the extractor recovers the answer essentially exactly.
+
+**An independent confirmation of E19 falls out of this.** The recovered `C` correlates with the
+**shadow** Hamiltonian at `1.0000` and with textbook energy at `0.9849`. E19 reached the same
+conclusion by a completely different route (a supervised sweep over a target family); here it appears
+in an unsupervised joint fit that was never told about `H~`.
+
+### Amendment, and why it is not tuning
+
+`docs/F1_PREREG.md` amended: **the reported object is the power-degree sweep itself, degrees 1-4,
+not a single choice**, with the ground-truth curve above committed as the reference a correct
+extraction should resemble. `P1`-`P3` are evaluated at degree 1, with 2-4 as sensitivity.
+
+Registered explicitly, so it cannot be decided after seeing results: **if degree 1 fails on the model
+we do not climb the degree ladder looking for a pass.** A higher degree that "works" after degree 1
+fails is the degeneracy above, not a discovery.
+
+The change was made on ground truth with no model involved, fixes a failure the original registration
+had already named, and is frozen before any checkpoint is analysed.
+
+### Nothing is claimed about the model yet
+
+No F1 model quantity has been computed. The extractor is validated; the checkpoints are not analysed.
