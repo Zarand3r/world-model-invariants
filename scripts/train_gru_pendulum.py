@@ -76,8 +76,16 @@ def main(a):
     print("\n  ACCEPTANCE")
     print(f"    1-step decode MSE {mse_model:.5f} vs predict-the-mean {mse_mean:.5f}  "
           f"ratio {mse_model/max(mse_mean,1e-12):.3f}  ({'OK' if mse_model < 0.25*mse_mean else 'FAIL'})")
+    # A static rollout passes a pixel-std check while being useless: F4's first run had
+    # std 0.021 (above the 0.01 floor) with frame-to-frame change 0.00084, i.e. frozen.
+    # The transition must actually MOVE the decoded frames.
+    with torch.no_grad():
+        motion = float((roll[:, 1:] - roll[:, :-1]).abs().mean())
+        data_motion = float((val[:, 1:20] - val[:, :19]).abs().mean())
     print(f"    rollout finite: {finite}  pixel std {spread:.4f} "
           f"({'OK' if finite and spread > 0.01 else 'FAIL — collapsed or diverged'})")
+    print(f"    rollout motion {motion:.5f} vs data {data_motion:.5f}  ratio {motion/max(data_motion,1e-12):.3f}  "
+          f"({'OK' if motion > 0.2 * data_motion else 'FAIL — transition is static'})")
     save(a.out, step)
     print(f"  saved {a.out}")
 

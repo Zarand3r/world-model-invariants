@@ -74,8 +74,32 @@ class ConvGRUWorldModel(nn.Module):
         return self.decoder(x).permute(0, 2, 3, 1)
 
     # ---- training ----------------------------------------------------------
-    def loss(self, batch):
-        """Teacher-forced one-step reconstruction. No KL: there is no stochastic latent."""
+    def loss(self, batch, open_loop: int = 8, w_open: float = 1.0):
+        """Teacher-forced reconstruction PLUS an open-loop rollout term.
+
+        **The open-loop term is not optional, and F4's first run proved it.** Trained on
+        teacher-forced reconstruction alone, `prior_input` appears in no loss, so `transition()` --
+        the map the entire extraction analyses -- is never trained. Measured on that model: the
+        autonomous step was 2.5x larger than a true step, the 50-step rollout changed by 0.00084 per
+        frame (essentially frozen), and the recovered scalar's one-step conservation defect was
+        ~10,000x worse than DreamerV3's while its energy correlation was *better* (0.97).
+
+        DreamerV3 trains its prior through the `kl_dyn` term. This is the deterministic analogue:
+        encode a prefix, then roll autonomously and require the decoded frames to match. Without it
+        the architecture comparison measures "a model whose transition was never trained" rather
+        than a second world-model family.
+        """
         h = self.encode(batch)
         pred = self.readout_from_h(h.reshape(-1, self.deter)).reshape(batch.shape)
-        return ((pred - batch) ** 2).mean()
+        rec = ((pred - batch) ** 2).mean()
+        if open_loop <= 0:
+            return rec
+        T = batch.shape[1]
+        start = max(1, T - open_loop)
+        hh = h[:, start - 1]
+        outs = []
+        for _ in range(T - start):
+            hh = self.transition(hh)
+            outs.append(self.readout_from_h(hh))
+        roll = torch.stack(outs, 1)
+        return rec + w_open * ((roll - batch[:, start:]) ** 2).mean()

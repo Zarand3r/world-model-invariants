@@ -3585,3 +3585,73 @@ milestone grid, same M29 provenance). The ConvGRU trains ~5x faster than the RSS
 1.1 minutes — so all three seeds complete in under an hour rather than 4.5 hours.
 
 Central seed 2 continues in parallel; step-capping keeps the contention irrelevant to results.
+
+---
+
+## 2026-08-28 01:10–01:40 UTC — **F4's first run was confounded by my own design, and the confound is itself a finding**
+
+Git at `ea189f9`.
+
+### What the first run showed
+
+ConvGRU seed 3 trained and **passed the registered acceptance checks** (1-step decode ratio 0.004,
+rollout finite, pixel std 0.021 > the 0.01 floor). Extraction at frozen hyperparameters:
+
+| step | \|rho_E\| | invariance ratio | **`rho_obs`** |
+|---|---|---|---|
+| 6,500 | **0.9736** | 4.33e-04 | **1.6e+02** |
+| 15,000 | 0.9731 | 1.39e-04 | 7.0e+01 |
+| 30,000 | 0.9698 | 1.20e-04 | 2.4e+02 |
+| 60,000 | 0.9692 | 5.99e-05 | 6.4e+01 |
+| *DreamerV3 reference* | *0.973 / 0.930 / 0.966* | *~1e-04* | ***~7e-03*** |
+
+Identification **better** than the RSSM, at every checkpoint including the earliest. Conservation
+**~10,000x worse**.
+
+### The diagnosis: the transition was never trained
+
+| | measured |
+|---|---|
+| median `||transition(h) - h||` | 12.82 |
+| median `||h_(t+1) - h_t||` on real data | 5.13 |
+| ratio | **2.5x** |
+| rollout frame-to-frame change over 50 steps | **0.00084** (essentially frozen) |
+
+The loss was teacher-forced reconstruction only. `transition()` feeds a learned constant
+`prior_input` through the GRU cell — and **`prior_input` appears in no loss term**. DreamerV3 trains
+its prior through `kl_dyn`; this model had no equivalent, so the map the entire extraction analyses
+was never optimised.
+
+**F4 as first run therefore tested "a model whose transition was never trained", not "a second
+architecture".** That is a flaw in my experiment design, not a result about architectures, and the
+prediction-1 pass at `|rho_E|` 0.97 must not be reported as an architecture finding.
+
+### The acceptance check was too lenient, and that is the transferable lesson
+
+The rollout check passed at pixel std 0.021 against a 0.01 floor — while the rollout was **static**.
+A frozen rollout has nonzero pixel std simply because different trajectories start differently.
+Those checks were designed for the RSSM and do not transfer to an architecture whose failure mode is
+different. Added: **rollout motion must be at least 0.2x the data's frame-to-frame motion.**
+
+### But the confound is a genuine result in its own right
+
+Strip the term that trains the prior, and you get a model that **encodes energy better than
+DreamerV3 (0.974 vs 0.973) while conserving nothing (`rho_obs` 64-238 against 7e-03)**. That is the
+decodability-versus-conservation dissociation at its most extreme yet — and it isolates *what
+produces conservation*: not the encoder, not the latent's information content, but **training the
+transition**.
+
+This is the same dissociation E14b found across regions of state space and E10b found across
+candidate directions, now found across training objectives. Three independent routes to it.
+
+### Corrected and relaunched
+
+`ConvGRUWorldModel.loss` now adds an **open-loop rollout term** — encode a prefix, roll autonomously,
+require the decoded frames to match — the deterministic analogue of `kl_dyn`. Docstring records why
+it is not optional, with the measurements above.
+
+Stale checkpoints from the flawed run removed for seeds 4 and 5; seed 3's are being overwritten in
+place by the relaunched job. `runs/f4_recovery.json` deleted — its numbers describe a model that no
+longer exists.
+
+**F4's registered predictions are untested.** The first run does not bear on them.
