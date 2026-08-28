@@ -5340,3 +5340,51 @@ The docstring records the incident that motivated it, so the reason survives the
 
 No bug found, which is the useful outcome of an audit; one silent-failure mode now covered by a test
 that is verified to catch it. No paper number changed.
+
+## 2026-08-28 -- **F1 seed 4 done; and the paper was understating its own evidence about F2**
+
+Loop iteration. Seed 4 finished 60,000 steps and **passed every acceptance criterion** -- action use
+0.791, raw KL 1.11, 1-step decode ratio 0.004, rollout finite. Seed 5 training (step 3,000).
+Action-use on the final checkpoints is now n = 2: **0.748 (s3), 0.761 (s4)**. The F1 analysis remains
+blocked on the extractor question and is not being run.
+
+### A correctness fix in the paper's limitations
+
+`limits.tex` said:
+
+> Whether invariant drift predicts rollout failure usefully, or whether the correction helps a
+> planner, **is untested**.
+
+**That is not true, and it errs in the paper's favour.** F2 tested exactly that question, was
+preregistered in `docs/F2_PREREG.md` with a direction predicted, and **failed its registered
+falsifier**. Recomputed from `runs/f2_trust_signal.json` this iteration:
+
+| signal | s3 | s4 | s5 | median \|rho\| |
+|---|---|---|---|---|
+| accumulated invariant drift | -0.022 | +0.087 | -0.243 | 0.022 |
+| **plain latent displacement** | **+0.274** | **+0.290** | **+0.310** | **0.290** |
+| nearest-neighbour distance | +0.010 | +0.281 | +0.434 | 0.281 |
+| random-constraint control | +0.134 | +0.344 | +0.198 | 0.198 |
+
+The registered prediction was that accumulated drift would attain a **higher** absolute Spearman than
+latent displacement. It is lower on **all three models**, and the random-constraint control -- which
+was registered to sit near zero -- beats it on two of three.
+
+Describing a tested, preregistered failure as "untested" makes an unfavourable result read as an open
+possibility. Rewritten to state the result, the numbers, and the conclusion it forces: **a conserved
+quantity being causally deployed in imagination does not imply its drift is a useful online signal,
+and the paper claims no such thing.**
+
+This is the more useful version for a reader as well. "Untested" invites the reviewer question; the
+negative answers it, and answering it is a contribution in itself.
+
+### Guards
+
+Six F2 checks added to `verify_paper_numbers.py` -- the per-seed Spearman for both the failing signal
+and the baseline that beats it -- plus a guard that fails if the "untested" phrasing returns.
+**32/32 checks pass.** Required adding a missing `numpy` import the new code exposed.
+
+### Net
+
+No experiment run. One paper statement corrected from "untested" to a reported negative, with its
+numbers pinned; the correction moves against the paper's own convenience.

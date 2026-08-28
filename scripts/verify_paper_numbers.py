@@ -11,6 +11,8 @@ drifted apart -- it does not say which one is wrong.
 """
 import json, pathlib, re, statistics as st, sys
 
+import numpy as np
+
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 RUNS, TEX = ROOT / "runs", ROOT / "paper1.2" / "sections"
 # CLAIMS.md is checked too: it carried stale mean-based numbers for a full day because this
@@ -30,6 +32,7 @@ def load(n): return json.loads((RUNS / n).read_text())
 e18, e19 = load("e18_supervised_baseline.json"), load("e19_shadow_sweep.json")
 f4b = load("f4b_recovery.json")
 e10b = load("e10b_matched_band_pool400.json")
+f2 = load("f2_trust_signal.json")
 lf  = [m["unsupervised"] for m in e18["models"]]
 sup = [m["supervised"] for m in e18["models"]]
 at  = lambda m, c: next(r for r in m["sweep"] if r["c"] == c)
@@ -68,6 +71,19 @@ for m in e19["models"]:
 term = [m["recovered"]["rho_obs"] for m in f4b["models"] if m["ckpt"].endswith("step60000.pt")]
 check("F4b degradation vs RSSM",
       st.median(term) / st.median(r["rho_obs"] for r in lf), fmt="{:.0f}")
+
+# --- F2 (registered NEGATIVE: drift is not a useful trust signal) ---
+def _rank_np(x):
+    x = np.asarray(x, float); o = np.argsort(x); r = np.empty(len(x)); r[o] = np.arange(len(x)); return r
+def _spear(a, b):
+    ra, rb = _rank_np(a) - _rank_np(a).mean(), _rank_np(b) - _rank_np(b).mean()
+    return float((ra @ rb) / np.sqrt((ra @ ra) * (rb @ rb) + 1e-30))
+for _sig in ("acc_drift", "latent_disp"):
+    for _m in f2["models"]:
+        _s = _spear(_m["signals"][_sig], _m["target_energy_error"])
+        check(f"F2 {_sig} {_m['ckpt'][-16:-3]}", _s, fmt="{:+.2f}")
+CHECKS.append(("F2 stated as tested, not 'untested'", "-",
+               "was tested" in CORPUS and "predicts rollout failure usefully, or" not in CORPUS))
 
 # --- E10b (400-pool, the matched-design primary set) ---
 import math
