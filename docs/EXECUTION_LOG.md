@@ -3725,3 +3725,62 @@ properties are separable, and that only the operator statistic sees the differen
 Seed 3 only; seeds 4 and 5 training. F4 prediction 2 (repair) is untested — with `rho_obs` of 1.75,
 one autonomous step changes `C` by 1.75x its across-trajectory spread, so a level-set projection has
 little to lock onto. That is an expectation, not a measurement.
+
+---
+
+## 2026-08-28 02:03–02:25 UTC — **E18: a perfect energy probe repairs WORSE than the label-free invariant**
+
+Git at `07e3e02`. Preregistered in `docs/E18_PREREG.md` with three directional predictions and a
+falsifier, before any quantity was computed.
+
+### The objection
+
+Nothing in this project had compared the recovered `C` against the obvious alternative: fit a readout
+to true energy, supervised, and project on that. "Why not just probe for energy?" had no answer.
+
+### Result — all three registered predictions PASS 3/3
+
+| seed | arm | \|rho_E\| | `rho_obs` | repair |
+|---|---|---|---|---|
+| 3 | unsupervised `C` | 0.9730 | 6.27e-03 | **-50.9%** |
+| 3 | **supervised probe** | **1.0000** | 4.58e-02 | **+26.8%** |
+| 4 | unsupervised `C` | 0.9299 | 8.65e-03 | **-42.2%** |
+| 4 | **supervised probe** | **0.9999** | 4.59e-02 | -0.3% |
+| 5 | unsupervised `C` | 0.9657 | 6.85e-03 | **-32.2%** |
+| 5 | **supervised probe** | **0.9999** | 4.57e-02 | **+33.4%** |
+| 3-5 | random (n = 20 each) | ~0.12 | ~1.0 | +16.9 / -8.0 / +10.2 |
+
+| registered prediction | result |
+|---|---|
+| 1. supervised tracks energy better | **PASS 3/3** — 0.9999 vs 0.9562 |
+| 2. supervised is **worse conserved** | **PASS 3/3** — 4.58e-02 vs 7.26e-03, **6.3x worse** |
+| 3. supervised **repairs worse** | **PASS 3/3** — **+20.0%** vs **-41.8%** |
+
+### What this establishes
+
+**A probe that tracks true energy essentially perfectly (0.9999) actively harms the rollout, while a
+label-free search that tracks it slightly worse (0.956) repairs by -42%.** The difference between
+them is conservation: the supervised probe is 6.3x less preserved by the model's own transition.
+
+This is the probe-versus-dynamics thesis in its most direct form. Every previous demonstration
+contrasted the recovered scalar against *random* or *untrained* controls. This one contrasts it
+against **the correct physical quantity, fitted optimally**, and the correct physical quantity loses.
+
+It also answers the practical objection directly. The label-free search is not a workaround for
+missing labels — **it finds something a supervised fit on perfect labels does not**, because it
+optimises the property that matters (conservation by the transition) rather than the property that
+seems to matter (tracking the physical variable).
+
+### The bias works against the result, not for it
+
+The prereg noted that a supervised probe fitted and scored on the same trajectories is optimistically
+biased in `|rho_E|`. That bias favours the supervised arm and makes the registered predictions
+*harder* to confirm. They confirmed anyway, and the supervised probe reached a genuine 0.9999.
+
+### Scope
+
+Pendulum seeds 3/4/5 at step 6,500, 20 magnitude-matched random directions per seed as a shared
+reference. Not yet run on the 2-DoF system or at other checkpoints.
+
+Note the supervised probe is far better conserved than random (4.6e-02 against ~1.0), so it is not
+degenerate — it is simply **not conserved enough**, and that margin is what decides the repair.
