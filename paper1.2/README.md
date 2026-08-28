@@ -1,45 +1,51 @@
-# Paper build
+# paper1.2 — build and figure provenance
+
+This is the **current** manuscript. `paper/` is the superseded arXiv version and carries a documented
+defect in its random-constraint null; see `paper/README.md`.
 
 ```bash
-uv run python paper/make_figures.py     # regenerate all figures from runs/*.json
-cd paper && tectonic -X compile main.tex
+uv run python paper1.2/make_fig1.py       # Figure 1
+uv run python paper1.2/make_fig2.py       # Figure 2
+uv run python paper1.2/make_figures.py    # Figures 3-5 (appendix)
+cd paper1.2 && tectonic -X compile main.tex
+../scripts/make_arxiv_archive.sh paper1.2 # submission tarball
 ```
 
-`make_figures.py` reads only committed run logs, so every number and mark in every figure
-regenerates from the experiment output. Run it before each build and confirm the diff is empty.
+Every figure regenerates from committed run records, so the numbers in the figures cannot drift from
+the experiments. Run all three generators before a build and confirm the diff is empty.
 
-| figure | source |
-|---|---|
-| `fig1_three_claims.pdf` | `runs/dreamer_refusal.json`, `runs/dreamer_untrained_null.json`, `runs/dreamer_edit.json` |
-| `fig2_ld_sweep.pdf` | `runs/dreamer_ld_sweep.json` |
-| `fig3_low_variance.pdf` | `runs/dreamer_residual_decomp.json` |
-| `fig4_leverage.pdf` | `runs/dreamer_leverage.json` |
-| `fig5_random_null.pdf` | `runs/dreamer_edit.json` |
-
-Figure grammar enforced here, beyond "no bars on a log axis" and "per-seed points always":
-
-- **No dual axes.** `fig2` was a `twinx()` chart until 2026-08-13. Two y-scales make the crossing an
-  artefact of scale alignment, and that crossing is the figure's whole claim. Both quantities are
-  dimensionless, so they now share one axis.
-- **The palette is validated, not chosen.** The previous "random law" orange and "dissipative" red
-  failed colourblind separation (deutan ΔE 5.6) *and* the normal-vision floor (ΔE 7.1 against 15).
-  The current set passes all-pairs CVD, normal vision, and 3:1 contrast on white.
-- **Colour encodes the arm, shape encodes the seed.** `fig4`'s three seeds are one arm making one
-  point, so they share a hue and differ by marker.
-
-Label map from paper claims to the code and pre-registration that produced them:
-
-| paper claim | script | pre-registration | decision entry |
+| figure | rendered as | generator | run records |
 |---|---|---|---|
-| recovery at LD=12 | `run_dreamer_extraction.py --ld 12` | D36 | D37, D39 |
-| untrained null | `run_dreamer_extraction.py --untrained` | `gauge.decodability` docstring | D43 |
-| refusal | `run_dreamer_refusal.py` | `docs/DISSIPATIVE_PREREG.md` | D44 |
-| the edit, 20-draw null | `run_dreamer_edit.py` | `docs/S4_PREREG.md` | D45, D67 |
-| LD sweep / residual anti-correlation | `run_dreamer_ld_sweep.py` | D36 | D37, D67 |
-| what the correction acts on | `run_dreamer_leverage.py` | D46 registered block | D46, D48, D52 |
-| dissipative control on the above | `run_dreamer_leverage.py --ckpts runs/dreamer_damped_s*.pt --data runs/pendulum_pixels_damped.npz` | M26 | D67 |
-| mechanism (unresolved) | `run_dreamer_nested_kappa.py` | D38 | D40, D41, D42 |
+| `fig1_probe_vs_operator.pdf` | Figure 1 | `make_fig1.py` | `e18_supervised_baseline.json` |
+| `fig2_shadow_sweep.pdf` | Figure 2 | `make_fig2.py` | `e19_shadow_sweep.json`, `e18_supervised_baseline.json` |
+| `fig3_leverage.pdf` | Figure 3 | `make_figures.py` | `dreamer_leverage.json`, `dreamer_leverage_damped.json` |
+| `fig4_ld_sweep.pdf` | Figure 4 | `make_figures.py` | `dreamer_ld_sweep.json` |
+| `fig5_low_variance.pdf` | Figure 5 | `make_figures.py` | `dreamer_residual_decomp.json` |
 
-Two runs in this table are re-generations, not the originals, and the reason is recorded in D67:
-`dreamer_edit.json` because its random-law arm was a single reused draw, and `dreamer_ld_sweep.json`
-because the committed file no longer reproduced under the deterministic `encode` of D39.
+**Filename matches rendered number.** It did not until 2026-08-28: the directory was copied from
+`paper/`, so `fig4_leverage` rendered as Figure 3 and two files began `fig2_`. That is the collision
+`make_arxiv_archive.sh`'s own header warns about, having once shipped stale figures.
+`scripts/verify_paper_numbers.py` now asserts one file per number and that every shipped figure is
+referenced by a section.
+
+**`make_figures.py` writes to `paper1.2/figures/`.** It was copied from `paper/` with the output path
+hardcoded, so until 2026-08-28 it wrote this manuscript's figures into the superseded one's directory
+— silently, because both exist. It no longer emits `fig1_three_claims.pdf` or `fig5_random_null.pdf`,
+which belong to paper 1.0 only.
+
+## Figure grammar
+
+Inherited from `paper/README.md` and still enforced:
+
+- **No dual axes.** Two y-scales make a crossing an artefact of scale alignment.
+- **The palette is validated, not chosen** — all-pairs CVD, normal vision, and 3:1 contrast on white.
+- **Colour encodes the arm, shape encodes the seed.** Replicates are never averaged away.
+- **Render every figure and look at it before shipping.** Three defects this session were invisible
+  in code and obvious on sight: an axis label asserting the opposite of the result, a legend sitting
+  on data, and an annotation clipped off the axis.
+
+## Claims
+
+`CLAIMS.md` holds the claim architecture — written before the prose, with every number traceable to a
+run record. `scripts/verify_paper_numbers.py` recomputes each headline number from `runs/*.json` and
+greps the sources for it; it reads `CLAIMS.md` as well as `sections/*.tex`.

@@ -1,3 +1,24 @@
+> ## ⚠ Superseded — and this version contains a known defect
+>
+> This directory is the **published arXiv manuscript (paper 1.0)**, kept for the record. The current
+> manuscript is **`paper1.2/`**.
+>
+> **The defect.** This version describes its random-constraint null as "matched in norm". The
+> correction it applies is the level-set projection
+> `z <- z - alpha (C - C_0) grad C / ||grad C||^2`, which is **invariant under `C -> lambda C`**, so
+> the coefficient norm has no effect on the size of the edit. Measured afterwards: random draws took
+> steps **29x larger** than the recovered constraint. The published specificity comparison was
+> therefore **not matched**, and the null controls nothing.
+>
+> Re-run with a **magnitude-matched** null (fixed step size along each constraint's normal),
+> specificity **improves**, from 2 of 3 seeds to 3 of 3 — so the corrected control strengthens the
+> result rather than weakening it. See `paper1.2/CLAIMS.md` and the 2026-08-26 entry in
+> `docs/EXECUTION_LOG.md`.
+>
+> **Do not build on the null in this directory.** `scripts/make_arxiv_archive.sh` now takes the
+> manuscript directory as an argument and should be pointed at `paper1.2`; it defaulted to this
+> directory until 2026-08-28, which would have packaged the defective version.
+
 # Paper build
 
 ```bash

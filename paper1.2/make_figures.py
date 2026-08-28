@@ -20,7 +20,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 R = pathlib.Path("runs")
-OUT = pathlib.Path("paper/figures")
+# This script lives in paper1.2/ and must write here. It was copied from paper/ at the fork with
+# the path hardcoded, so running it wrote the CURRENT manuscript's figures into the SUPERSEDED
+# paper's directory -- silently, since both directories exist.
+OUT = pathlib.Path(__file__).resolve().parent / "figures"
 OUT.mkdir(parents=True, exist_ok=True)
 
 plt.rcParams.update({
@@ -147,7 +150,7 @@ def fig1_three_claims():
     _panel(ax[2], "(c) intervene", "enforcing it lowers rollout error")
 
     fig.tight_layout(w_pad=2.6)
-    fig.savefig(OUT / "fig1_three_claims.pdf")
+    pass  # "fig1_three_claims.pdf" is paper 1.0 only; paper1.2 does not include it
     plt.close(fig)
     return dict(cons_rho=cons_rho, null_rho=null_rho, damp_rho=damp_rho,
                 cons_dr=cons_dr, damp_dr=damp_dr)
@@ -305,7 +308,7 @@ def fig5_random_null():
     ax.set_xscale("symlog", linthresh=0.1)
     ax.set_ylim(-.6, 2.62)
     fig.tight_layout()
-    fig.savefig(OUT / "fig5_random_null.pdf")
+    pass  # "fig5_random_null.pdf" is paper 1.0 only; paper1.2 does not include it
     plt.close(fig)
     return {ck: (own[ck], float(np.median([r["normalised_slope"]
                                            for r in edit["B_conservative_random"]

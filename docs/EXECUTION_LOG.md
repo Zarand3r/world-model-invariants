@@ -5541,3 +5541,55 @@ redesign following three failed repairs, and that decision is Richard's.
 
 F1's training arm is complete and fully accepted; one F1 finding (action-use, n = 3) is established;
 the balance question is untouched and remains open pending a design decision. No paper number changed.
+
+## 2026-08-28 -- **A defect I introduced: the paper1.2 figure generator was writing into paper 1.0**
+
+Loop iteration. All F1 training complete; no jobs; no new artefacts. Checked whether the two
+manuscript directories document their own status, and found a chain of problems -- one of them mine.
+
+### `paper/` did not say it was superseded or defective
+
+`paper/` holds the **published arXiv manuscript**, whose random-constraint null is documented as
+controlling nothing: the level-set projection is invariant under `C -> lambda C`, so "norm-matched"
+random draws took steps **29x larger** than the recovered constraint. Nothing in that directory said
+so. Anyone reading the repo, or rebuilding that archive, would have reproduced the defect.
+
+Added a warning header to `paper/README.md` naming the defect, the measurement, the fact that the
+corrected magnitude-matched null **strengthens** the result (specificity 2/3 -> 3/3), and pointing at
+`paper1.2/`.
+
+### A defect I introduced on 2026-08-28, found and fixed here
+
+`paper1.2/make_figures.py` was copied from `paper/` at the fork with its output path hardcoded:
+
+    OUT = pathlib.Path("paper/figures")
+
+So the **current** manuscript's generator wrote into the **superseded** manuscript's figure directory
+-- silently, because both directories exist. When I renamed the appendix figures earlier today I
+edited that script, and running it therefore wrote *both* old and new filenames into `paper/figures/`,
+modifying two tracked paper-1.0 figures and adding three untracked ones.
+
+Restored `paper/figures/` with `git checkout` and removed the three strays. Fixed `OUT` to resolve
+relative to the script's own location, and stopped it emitting `fig1_three_claims.pdf` and
+`fig5_random_null.pdf`, which belong to paper 1.0 only.
+
+**This is worth recording plainly: the rename was verified by recompiling and rebuilding the archive,
+both of which passed, because neither touches the generator.** The check that would have caught it --
+running the generator and seeing where the bytes landed -- is the one I did not do. Regenerating from
+source is not the same as compiling from committed artifacts, and only the first catches a generator
+writing to the wrong tree.
+
+### `paper1.2/README.md` was a verbatim copy and actively wrong
+
+It instructed the reader to run `paper/make_figures.py`, listed five figure names of which two are
+deleted and three renamed, and **did not mention Figures 1 and 2 or their generators at all** -- the
+paper's two main figures. Following it would have regenerated deleted figures and missed the current
+ones. Rewritten with the actual generator-to-figure-to-run-record map, the two path defects above, and
+the figure grammar.
+
+### Verification
+
+Paper recompiles at 14 pages with no errors; the three regenerated appendix figures are byte-modified
+but the build is unchanged; archive rebuilt and re-verified in a clean extraction (14 pages, 0
+errors); **34/34 mechanical checks pass**; `paper/` restored to its committed state apart from the
+intentional README warning.
