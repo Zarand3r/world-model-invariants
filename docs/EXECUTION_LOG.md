@@ -3784,3 +3784,69 @@ reference. Not yet run on the 2-DoF system or at other checkpoints.
 
 Note the supervised probe is far better conserved than random (4.6e-02 against ~1.0), so it is not
 degenerate — it is simply **not conserved enough**, and that margin is what decides the repair.
+
+---
+
+## 2026-08-28 02:11–02:30 UTC — **F4 at n = 3: recovery FAILS on one of three seeds; conservation fails on all three**
+
+Git at `c5d35ba`. All three ConvGRU seeds trained and **passed the tightened acceptance checks**
+(decode ratios 0.005/0.005/0.011, rollout-motion ratios 0.772/0.833/0.730 — all well clear).
+
+### Result
+
+| checkpoint | \|rho_E\| | invariance ratio | `rho_obs` |
+|---|---|---|---|
+| gru s3 @ 60k | **0.9708** | 7.35e-05 | 1.75 |
+| gru s4 @ 60k | **0.8879** | 7.12e-04 | 5.33 |
+| **gru s5 @ 60k** | **0.1893** | 1.84e-03 | 9.02 |
+| RSSM, n = 3 | 0.930 – 0.973 | ~1e-04 | **6.3e-03 – 8.7e-03** |
+
+**Registered prediction 1 (`|rho_E| > 0.8`): FAIL, 2 of 3.**
+
+**Conservation fails on all three**: `rho_obs` 1.75-9.02 against the RSSM's ~7e-03, a **730x** median
+gap.
+
+### The registered falsifier fired, on one seed
+
+`F4_PREREG` stated: *"if recovery fails on a model that passes the acceptance checks, the invariant
+is a property of the RSSM's latent structure rather than of learned world models generally, and every
+claim in the project must be qualified to that architecture."*
+
+Seed 5 passed every acceptance check and recovery failed (0.189). The falsifier fired on 1 of 3.
+
+### Correcting last iteration's header
+
+I titled the previous entry **"identification transfers across architectures, conservation does
+not"** on the strength of seed 3 alone, while noting seeds 4 and 5 were training. The n = 3 statement
+is weaker:
+
+> **Identification transfers on 2 of 3 ConvGRU seeds and fails on the third. Conservation transfers
+> on none.**
+
+That is the **seventh** time this session a claim stated from one seed has needed narrowing at n = 3.
+The caveat was recorded, but the header was not written to the evidence available, and headers are
+what get remembered.
+
+### The failure is internally coherent
+
+`|rho_E|`, invariance ratio and `rho_obs` degrade **together** across the three seeds
+(0.971/7.4e-05/1.75 -> 0.888/7.1e-04/5.33 -> 0.189/1.8e-03/9.02). Seed 5's transition conserves
+least, and the conservation-optimising search consequently finds nothing energy-like. That is exactly
+what the two-factor account predicts and what E18 demonstrated directly: **the search finds energy
+only where the transition conserves something.** It is not a separate failure mode.
+
+### What this does to the generality claim
+
+**The phenomenon is architecture-dependent, and that must be stated.** The recovered invariant is not
+a property of learned pixel world models in general; it is reliable in DreamerV3's RSSM (3/3, `rho_obs`
+~7e-03) and unreliable in a deterministic ConvGRU trained with a modest open-loop term (2/3
+identification, 0/3 conservation).
+
+The F4 confound stands and now matters more: the ConvGRU's transition is trained over 8 of 64 steps
+while `kl_dyn` trains the RSSM's prior at every step. Whether the gap is the architecture or the
+amount of prior training is **still unseparated**, and closing that is the next Tier-1 item.
+
+Either way, the honest scope is now: **an architecture whose transition is trained to be predictive
+under open-loop rollout develops a conserved quantity; one trained less so does not, or does so
+unreliably.** That is a weaker generality claim than "learned world models" and a more useful one
+than "DreamerV3".
