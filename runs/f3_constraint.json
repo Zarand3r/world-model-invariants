@@ -1,0 +1,82 @@
+{
+ "models": [
+  {
+   "ckpt": "runs/dreamer_ref_s3_step6500.pt",
+   "n_train_traj": 26,
+   "n_test_traj": 26,
+   "second_moment_G": 2.750668464272076e-07,
+   "second_moment_best_invariant": 0.002337300643765201,
+   "second_moment_random_median": 0.9559569750752227,
+   "rho_G_Gtrue": 0.0036258819812904517,
+   "ratio_vs_invariant": 8497.209584230039,
+   "ratio_vs_random": 3475362.3982387227,
+   "A1_pass": false,
+   "A2_pass": true,
+   "A3_pass": true
+  },
+  {
+   "ckpt": "runs/dreamer_ref_s4_step6500.pt",
+   "n_train_traj": 26,
+   "n_test_traj": 26,
+   "second_moment_G": 8.311098385725718e-07,
+   "second_moment_best_invariant": 0.006472104428834168,
+   "second_moment_random_median": 0.8767652456469458,
+   "rho_G_Gtrue": 0.03215921646576425,
+   "ratio_vs_invariant": 7787.303348435851,
+   "ratio_vs_random": 1054933.060536002,
+   "A1_pass": false,
+   "A2_pass": true,
+   "A3_pass": true
+  },
+  {
+   "ckpt": "runs/dreamer_ref_s5_step6500.pt",
+   "n_train_traj": 26,
+   "n_test_traj": 26,
+   "second_moment_G": 7.458815012789768e-07,
+   "second_moment_best_invariant": 3.310644544968206e-05,
+   "second_moment_random_median": 1.0415772435258757,
+   "rho_G_Gtrue": 0.0171567388061666,
+   "ratio_vs_invariant": 44.38566366495727,
+   "ratio_vs_random": 1396437.961981714,
+   "A1_pass": false,
+   "A2_pass": true,
+   "A3_pass": true
+  }
+ ],
+ "provenance": {
+  "runs": [
+   {
+    "argv": [
+     "scripts/run_f3_constraint.py"
+    ],
+    "cwd": "/home/rbao/world-model-invariants",
+    "utc": "2026-08-29T04:54:03+00:00",
+    "git": "0887e60a26bda7c5f34638ce93baab0251f55454",
+    "git_dirty": true,
+    "python": "3.13.13",
+    "inputs": {
+     "runs/dreamer_ref_s3_step6500.pt": {
+      "sha256": "706cc31890259decf020cc925021f5a5fc56e4fc55c896a8dc6d8d22ee6c33e1",
+      "mtime": "2026-08-26T21:03:29+00:00",
+      "bytes": 53828901
+     },
+     "runs/dreamer_ref_s4_step6500.pt": {
+      "sha256": "69f4f4eda49f4079d950d1e134fb268cb22425666840b37421d4e2ec293c0484",
+      "mtime": "2026-08-26T22:52:55+00:00",
+      "bytes": 53828901
+     },
+     "runs/dreamer_ref_s5_step6500.pt": {
+      "sha256": "9146998bba3ac59b6282c4df70fc32208a157a4452b2e1337801c1239ded9a0a",
+      "mtime": "2026-08-27T00:28:08+00:00",
+      "bytes": 53828901
+     },
+     "runs/pendulum_pixels.npz": {
+      "sha256": "9eed2d0776a177961113f711b4ba4bd69d3db1a1c0f6f9c5519364824d910e8b",
+      "mtime": "2026-08-26T20:36:36+00:00",
+      "bytes": 6799505
+     }
+    }
+   }
+  ]
+ }
+}

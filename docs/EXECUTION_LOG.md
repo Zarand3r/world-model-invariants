@@ -6174,3 +6174,70 @@ sharpens the paper's existing thesis rather than contradicting it.
 
 The first commit attempt failed: unescaped quotes in the message broke the shell. Same defect as
 2026-08-26; redone with a heredoc. The prereg file itself was written correctly.
+
+## 2026-08-29 -- **F3 Stage A: A1 fails 3/3. The gate fires, and the reason generalises to Stage B.**
+
+Richard approved running Stage A. Registered gate: if A1 fails, **STOP** and do not proceed to a
+released checkpoint.
+
+### The constraint is real and has the right signature
+
+Rod length in the training pixels: centroid radius mean **7.887 px**, relative std **0.67%**, with
+within-trajectory spread (0.0518) and across-trajectory spread of means (0.0101) **both tiny** -- the
+signature of a constraint rather than an orbit label. For contrast, energy's relative std is 65%.
+
+This also confirms the roadmap's warning **quantitatively**: the radius has an invariance ratio of
+**~0.97**, so `polynomial_invariants` would rank it among the *worst* conserved directions available.
+The existing method does not merely miss constraints; it ranks them as noise.
+
+### Result: A2 and A3 pass spectacularly, A1 fails completely
+
+| model | `E[G^2]` | `rho(G, G_true)` | vs best invariant | vs random |
+|---|---|---|---|---|
+| s3 | 2.75e-07 | **0.0036** | 8497x | 3,475,362x |
+| s4 | 8.31e-07 | **0.0322** | 7787x | 1,054,933x |
+| s5 | 7.46e-07 | **0.0172** | 44x | 1,396,438x |
+
+**A1 False on 3/3. A2 True. A3 True.**
+
+The method finds a direction whose second moment is **three million times** below a random direction
+-- and which has **nothing to do with the rod length**. Without the positive control this would have
+been reported as a triumph. It is the exact reason A1 was registered as a hard gate.
+
+### Two distinct causes, both measured
+
+**1. The objective is wrong.** Fitting the constraint directly and locating it in the spectrum the
+extractor minimises: the constraint direction has `E[G^2] = 4.75e-03`, while **1525 of 1819**
+directions have a *smaller* second moment. The extractor's pick sits at `2.61e-10`. So even given the
+answer, minimising `E[G^2]` would rank the true constraint **1526th**. The smallest-second-moment
+direction in a rich polynomial basis is an artifact of basis conditioning (`sigma_min/sigma_max =
+3.4e-06`), not physics.
+
+**2. The constraint is barely encoded at all.** Predicting the radius from the latent by ridge
+regression gives held-out `|rho| = 0.19`, with a residual std of **0.218 px against a true variation
+of 0.0515 px** -- the prediction is four times worse than just guessing the mean.
+
+### Why that second cause matters more than this experiment
+
+**A constraint that never varies carries no information, so a representation-learning objective has
+no pressure to encode it.** The rod length is identical in every frame of every trajectory; the model
+can reconstruct perfectly with the rod length baked into **decoder weights**, and nothing in the
+training signal rewards putting it in the latent. There is no direction to find because there is
+nothing to represent.
+
+**This generalises directly to Stage B, and it is why Stage B is not merely gated but likely
+misconceived.** A walker's limb lengths also never vary. A DreamerV3 walker checkpoint would encode
+them in weights for the same reason, and the same search would fail for the same reason -- after the
+substantial adapter work the prereg flagged. The roadmap was right that F3 needed a methodological
+extension; what Stage A shows is that the extension has a deeper problem than its objective.
+
+**Stage B is NOT RUN**, per the registered gate. Not as an infrastructure blocker -- as a gate that
+fired for a measured reason.
+
+### What this is worth
+
+A negative with a mechanism, of the same shape as F2, F5 and F1: the method is bounded, and the bound
+is explained rather than observed. Specifically: **latent-space extraction can only find quantities
+the training data gave the model a reason to represent.** Orbit labels vary and are represented;
+constraints do not vary and are not. That is a statement about representation learning, not about
+this pendulum.
