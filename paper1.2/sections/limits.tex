@@ -39,6 +39,13 @@ that re-plans every step never imagines long enough to accumulate the drift the 
 bounds where the method can matter --- long open-loop imagination, not closed-loop control --- and it
 is the same effect-size limit that defeats the trust signal below.
 
+Planning further ahead does not recover the effect, and the reason is that the two requirements are
+in opposition. Tripling the planning horizon leaves every arm still indistinguishable from no
+correction (largest effect $0.007$ against an episode return standard deviation of $0.862$), while
+planning quality itself \emph{degrades}, from $-0.34$ to $-0.56$ in mean return: the model's rollout
+error grows with horizon faster than the value of looking further ahead. The regime in which the
+correction would have something to correct is the regime in which the planner is already worse off.
+
 Whether invariant drift predicts rollout failure was tested
 directly, and it does not: accumulated drift at rollout step 25 correlates with decoded energy error
 at step 100 at Spearman $-0.02$, $+0.09$ and $-0.24$ across three models, against $+0.27$, $+0.29$

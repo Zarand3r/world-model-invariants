@@ -5923,3 +5923,28 @@ Running seed 3 with **`plan_H = 30`**, three times the original, 12 episodes, al
 This can only confirm or overturn a negative already in the paper. If the tie persists, the published
 statement is safe. **If a longer horizon produces a real effect, `limits.tex` is wrong and must be
 corrected before submission** -- which is exactly why this is worth running rather than arguing.
+
+### Result: the negative survives, and the robustness check adds a finding
+
+`plan_H = 30`, seed 3, 12 episodes, paired against no correction:
+
+| arm | mean diff | 95% CI | excludes 0 |
+|---|---|---|---|
+| conserve | -0.00071 | [-0.00527, +0.00385] | no |
+| balance | +0.00584 | [-0.00184, +0.01352] | no |
+| probe | -0.00701 | [-0.01891, +0.00488] | no |
+| random | +0.00211 | [-0.00125, +0.00548] | no |
+
+Largest effect `0.00701` against an across-episode return SD of `0.8616` -- **0.8% of one episode's
+spread**. The published negative is safe: it does not rest on the un-piloted horizon.
+
+**And the check found something the argument had missed.** Planning quality itself **degrades** with
+the longer horizon: mean return `-0.341` at `H = 10` against `-0.560` at `H = 30`. The model's rollout
+error grows with horizon faster than the value of looking further ahead.
+
+That closes the obvious objection to the F5 negative -- *"just plan further ahead, then the
+accumulated drift the method removes would matter"* -- with a measurement rather than an argument.
+**The two requirements are in opposition:** the regime where the correction would have something to
+correct is the regime where the planner is already worse off. Added to `limits.tex`.
+
+Raw rows kept separately in `runs/f5_planning_H30.json`; the registered n = 3 record is untouched.
