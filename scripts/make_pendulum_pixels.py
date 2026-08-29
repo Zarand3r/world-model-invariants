@@ -71,9 +71,14 @@ def damped_step(state, zeta: float, dt: float = 0.05, g: float = 10.0, l: float 
 
 def main(n_traj: int, n_steps: int, seed: int, out: str, zeta: float = 0.0,
          th_lo: float = 0.0, th_hi: float = TH_MAX,
-         thd_lo: float = 0.0, thd_hi: float = THD_MAX):
+         thd_lo: float = 0.0, thd_hi: float = THD_MAX, dt=None):
     env = gym.make("Pendulum-v1", render_mode="rgb_array")
     u = env.unwrapped
+    if dt is not None:
+        # F6 varies the simulator timestep. This does NOT change RNG consumption, so the default
+        # path stays bit-exact and the free-evolution data_sha256 chain the checkpoints record
+        # remains valid.
+        u.dt = float(dt)
     rng = np.random.default_rng(seed)
     frames = np.zeros((n_traj, n_steps, RES, RES, 3), dtype=np.uint8)
     states = np.zeros((n_traj, n_steps, 2), dtype=np.float64)
@@ -145,9 +150,11 @@ if __name__ == "__main__":
     a.add_argument("--n-steps", type=int, default=120)
     a.add_argument("--seed", type=int, default=0)
     a.add_argument("--out", default="runs/pendulum_pixels.npz")
+    a.add_argument("--dt", type=float, default=None,
+                   help="override the simulator timestep (F6). Default keeps gymnasium's 0.05.")
     a.add_argument("--zeta", type=float, default=0.0,
                    help="linear damping; 0 is the conservative dataset, 0.15 the GRU control value")
     a = a.parse_args()
     print("Building a PIXEL dataset from gymnasium Pendulum-v1 (real third-party simulator).")
-    main(a.n_traj, a.n_steps, a.seed, a.out, zeta=a.zeta,
+    main(a.n_traj, a.n_steps, a.seed, a.out, zeta=a.zeta, dt=a.dt,
          th_lo=a.th_lo, th_hi=a.th_hi, thd_lo=a.thd_lo, thd_hi=a.thd_hi)
