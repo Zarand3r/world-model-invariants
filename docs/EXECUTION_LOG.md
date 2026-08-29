@@ -5888,3 +5888,38 @@ Nothing beyond the evidence was added. No arm is claimed to help.
 - `ROADMAP.md`: F5 added to the execution-status table; the "Not yet attempted" list no longer claims
   the planner demonstration is unattempted, because it is now a measured negative.
 - arXiv archive rebuilt and re-verified in a clean extraction: **14 pages, 0 errors**.
+
+## 2026-08-29 -- **F5 artefacts verified against the preregistration; horizon robustness check launched**
+
+Loop iteration. No jobs at start, no new artefacts, tree clean.
+
+### Step (2): F5 records verified against `docs/F5_PREREG.md`
+
+| requirement | status |
+|---|---|
+| 3 independently trained seeds | 3 models |
+| arms share the planner, seeds and episodes | 20 episodes/arm, 5 arms |
+| `E*` and seeds drawn once, shared so arms never differ by task | **identical across arms AND across all 3 models** |
+| `E*` inside the training band `[-2.58, 5.07]` | `-0.80 .. 3.41` |
+| return scored from the simulator, not the model's decode | yes, `true_energy(u.state)` |
+| provenance stamped | git HEAD + input sha256 on both records |
+
+All met. The provenance stamps honestly record `dirty=True`, since the tree carried uncommitted work
+while the runs executed -- which is the point of recording it rather than asserting cleanliness.
+
+The one requirement **not** met remains the one already owned: planner hyperparameters were to be
+frozen from a pilot on seed 3 *before* arm comparison, and `plan_H = 10` was set without that pilot.
+
+### Robustness check on that defect (labelled as such, not a new claim)
+
+The F5 negative is now published in `limits.tex`, so it should not rest on a horizon chosen without
+the registered pilot. The effect-size diagnostic already argues the conclusion is horizon-robust --
+the correction stays under 8% of the plan-ranking spread even at 80 steps -- but that is an argument,
+not a measurement of returns.
+
+Running seed 3 with **`plan_H = 30`**, three times the original, 12 episodes, all five arms, to a
+**separate record** (`runs/f5_planning_H30.json`) so the registered n = 3 result stays immutable.
+
+This can only confirm or overturn a negative already in the paper. If the tie persists, the published
+statement is safe. **If a longer horizon produces a real effect, `limits.tex` is wrong and must be
+corrected before submission** -- which is exactly why this is worth running rather than arguing.
