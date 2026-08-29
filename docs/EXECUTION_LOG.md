@@ -6522,3 +6522,39 @@ overstatement would have missed it, which is an argument for checking counts mec
 than trusting a reading.
 
 **63/63 checks pass.**
+
+## 2026-08-29 -- **F6 artefacts verified, provenance gap closed, and both integrations brought current**
+
+Loop iteration. No jobs, no failures.
+
+### Step (2): F6 records verified against `docs/F6_PREREG.md`
+
+| requirement | status |
+|---|---|
+| 4 timesteps x 3 seeds | 12 models, `{0.02: 3, 0.035: 3, 0.05: 3, 0.08: 3}` |
+| relative grid `r = c/(2.5 dt)` as registered | exactly the 12 registered points |
+| P1 gate before any model analysis | all 4 timesteps pass |
+| labels used only after the fit is frozen | yes, evaluation only |
+| provenance stamped | `f6_models.json` yes; **`f6_physics.json` NO** |
+
+**An M29 gap of my own making.** `run_f6_timestep.py` wrote its record with a bare `write_text`,
+bypassing the `attach()` stamp every other producer here uses. Patched. Rather than stamping the
+existing file with today's argv -- which would assert an invocation that did not produce those rows
+-- the gate was **re-run to a temporary path and the rows compared**: identical, confirming the gate
+is deterministic, so the stamped version replaces it honestly.
+
+### Integrations brought current
+
+- **W&B**: 12 F6 training runs shipped, plus the results run refreshed to **63/63 checks, 47
+  metrics**. The project now carries 26 training runs and one results run.
+- **Hugging Face**: F6 added to the curated selection with its own manifest entry. The repo now holds
+  **56 files, 1,968 MB** -- 38 checkpoints and 14 datasets -- and remains **private**, as set on
+  2026-08-29 for double-blind anonymity.
+
+The upload guard behaved as intended: it read back the repo's real visibility, found it private,
+and proceeded without needing `--public`.
+
+### Net
+
+No experiment run. One provenance gap found and closed the honest way, F6's records verified against
+their registration, and both integrations current with the newest result. 63/63 checks pass.

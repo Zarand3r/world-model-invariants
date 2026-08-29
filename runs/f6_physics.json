@@ -242,5 +242,23 @@
   1.5,
   2.0,
   3.0
- ]
+ ],
+ "provenance": {
+  "runs": [
+   {
+    "argv": [
+     "scripts/run_f6_timestep.py",
+     "--physics",
+     "--out",
+     "/tmp/claude-1000/-home-rbao-world-model-invariants/7c020b66-48d7-4165-ada8-f4f04b7501b3/scratchpad/f6_phys_new.json"
+    ],
+    "cwd": "/home/rbao/world-model-invariants",
+    "utc": "2026-08-29T09:40:59+00:00",
+    "git": "087bb071fad91ddbf626a1f0529f86d63f3b75b5",
+    "git_dirty": true,
+    "python": "3.13.13",
+    "inputs": {}
+   }
+  ]
+ }
 }

@@ -34,7 +34,11 @@ SELECTION: list[tuple[str, str]] = [
     ("gru_ref_s[345].pt", "F4, second architecture (conv-GRU)."),
     ("gru56_ref_s[345].pt", "F4b, conv-GRU with 7x more open-loop training."),
     ("f1_act_s[345].pt", "F1/F5, action-conditioned models."),
-    ("*.npz", "All datasets. Every result is reproducible from these plus the checkpoints above."),
+    ("f6_dt*_s[345]_step6500.pt",
+     "F6, the timestep-scaling result: four simulator timesteps x three seeds. The models that "
+     "recover c* = (dt/2) mg(l/2) across a 4x range of dt."),
+    ("*.npz", "All datasets, including the four F6 timestep variants. Every result is reproducible "
+     "from these plus the checkpoints above."),
     ("pixel_readout_calibration.json", "The frozen pixel-readout pivot; the decoded-energy metric depends on it."),
 ]
 

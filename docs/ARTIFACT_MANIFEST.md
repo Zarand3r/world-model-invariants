@@ -28,14 +28,30 @@ sha256, so a download can be checked against the record the experiments were run
 | `f1_act_s3.pt` | 53.8 | `bc3b4c8156feaa4e` | F1/F5, action-conditioned models. |
 | `f1_act_s4.pt` | 53.8 | `b1aaa0382fa6ca32` | F1/F5, action-conditioned models. |
 | `f1_act_s5.pt` | 53.8 | `ce29356c326f1e24` | F1/F5, action-conditioned models. |
-| `osc2d_central.npz` | 5.3 | `b5db1f18f8a3f1b8` | All datasets. Every result is reproducible from these plus the checkpoints above. |
-| `osc2d_noncentral.npz` | 5.5 | `c0aec11ea0b76279` | All datasets. Every result is reproducible from these plus the checkpoints above. |
-| `osc2d_noncentral_eval.npz` | 18.4 | `469eb440f7a1abaf` | All datasets. Every result is reproducible from these plus the checkpoints above. |
-| `osc2d_ood_high.npz` | 2.8 | `277a9bae266bb8a9` | All datasets. Every result is reproducible from these plus the checkpoints above. |
-| `osc2d_ood_low.npz` | 2.8 | `b87451d804ef5bbd` | All datasets. Every result is reproducible from these plus the checkpoints above. |
-| `pendulum_actuated.npz` | 7.3 | `ea7b6c2e19522825` | All datasets. Every result is reproducible from these plus the checkpoints above. |
-| `pendulum_ood_low.npz` | 3.4 | `d6f64947d2405c2d` | All datasets. Every result is reproducible from these plus the checkpoints above. |
-| `pendulum_pixels.npz` | 6.8 | `9eed2d0776a17796` | All datasets. Every result is reproducible from these plus the checkpoints above. |
-| `pendulum_pixels_damped.npz` | 6.8 | `082cbfde0afa20c2` | All datasets. Every result is reproducible from these plus the checkpoints above. |
-| `pendulum_pixels_eval.npz` | 22.6 | `c2bdf8bea9db44fd` | All datasets. Every result is reproducible from these plus the checkpoints above. |
+| `f6_dt0.02_s3_step6500.pt` | 53.8 | `4b5e54122040c385` | F6, the timestep-scaling result: four simulator timesteps x three seeds. The models that recover c* = (dt/2) mg(l/2) across a 4x range of dt. |
+| `f6_dt0.02_s4_step6500.pt` | 53.8 | `d7d17a195245fda0` | F6, the timestep-scaling result: four simulator timesteps x three seeds. The models that recover c* = (dt/2) mg(l/2) across a 4x range of dt. |
+| `f6_dt0.02_s5_step6500.pt` | 53.8 | `73101479f4756532` | F6, the timestep-scaling result: four simulator timesteps x three seeds. The models that recover c* = (dt/2) mg(l/2) across a 4x range of dt. |
+| `f6_dt0.035_s3_step6500.pt` | 53.8 | `9064a6ae89993303` | F6, the timestep-scaling result: four simulator timesteps x three seeds. The models that recover c* = (dt/2) mg(l/2) across a 4x range of dt. |
+| `f6_dt0.035_s4_step6500.pt` | 53.8 | `374f10fe7c0a6b3c` | F6, the timestep-scaling result: four simulator timesteps x three seeds. The models that recover c* = (dt/2) mg(l/2) across a 4x range of dt. |
+| `f6_dt0.035_s5_step6500.pt` | 53.8 | `22244ff9f3d25708` | F6, the timestep-scaling result: four simulator timesteps x three seeds. The models that recover c* = (dt/2) mg(l/2) across a 4x range of dt. |
+| `f6_dt0.05_s3_step6500.pt` | 53.8 | `7716c91b0dfebfca` | F6, the timestep-scaling result: four simulator timesteps x three seeds. The models that recover c* = (dt/2) mg(l/2) across a 4x range of dt. |
+| `f6_dt0.05_s4_step6500.pt` | 53.8 | `b296a804d3d3586f` | F6, the timestep-scaling result: four simulator timesteps x three seeds. The models that recover c* = (dt/2) mg(l/2) across a 4x range of dt. |
+| `f6_dt0.05_s5_step6500.pt` | 53.8 | `1f100cf84ef1997c` | F6, the timestep-scaling result: four simulator timesteps x three seeds. The models that recover c* = (dt/2) mg(l/2) across a 4x range of dt. |
+| `f6_dt0.08_s3_step6500.pt` | 53.8 | `0d0544a94618ffa4` | F6, the timestep-scaling result: four simulator timesteps x three seeds. The models that recover c* = (dt/2) mg(l/2) across a 4x range of dt. |
+| `f6_dt0.08_s4_step6500.pt` | 53.8 | `db997f0f61b7330e` | F6, the timestep-scaling result: four simulator timesteps x three seeds. The models that recover c* = (dt/2) mg(l/2) across a 4x range of dt. |
+| `f6_dt0.08_s5_step6500.pt` | 53.8 | `7c9136b9c8f9ffa0` | F6, the timestep-scaling result: four simulator timesteps x three seeds. The models that recover c* = (dt/2) mg(l/2) across a 4x range of dt. |
+| `osc2d_central.npz` | 5.3 | `b5db1f18f8a3f1b8` | All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above. |
+| `osc2d_noncentral.npz` | 5.5 | `c0aec11ea0b76279` | All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above. |
+| `osc2d_noncentral_eval.npz` | 18.4 | `469eb440f7a1abaf` | All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above. |
+| `osc2d_ood_high.npz` | 2.8 | `277a9bae266bb8a9` | All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above. |
+| `osc2d_ood_low.npz` | 2.8 | `b87451d804ef5bbd` | All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above. |
+| `pend_dt0.02.npz` | 6.6 | `14c04b7347adaf4e` | All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above. |
+| `pend_dt0.035.npz` | 6.7 | `ad78b6e39d81a73d` | All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above. |
+| `pend_dt0.05.npz` | 6.8 | `9eed2d0776a17796` | All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above. |
+| `pend_dt0.08.npz` | 6.9 | `aa95321c02adaccd` | All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above. |
+| `pendulum_actuated.npz` | 7.3 | `ea7b6c2e19522825` | All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above. |
+| `pendulum_ood_low.npz` | 3.4 | `d6f64947d2405c2d` | All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above. |
+| `pendulum_pixels.npz` | 6.8 | `9eed2d0776a17796` | All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above. |
+| `pendulum_pixels_damped.npz` | 6.8 | `082cbfde0afa20c2` | All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above. |
+| `pendulum_pixels_eval.npz` | 22.6 | `c2bdf8bea9db44fd` | All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above. |
 | `pixel_readout_calibration.json` | 0.0 | `e69a841d738e383b` | The frozen pixel-readout pivot; the decoded-energy metric depends on it. |

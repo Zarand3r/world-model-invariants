@@ -13,6 +13,8 @@ analysed.
 import argparse, json, pathlib
 import numpy as np
 
+from latent_noether.provenance import attach, inputs_from_args
+
 G, M, L = 10.0, 1.0, 1.0
 I = M * L ** 2 / 3.0
 MGL2 = M * G * L / 2.0
@@ -83,5 +85,10 @@ if __name__ == "__main__":
         res = physics(a.dts, a.n_traj, a.n_steps, a.seed)
         allpass = all(v["P1_pass"] for v in res.values())
         print(f"  P1 gate: {'PASS' if allpass else 'FAIL'} on {sum(v['P1_pass'] for v in res.values())}/{len(res)} timesteps")
-        pathlib.Path(a.out).write_text(json.dumps({"physics": res, "r_grid": list(R_GRID)}, indent=1) + "\n")
+        # M29: this script wrote its record directly and so carried no provenance stamp, unlike
+        # every other producer here. Stamped now.
+        out = {"physics": res, "r_grid": list(R_GRID)}
+        op = pathlib.Path(a.out)
+        attach(out, op, inputs=inputs_from_args(a))
+        op.write_text(json.dumps(out, indent=1) + "\n")
         print(f"wrote {a.out}")
