@@ -5791,3 +5791,72 @@ All effects are single-digit percentages on 12 episodes and one seed, and nothin
 
 Seeds 4 and 5 not yet run. Whether to run them, or to treat the effect-size diagnosis as the result,
 is a judgement worth Richard's input given the seed-3 arms are separated by 0.003.
+
+## 2026-08-29 -- **F5 complete at n = 3: a decisive negative, with the reason measured**
+
+Ran seeds 4 and 5 as the registration specifies. This needed no new decision: 3 seeds *is* the
+registered protocol, and treating the seed-3 diagnosis as the result would have required a new
+preregistration.
+
+### Result, 3 models x 20 episodes, paired on shared targets and seeds
+
+| | none | conserve | balance | probe | random |
+|---|---|---|---|---|---|
+| s3 | -0.3409 | -0.3403 | -0.3395 | -0.3412 | -0.3420 |
+| s4 | -0.3367 | -0.3365 | -0.3374 | -0.3369 | -0.3395 |
+| s5 | -0.3375 | -0.3359 | -0.3365 | -0.3376 | -0.3378 |
+
+Paired differences against `none`, pooled over 60 episodes:
+
+| arm | mean diff | 95% CI | excludes 0 |
+|---|---|---|---|
+| conserve | +0.00081 | [-0.00117, +0.00280] | no |
+| balance | +0.00055 | [-0.00120, +0.00230] | no |
+| probe | -0.00022 | [-0.00217, +0.00174] | no |
+| random | -0.00138 | [-0.00343, +0.00067] | no |
+
+**Every registered prediction fails.**
+
+- **P1** balance > none: `+0.00055`, CI contains zero. **FAIL.**
+- **P2** balance > random: `+0.00193`, CI contains zero. **FAIL.**
+- **P3** balance > probe: `+0.00077`, CI contains zero. **FAIL.** The E18 dissociation does **not**
+  transfer to task performance.
+- **P4** conserve worse than balance: conserve is marginally *better*. **FAIL**, in the opposite
+  direction to the prediction.
+
+### The number that settles it
+
+Across-episode SD of return is **0.575**. The largest arm effect is **0.00138** -- **0.24% of one
+episode's standard deviation**. The arms are not close; they are indistinguishable by three orders of
+magnitude.
+
+The directional ordering is mostly as predicted (`conserve` and `balance` best, `random` worst), which
+is why the effect is not *nothing* -- but it is far below anything that could matter.
+
+### What F5 establishes, and it is worth more than the negative
+
+1. **Gate 0 passed.** A world model trained only on pixels, with no reward, no policy and no
+   actor-critic, plans competently: paired margin **+1.646**, CI [+0.503, +2.789], better on 14/20
+   episodes than random actions.
+2. **The correction confers no control benefit**, at n = 3, with every registered prediction failing.
+3. **The reason is measured, not guessed.** The correction shifts imagined energy by **0.3%** of the
+   spread across candidate action sequences at the planning horizon -- the quantity CEM ranks plans
+   by. It cannot change which plan is chosen.
+4. **The cause is structural.** The repair acts on *accumulated* drift. E1 measured it over **100**
+   free steps; a re-planning controller imagines **10** and re-plans every step, so drift never
+   accumulates. Even at an 80-step horizon the effect stays under 8%.
+
+This also explains **F2**: both negatives are the same effect-size problem in different clothes.
+A quantity can be genuinely conserved, genuinely causally deployed inside long free imagination, and
+still be irrelevant to a controller that never imagines long enough for it to matter.
+
+### Consequence for the paper
+
+`limits.tex` currently says "Whether the correction helps a planner is untested." **That is now
+tested.** The replacement is a bounded, quantified statement: it does not help, the effect is 0.24%
+of an episode's SD, and the reason is that re-planning truncates exactly the accumulation the method
+depends on. That is a far more useful limitation than the silence it replaces, and it tells a
+practitioner precisely when the method could matter -- long open-loop imagination, not closed-loop
+control.
+
+Raw rows immutable in `runs/f5_planning.json` and `runs/f5_gate0.json`, both provenance-stamped.
