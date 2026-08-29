@@ -184,6 +184,20 @@ for stale, why in (
                    ("+20.0", "supervised effect median is +26.8%, not the mean +20.0%")):
     CHECKS.append((f"no stale mean-based value {stale!r} ({why})", "-", stale not in CORPUS))
 
+# --- ICLR submission format ---
+_main = (TEX.parent / "main.tex").read_text()
+CHECKS.append(("uses the ICLR 2025 style, not a geometry approximation", "-",
+               "iclr2025_conference" in _main and "geometry}" not in _main))
+_pdf = TEX.parent / "main.pdf"
+if _pdf.exists():
+    import subprocess as _sp
+    _txt = _sp.run(["pdftotext", str(_pdf), "-"], capture_output=True, text=True).stdout
+    # double-blind: the author name must not appear anywhere in the rendered PDF
+    CHECKS.append(("double-blind: author name absent from the PDF", "-",
+                   not re.search(r"Richard\s+Bao|richardbao419", _txt, re.I)))
+    CHECKS.append(("anonymous submission header present", "-",
+                   "Anonymous authors" in _txt))
+
 # --- figure hygiene: filename prefix must be unique, and match the figure it renders as ---
 # paper1.2 inherited paper 1.0's filenames, so `fig4_leverage` rendered as Figure 3 and TWO files
 # began `fig2_`. That is the collision the archive script's own header warns about, having once

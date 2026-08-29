@@ -6769,3 +6769,29 @@ every causal intervention survive in the main text as summaries with numbers.
 - Full paper compiles with **0 errors, 0 undefined references**.
 - arXiv archive rebuilds and compiles **standalone**: 15 pages, **0 unresolved citations**.
 - `origin/main` still **`20fa8b4`** (2026-08-24); the pre-push hook remains in place.
+
+## 2026-08-29 -- **Real ICLR 2025 template applied; main text is 9 pages under it**
+
+Replaced the geometry approximation with the actual style files, fetched from
+`ICLR/Master-Template`: `iclr2025_conference.sty`, its `.bst`, `fancyhdr.sty` and `math_commands.tex`.
+Tested in a scratch copy before touching the manuscript.
+
+**The approximation was accurate.** Under the real template the main text is **9 pages** --- verified
+by compiling the body alone --- with the last page 297 words full rather than teetering. Full document
+with appendix and references: **16 pages**.
+
+### Double-blind, checked rather than assumed
+
+The template's submission mode renders **"Anonymous authors / Paper under double-blind review"**, and
+the author name appears **0 times** in the rendered PDF. Both are now **mechanically enforced**: new
+checks assert the ICLR style is in use (and that no `geometry` package fights it), that the author
+name is absent from the PDF, and that the anonymous header is present. A later edit that reinstates
+`\author` or swaps the style would fail the checks rather than reaching a reviewer.
+
+### Archive
+
+`make_arxiv_archive.sh` now ships `*.sty`, `*.bst` and `math_commands.tex` --- **without them a clean
+extraction cannot build**, since the venue style is not in TeX Live. Rebuilt and verified in a clean
+room: 16 pages, **0 errors, 0 unresolved citations, 0 author leaks**.
+
+**66/66 checks pass.** `origin/main` remains `20fa8b4`.

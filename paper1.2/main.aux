@@ -31,8 +31,8 @@
 \newlabel{sec:setup}{{2}{2}{Recovering a latent invariant}{section.2}{}}
 \@writefile{toc}{\contentsline {paragraph}{Model and data.}{2}{section*.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Latent coordinates.}{2}{section*.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{The candidate family.}{2}{section*.7}\protected@file@percent }
 \citation{arnold1989mathematical}
+\@writefile{toc}{\contentsline {paragraph}{The candidate family.}{3}{section*.7}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{The invariance criterion.}{3}{section*.8}\protected@file@percent }
 \newlabel{eq:ratio}{{1}{3}{The invariance criterion}{equation.2.1}{}}
 \@writefile{toc}{\contentsline {paragraph}{Selecting among conserved candidates.}{3}{section*.9}\protected@file@percent }
@@ -40,26 +40,26 @@
 \@writefile{toc}{\contentsline {section}{\numberline {3}Decodability is not dynamical structure}{3}{section.3}\protected@file@percent }
 \newlabel{sec:dissociation}{{3}{3}{Decodability is not dynamical structure}{section.3}{}}
 \newlabel{eq:rhoobs}{{2}{3}{Decodability is not dynamical structure}{equation.3.2}{}}
-\@writefile{toc}{\contentsline {paragraph}{A perfect probe identifies a direction the dynamics do not use.}{3}{section*.11}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces A perfect probe is not a conserved quantity. Colour is the constraint; marker is the model seed (all three shown, never averaged). \textbf  {Left:} the supervised probe reads true energy almost perfectly. \textbf  {Centre:} the model's own transition preserves it an order of magnitude worse than the label-free scalar. \textbf  {Right:} acting on it fails to reduce rollout energy drift, while the label-free scalar cuts drift on every seed. Probe quality and dynamical relevance rank the three constraints differently.\relax }}{4}{figure.caption.12}\protected@file@percent }
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
 \newlabel{fig:probe_vs_operator}{{1}{4}{A perfect probe is not a conserved quantity. Colour is the constraint; marker is the model seed (all three shown, never averaged). \textbf {Left:} the supervised probe reads true energy almost perfectly. \textbf {Centre:} the model's own transition preserves it an order of magnitude worse than the label-free scalar. \textbf {Right:} acting on it fails to reduce rollout energy drift, while the label-free scalar cuts drift on every seed. Probe quality and dynamical relevance rank the three constraints differently.\relax }{figure.caption.12}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Decodability is retained while dynamical structure degrades, across five independent axes. $\rho _{\mathrm  {obs}}$ for the trained conservative model in-distribution is $6.3$--$8.7\times 10^{-3}$.\relax }}{4}{table.caption.14}\protected@file@percent }
 \newlabel{tab:axes}{{1}{4}{Decodability is retained while dynamical structure degrades, across five independent axes. $\rho _{\mathrm {obs}}$ for the trained conservative model in-distribution is $6.3$--$8.7\times 10^{-3}$.\relax }{table.caption.14}{}}
+\@writefile{toc}{\contentsline {paragraph}{A perfect probe identifies a direction the dynamics do not use.}{4}{section*.11}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{The dissociation is directional, and appears on five further axes.}{4}{section*.13}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Whether conservation \emph  {alone} predicts the intervention is not established.}{4}{section*.15}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Where the phenomenon stops.}{4}{section*.16}\protected@file@percent }
 \citation{hairer2006geometric}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces The model's transition conserves the integrator's shadow Hamiltonian, not textbook energy. Both panels sweep the target $T_c = E + c\,\dot  \theta \qopname  \relax o{sin}\theta $; the dotted line is $c^\star = 0.125$ predicted from the integrator with no fitting. \textbf  {Left:} on ground-truth trajectories, with no model involved, $T_{c^\star }$ is $591\times $ better conserved than textbook energy. \textbf  {Right:} the learned transition agrees, on all three seeds. The sweep passes from the supervised probe's level (red) down to the label-free scalar's (blue) exactly at $c^\star $. The wrong-sign control at $c=-c^\star $ is $12\times $ worse (median over seeds), so this is not monotone in $|c|$.\relax }}{5}{figure.caption.19}\protected@file@percent }
-\newlabel{fig:shadow}{{2}{5}{The model's transition conserves the integrator's shadow Hamiltonian, not textbook energy. Both panels sweep the target $T_c = E + c\,\dot \theta \sin \theta $; the dotted line is $c^\star = 0.125$ predicted from the integrator with no fitting. \textbf {Left:} on ground-truth trajectories, with no model involved, $T_{c^\star }$ is $591\times $ better conserved than textbook energy. \textbf {Right:} the learned transition agrees, on all three seeds. The sweep passes from the supervised probe's level (red) down to the label-free scalar's (blue) exactly at $c^\star $. The wrong-sign control at $c=-c^\star $ is $12\times $ worse (median over seeds), so this is not monotone in $|c|$.\relax }{figure.caption.19}{}}
+\@writefile{toc}{\contentsline {paragraph}{Whether conservation \emph  {alone} predicts the intervention is not established.}{5}{section*.15}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Where the phenomenon stops.}{5}{section*.16}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {4}Why the perfect probe fails}{5}{section.4}\protected@file@percent }
 \newlabel{sec:mechanism}{{4}{5}{Why the perfect probe fails}{section.4}{}}
 \@writefile{toc}{\contentsline {paragraph}{The data does not conserve textbook energy.}{5}{section*.17}\protected@file@percent }
 \newlabel{eq:shadow}{{4}{5}{The data does not conserve textbook energy}{equation.4.4}{}}
 \@writefile{toc}{\contentsline {paragraph}{A sweep, not a two-point test.}{5}{section*.18}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{The minimum is where the integrator says it is.}{5}{section*.20}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces The model's transition conserves the integrator's shadow Hamiltonian, not textbook energy. Both panels sweep the target $T_c = E + c\,\dot  \theta \qopname  \relax o{sin}\theta $; the dotted line is $c^\star = 0.125$ predicted from the integrator with no fitting. \textbf  {Left:} on ground-truth trajectories, with no model involved, $T_{c^\star }$ is $591\times $ better conserved than textbook energy. \textbf  {Right:} the learned transition agrees, on all three seeds. The sweep passes from the supervised probe's level (red) down to the label-free scalar's (blue) exactly at $c^\star $. The wrong-sign control at $c=-c^\star $ is $12\times $ worse (median over seeds), so this is not monotone in $|c|$.\relax }}{6}{figure.caption.19}\protected@file@percent }
+\newlabel{fig:shadow}{{2}{6}{The model's transition conserves the integrator's shadow Hamiltonian, not textbook energy. Both panels sweep the target $T_c = E + c\,\dot \theta \sin \theta $; the dotted line is $c^\star = 0.125$ predicted from the integrator with no fitting. \textbf {Left:} on ground-truth trajectories, with no model involved, $T_{c^\star }$ is $591\times $ better conserved than textbook energy. \textbf {Right:} the learned transition agrees, on all three seeds. The sweep passes from the supervised probe's level (red) down to the label-free scalar's (blue) exactly at $c^\star $. The wrong-sign control at $c=-c^\star $ is $12\times $ worse (median over seeds), so this is not monotone in $|c|$.\relax }{figure.caption.19}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces The recovered correction tracks the simulator's timestep across a $4\times $ range. Three models per timestep; $\rho _{\mathrm  {obs}}$ is the median across seeds.\relax }}{6}{table.caption.22}\protected@file@percent }
 \newlabel{tab:timestep}{{2}{6}{The recovered correction tracks the simulator's timestep across a $4\times $ range. Three models per timestep; $\rho _{\mathrm {obs}}$ is the median across seeds.\relax }{table.caption.22}{}}
-\@writefile{toc}{\contentsline {paragraph}{The minimum is where the integrator says it is.}{6}{section*.20}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{The model tracks the simulator's timestep.}{6}{section*.21}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{What this does and does not settle.}{6}{section*.23}\protected@file@percent }
 \citation{makelov2024illusion}
@@ -68,7 +68,6 @@
 \@writefile{toc}{\contentsline {section}{\numberline {6}Limitations}{7}{section.6}\protected@file@percent }
 \newlabel{sec:limits}{{6}{7}{Limitations}{section.6}{}}
 \@writefile{toc}{\contentsline {paragraph}{No downstream benefit, and we measured why.}{7}{section*.24}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{The method finds only what the data gave the model a reason to represent.}{7}{section*.25}\protected@file@percent }
 \citation{alain2017probing}
 \citation{hewitt2019control}
 \citation{belinkov2022probing}
@@ -85,58 +84,63 @@
 \citation{hairer2006geometric2}
 \citation{hafner2023dreamerv3,ha2018world,schrittwieser2020muzero}
 \citation{locatello2019challenging}
+\@writefile{toc}{\contentsline {paragraph}{The method finds only what the data gave the model a reason to represent.}{8}{section*.25}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {7}Related work}{8}{section.7}\protected@file@percent }
 \newlabel{sec:related}{{7}{8}{Related work}{section.7}{}}
 \@writefile{toc}{\contentsline {paragraph}{What probes establish.}{8}{section*.26}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Discovering conserved quantities.}{8}{section*.27}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Structure by design, and whether it is what helps.}{8}{section*.28}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Drift, and evaluating physics in world models.}{8}{section*.29}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{8}{section.8}\protected@file@percent }
-\newlabel{sec:conclusion}{{8}{8}{Conclusion}{section.8}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{9}{section.8}\protected@file@percent }
+\newlabel{sec:conclusion}{{8}{9}{Conclusion}{section.8}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {A}Experimental details and extraction ablations}{9}{appendix.A}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{A magnitude-matched null, and why the obvious one fails.}{9}{section*.30}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Three kinds of latent trajectories.}{9}{section*.31}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Code and data.}{9}{section*.32}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Preliminary experiments.}{9}{section*.33}\protected@file@percent }
-\newlabel{sec:details}{{A}{9}{Preliminary experiments}{section*.33}{}}
-\@writefile{toc}{\contentsline {paragraph}{Training.}{9}{section*.34}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Data split.}{9}{section*.35}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Scoring the correction over a grid.}{9}{section*.36}\protected@file@percent }
-\citation{makelov2024illusion}
+\@writefile{toc}{\contentsline {paragraph}{Code and data.}{10}{section*.32}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Preliminary experiments.}{10}{section*.33}\protected@file@percent }
+\newlabel{sec:details}{{A}{10}{Preliminary experiments}{section*.33}{}}
+\@writefile{toc}{\contentsline {paragraph}{Training.}{10}{section*.34}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Data split.}{10}{section*.35}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Scoring the correction over a grid.}{10}{section*.36}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Flow alignment contributes reproducibility.}{10}{section*.37}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{The pairing residual does not track recovery.}{10}{section*.38}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {B}Causal-intervention protocols and per-model numbers}{10}{appendix.B}\protected@file@percent }
 \newlabel{sec:causal-detail}{{B}{10}{Causal-intervention protocols and per-model numbers}{appendix.B}{}}
 \@writefile{toc}{\contentsline {paragraph}{A magnitude-matched null.}{10}{section*.39}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Correcting the invariant repairs the imagined physics.}{10}{section*.40}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Setting the invariant steers the imagined physics.}{10}{section*.41}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{The subspace is used by the model's own dynamics, not only reachable from encoder states.}{10}{section*.42}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{The same pipeline refuses when there is nothing to find.}{10}{section*.43}\protected@file@percent }
+\citation{makelov2024illusion}
+\@writefile{toc}{\contentsline {paragraph}{Setting the invariant steers the imagined physics.}{11}{section*.41}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{The subspace is used by the model's own dynamics, not only reachable from encoder states.}{11}{section*.42}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{The same pipeline refuses when there is nothing to find.}{11}{section*.43}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Downstream tests in full.}{11}{section*.44}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{No downstream benefit, and we measured why.}{11}{section*.45}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{The method finds only what the data gave the model a reason to represent.}{11}{section*.46}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Conservation at matched decodability, in full.}{11}{section*.47}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Whether conservation \emph  {alone} predicts the intervention is not established.}{11}{section*.48}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Conservation at matched decodability, in full.}{12}{section*.47}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Whether conservation \emph  {alone} predicts the intervention is not established.}{12}{section*.48}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Under actuation the same split appears against a different law.}{12}{section*.49}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Where the phenomenon stops.}{12}{section*.50}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {C}Latent sensitivity analyses}{12}{appendix.C}\protected@file@percent }
-\newlabel{sec:sensitivity}{{C}{12}{Latent sensitivity analyses}{appendix.C}{}}
-\newlabel{eq:leverage}{{6}{12}{Latent sensitivity analyses}{equation.C.6}{}}
-\@writefile{toc}{\contentsline {paragraph}{Calibrating the displacement.}{12}{section*.51}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Variance and sensitivity at different horizons.}{12}{section*.52}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Each point is one of the 12 extracted directions, ranked within its own model; the dotted line marks equal ranks. \textbf  {(a)} Variance rank against damage rank at a 40-step horizon. \textbf  {(b)} Damage rank against the magnitude of the invariant correction along that direction.\relax }}{13}{figure.caption.53}\protected@file@percent }
-\newlabel{fig:leverage}{{3}{13}{Each point is one of the 12 extracted directions, ranked within its own model; the dotted line marks equal ranks. \textbf {(a)} Variance rank against damage rank at a 40-step horizon. \textbf {(b)} Damage rank against the magnitude of the invariant correction along that direction.\relax }{figure.caption.53}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {C}Latent sensitivity analyses}{13}{appendix.C}\protected@file@percent }
+\newlabel{sec:sensitivity}{{C}{13}{Latent sensitivity analyses}{appendix.C}{}}
+\newlabel{eq:leverage}{{6}{13}{Latent sensitivity analyses}{equation.C.6}{}}
+\@writefile{toc}{\contentsline {paragraph}{Calibrating the displacement.}{13}{section*.51}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Variance and sensitivity at different horizons.}{13}{section*.52}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Basis-independent properties reproduce better than coordinate selectors.}{13}{section*.54}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {D}Additional sweeps}{13}{appendix.D}\protected@file@percent }
 \newlabel{sec:sweeps}{{D}{13}{Additional sweeps}{appendix.D}{}}
 \@writefile{toc}{\contentsline {paragraph}{Energy outside the highest-variance directions.}{13}{section*.55}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Accumulated invariant error.}{13}{section*.56}\protected@file@percent }
 \bibstyle{plainnat}
 \bibdata{refs}
 \bibcite{alain2017probing}{{1}{2017}{{Alain and Bengio}}{{}}}
 \bibcite{alet2021noether}{{2}{2021}{{Alet et~al.}}{{Alet, Doblar, Zhou, Tenenbaum, Kawaguchi, and Finn}}}
 \bibcite{arnold1989mathematical}{{3}{1989}{{Arnold}}{{}}}
 \bibcite{belinkov2022probing}{{4}{2022}{{Belinkov}}{{}}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Each point is one of the 12 extracted directions, ranked within its own model; the dotted line marks equal ranks. \textbf  {(a)} Variance rank against damage rank at a 40-step horizon. \textbf  {(b)} Damage rank against the magnitude of the invariant correction along that direction.\relax }}{14}{figure.caption.53}\protected@file@percent }
+\newlabel{fig:leverage}{{3}{14}{Each point is one of the 12 extracted directions, ranked within its own model; the dotted line marks equal ranks. \textbf {(a)} Variance rank against damage rank at a 40-step horizon. \textbf {(b)} Damage rank against the magnitude of the invariant correction along that direction.\relax }{figure.caption.53}{}}
+\@writefile{toc}{\contentsline {paragraph}{Accumulated invariant error.}{14}{section*.56}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Energy recovery and pairing residual against extraction dimension. Lines are medians over the three models; points are individual models. Both quantities are dimensionless.\relax }}{14}{figure.caption.57}\protected@file@percent }
+\newlabel{fig:ldsweep}{{4}{14}{Energy recovery and pairing residual against extraction dimension. Lines are medians over the three models; points are individual models. Both quantities are dimensionless.\relax }{figure.caption.57}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces \textbf  {(a)} Energy-probe $R^2$ for the top six principal directions against directions 7--12, per model. \textbf  {(b)} Fraction of latent flow and pairing residual carried by each group, medians over three models.\relax }}{14}{figure.caption.57}\protected@file@percent }
+\newlabel{fig:lowvar}{{5}{14}{\textbf {(a)} Energy-probe $R^2$ for the top six principal directions against directions 7--12, per model. \textbf {(b)} Fraction of latent flow and pairing residual carried by each group, medians over three models.\relax }{figure.caption.57}{}}
 \bibcite{cranmer2020lnn}{{5}{2020}{{Cranmer et~al.}}{{Cranmer, Greydanus, Hoyer, Battaglia, Spergel, and Ho}}}
 \bibcite{fu2023forces}{{6}{2023}{{Fu et~al.}}{{Fu, Wu, Wang, Xie, Keten, Gomez-Bombarelli, and Jaakkola}}}
 \bibcite{greydanus2019hnn}{{7}{2019}{{Greydanus et~al.}}{{Greydanus, Dzamba, and Yosinski}}}
@@ -147,10 +151,6 @@
 \bibcite{hairer2006geometric}{{12}{2006{a}}{{Hairer et~al.}}{{Hairer, Lubich, and Wanner}}}
 \bibcite{hairer2006geometric2}{{13}{2006{b}}{{Hairer et~al.}}{{Hairer, Lubich, and Wanner}}}
 \bibcite{hewitt2019control}{{14}{2019}{{Hewitt and Liang}}{{}}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Energy recovery and pairing residual against extraction dimension. Lines are medians over the three models; points are individual models. Both quantities are dimensionless.\relax }}{14}{figure.caption.57}\protected@file@percent }
-\newlabel{fig:ldsweep}{{4}{14}{Energy recovery and pairing residual against extraction dimension. Lines are medians over the three models; points are individual models. Both quantities are dimensionless.\relax }{figure.caption.57}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces \textbf  {(a)} Energy-probe $R^2$ for the top six principal directions against directions 7--12, per model. \textbf  {(b)} Fraction of latent flow and pairing residual carried by each group, medians over three models.\relax }}{14}{figure.caption.57}\protected@file@percent }
-\newlabel{fig:lowvar}{{5}{14}{\textbf {(a)} Energy-probe $R^2$ for the top six principal directions against directions 7--12, per model. \textbf {(b)} Fraction of latent flow and pairing residual carried by each group, medians over three models.\relax }{figure.caption.57}{}}
 \bibcite{li2023othello}{{15}{2023}{{Li et~al.}}{{Li, Hopkins, Bau, Vi{\'e}gas, Pfister, and Wattenberg}}}
 \bibcite{liu2021aipoincare}{{16}{2021}{{Liu and Tegmark}}{{}}}
 \bibcite{locatello2019challenging}{{17}{2019}{{Locatello et~al.}}{{Locatello, Bauer, Lucic, R{\"a}tsch, Gelly, Sch{\"o}lkopf, and Bachem}}}
@@ -160,4 +160,4 @@
 \bibcite{schrittwieser2020muzero}{{21}{2020}{{Schrittwieser et~al.}}{{}}}
 \bibcite{towers2024gymnasium}{{22}{2024}{{Towers et~al.}}{{}}}
 \bibcite{zhang2023concernet}{{23}{2023}{{Zhang et~al.}}{{Zhang, Weng, Das, Megretski, Daniel, and Nguyen}}}
-\gdef \@abspage@last{15}
+\gdef \@abspage@last{16}
