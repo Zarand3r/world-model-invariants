@@ -6116,3 +6116,61 @@ never written down. Changed to check the endpoints. A guard that fails on a corr
 than no guard, because it trains you to ignore it.
 
 **50/50 checks pass.** Archive rebuilt and re-verified in a clean extraction: 15 pages, 0 errors.
+
+## 2026-08-29 -- **F3 preregistered: constraint residuals, staged so the risky half cannot be reached first**
+
+Loop iteration. No jobs, no new artefacts. Wrote the F3 registration; **not approved to run**, same
+pattern as F5 (registration is the instructed precondition, running is not).
+
+### Why the roadmap's warning is mathematically exact
+
+The roadmap says not to point the current extractor at limb-length or contact constraints. The reason
+is sharper than "different flavour of quantity":
+
+The extraction minimises the **invariance ratio** -- within-trajectory variance over **total**
+variance, as `W a = lambda T a`. That is built for *orbit-label* invariants: constant within a
+trajectory, **varying between** them. A constraint `G(z) = 0` holds for every state of every
+trajectory, so its total variance is ~0 and it lies in `T`'s **null space** -- exactly the degenerate
+direction the ridge exists to suppress. **The method does not merely miss constraints; it actively
+excludes them.** Running it unchanged would return whatever the regulariser left behind.
+
+The generalisation is therefore to minimise the **second moment** `E[G^2]` under a norm constraint,
+not a variance ratio.
+
+### The design decision that de-risks it
+
+That objective is trivially satisfied by numerical degeneracy -- which is precisely how F1's balance
+extractor failed (`cond(T) = 9.9e38`, a residual readable as anything between 0.97x and 5445x
+depending on the ridge). So Stage A validates the method on **a constraint we already have**:
+
+**The pendulum's rod length is fixed, and that is an exact algebraic constraint visible in its own
+pixels.** The ink centroid's distance from the calibrated pivot is constant across every frame of
+every trajectory, and `pixel_readout.py` already measures both. `G_true = ||centroid - pivot|| - L`
+needs no new data, no new model, and no external download -- Stage A runs on the three reference
+checkpoints already in hand.
+
+**A1 is a hard gate:** if the method cannot recover a constraint we can write down exactly, in a model
+we already trust, it does not get pointed at a walker.
+
+Three defences carried forward from lessons already paid for: standardised features with a
+trace-relative ridge (the `balance.py` bug), held-out evaluation (E9's discipline, retrofitted into
+F1), and a positive control -- without which "we found a direction with small residual" is
+unfalsifiable.
+
+### Stage B's risks registered in advance
+
+`dreamer_adapter.py` hardcodes `num_actions=1` and a 64x64 single-camera observation; a walker
+checkpoint has a 6-dimensional action space and different encoder shapes. Loading one is an adapter
+change, not a config change. Registered now that **if no released checkpoint can be loaded and
+verified to reconstruct its own frames, Stage B is reported as NOT RUN** -- an infrastructure blocker,
+not a scientific negative. Stage B's predictions are deliberately left unregistered until Stage A's
+outcome is known, since registering against a method that may not exist is meaningless.
+
+A negative is explicitly registered as a real outcome: a model that does not represent its own
+rod-length constraint would be encoding the *state* without the *kinematics* that generate it, which
+sharpens the paper's existing thesis rather than contradicting it.
+
+### Note
+
+The first commit attempt failed: unescaped quotes in the message broke the shell. Same defect as
+2026-08-26; redone with a heredoc. The prereg file itself was written correctly.
