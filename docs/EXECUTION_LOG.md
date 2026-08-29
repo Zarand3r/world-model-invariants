@@ -6588,3 +6588,44 @@ the same error as adding a sixth dissociation axis, which was declined for the s
 **F7 is recorded here as the best next experiment *if and when* the paper has room for it.** The
 right next action is editorial: choose a venue, make F6 the lead, and cut 4 pages. That is Richard's
 call, and it is the only thing standing between this project and a submission.
+
+## 2026-08-29 -- **Editorial pass begun (ICLR, F6 as lead); origin pinned to the published state**
+
+Richard delegated the venue and restructuring decision, then instructed: *"make sure we dont update
+origin yet. Origin should be at the state it was at when we last published the paper."*
+
+### Origin: verified untouched, and guarded
+
+- `origin/main` = **`20fa8b4`** (2026-08-24), the published arXiv state.
+- Local `main` is **identical** to it.
+- All **133** commits of this work sit on `roadmap/stage1`, which has **no upstream configured** and
+  has never been pushed. Nothing in the reflog shows a push.
+
+Because that instruction has to outlive any single session's memory of it, it is now enforced rather
+than remembered: `.git/hooks/pre-push` refuses every push with an explanation and the deliberate
+override (`--no-verify`). **Tested by attempting a real push**, which was blocked; origin still reads
+`20fa8b4`. The hook is not version-controlled, so it guards this working copy rather than a fresh
+clone -- which is the copy that matters here.
+
+Note for the record: the Hugging Face and W&B uploads are separate from git origin and were made
+earlier at Richard's request. The HF repo is **private**.
+
+### Decision taken as delegated
+
+**ICLR** -- highest estimated probability (55-65%), a 9-page limit rather than ICML's 8, and the venue
+that most rewards a conceptual contribution on small systems when the controls are this thorough.
+
+**F6 becomes the lead.** Title changed from *"Correcting a learned physical invariant improves
+world-model rollouts"* to **"World models learn their simulator's integrator, not the physics it
+approximates"**, and the abstract rewritten to open on the timestep-scaling result, with the probing
+dissociation as its consequence rather than as the headline.
+
+Section order is **deliberately unchanged**. `mechanism` depends on `rho_obs` and the supervised probe,
+both introduced in `dissociation`; reordering would require rewriting those dependencies for a gain
+the front matter already delivers. A reader meets the abstract and introduction first, and both now
+lead with F6.
+
+**Cuts so far:** three `setup` detail paragraphs moved to the appendix; `boundaries` folded into
+`dissociation`. Main body **13 -> 12** at ICLR geometry against a 9-page target. The remaining three
+pages must come from prose compression -- every surviving section is load-bearing, and removing one
+would delete evidence rather than slack.
