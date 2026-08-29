@@ -79,7 +79,7 @@ Load-bearing, not embarrassments — each bounds the claim with a number.
 | **F2** | is drift an online trust signal? | **no** | Spearman `-0.02/+0.09/-0.24` vs `+0.27/+0.29/+0.31` for plain latent displacement |
 | **F1** | does it learn the balance law under action? | **no** | power explains **0.31%** of the variance in `dC`; observed change 4.5--5.4x larger than predicted |
 | **F3** | can constraints `G(z)=0` be extracted? | **no** | `E[G^2]` ranks the true constraint **1526th of 1819**, and the constraint is barely encoded (held-out `rho` 0.19). **A quantity that never varies carries no information** — it lives in decoder weights. This is why no released-checkpoint experiment is reported: limb lengths do not vary either |
-| **E10b** | does conservation *alone* predict repair? | **not established** | CI excludes zero on 1 of 3 seeds; the previously reported `+0.71` came from an uncommitted script and does not reproduce |
+| **E10b** | does conservation *alone* predict repair? | **not established** | CI excludes zero on 1 of 3 seeds; the figure reported before 2026-08-28 came from an uncommitted script and does not reproduce |
 
 ---
 
@@ -97,10 +97,10 @@ Read this section first if you are reviewing adversarially.
   sha256 into every record.
 - **Four headline records were re-derived from scratch.** E9, E4 and E12c reproduce to every reported
   digit. E10b did not — and it was the only one produced by an uncommitted script.
-- **Several errors were mine and are logged.** An overclaim ("increases drift on 3 of 3" when one seed
-  reduced it), a flattering-seed quote (14x was seed 3 of 14/10/12), an arithmetic slip (768 vs 767),
-  a count understating our own result (9 of 12 when it was 10), and a page-length metric that was
-  wrong for several passes. Each is dated in `docs/EXECUTION_LOG.md` with how it was found.
+- **Several errors were mine and are logged.** <!-- superseded: an overclaim ("increases drift on 3 of 3" when one seed reduced it), a flattering-seed quote (14x was seed 3 of 14/10/12), an arithmetic slip (768 vs 767), a count understating our own result (9 of 12 when it was 10), and a page-length metric wrong for several passes -->
+  Five of them, each dated in `docs/EXECUTION_LOG.md` with how it was found: an overclaim, a
+  flattering-seed quote, an arithmetic slip, a count that understated our own result, and a
+  page-length metric that was wrong for several passes.
 - **The guards themselves have failed in both directions**, and the fixes are recorded: one matched
   an ASCII rendering and missed a stale `6.3\times` for many iterations; its replacement matched bare
   digits and flagged two legitimate uses. The rule now is **match the claim, not its rendering**.

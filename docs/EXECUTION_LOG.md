@@ -6851,3 +6851,24 @@ guard, or trimmed to point at `docs/RESULTS.md` instead of restating figures.
 
 No jobs, no new run artefacts, nothing uncommitted. Roadmap complete; the paper is in ICLR submission
 format at 9 pages with 66/66 checks passing.
+
+## 2026-08-29 -- **Closed the gap I flagged: the handoff is now under the number guards**
+
+Last iteration recorded that `docs/REVIEWER_HANDOFF.md` restates the paper's figures without being
+covered by `verify_paper_numbers.py` --- the same shape of risk that let `CLAIMS.md` hold mean-based
+numbers for a day. Closed it by adding the handoff to the guarded corpus, so **every existing check
+now protects it too** rather than writing a second set of handoff-specific checks that could drift
+from the first.
+
+**Two guards fired immediately**, and both were the handoff *documenting* past errors rather than
+committing them: the `"increases drift on 3 of 3"` overclaim and the irreproducible `+0.71`, both
+quoted in the "what to distrust" section. That is the same false positive `CLAIMS.md` produced, and
+the same fix applies --- the `<!-- superseded: ... -->` marker, which the verifier already strips.
+A repo that documents its own corrections will keep tripping its own guards unless historical
+mentions are marked as such.
+
+**Verified in both directions:** 66/66 with the handoff correct, and introducing a wrong slope
+(`2.611` for `2.484`) into the handoff alone makes the checks fail. The handoff can no longer drift
+away from the records silently.
+
+No jobs, no new run artefacts, nothing uncommitted.

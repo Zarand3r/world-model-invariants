@@ -19,6 +19,10 @@ RUNS, TEX = ROOT / "runs", ROOT / "paper1.2" / "sections"
 # verifier only ever globbed sections/*.tex, and nothing else compared the two.
 _RAW = "\n".join(p.read_text() for p in sorted(TEX.glob("*.tex")))
 _RAW += "\n" + (TEX.parent / "CLAIMS.md").read_text()
+# The reviewer handoff restates the paper's figures, so it carries the same drift risk and is
+# guarded by the same checks. CLAIMS.md silently held mean-based numbers for a day before it
+# was added here; the handoff is the same shape of risk.
+_RAW += "\n" + (ROOT / "docs" / "REVIEWER_HANDOFF.md").read_text()
 # Lines marked `<!-- superseded: ... -->` deliberately NAME an old value in order to record that it
 # was wrong. A repo that documents its own corrections will otherwise trip every stale-value guard
 # it owns, so those annotations are excluded from the corpus the guards read.
