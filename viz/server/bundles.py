@@ -119,7 +119,13 @@ def _remember(k: str, b: Bundle) -> None:
             _mem.popitem(last=False)
 
 
+class FitInProgress(RuntimeError):
+    """A fit is already running. Raised rather than queued: see `start_job`."""
+
+
 def start_job(model_key: str, ld: int, degree: int) -> str:
+    if any(j["state"] in ("queued", "running") for j in _jobs.values()):
+        raise FitInProgress("a fit is already running; wait for it to finish")
     jid = uuid.uuid4().hex[:12]
     _jobs[jid] = {"state": "queued", "messages": [], "key": key(model_key, ld, degree)}
     while len(_jobs) > MAX_JOBS:

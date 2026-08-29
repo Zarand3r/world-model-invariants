@@ -40,7 +40,10 @@ def _bundle(key: str):
 
 @app.get("/api/models")
 def get_models():
-    return {"models": [m.__dict__ for m in assets.models()],
+    # `path` is deliberately dropped: it is an absolute path on the host, the UI never used it, and
+    # this endpoint is reachable from the internet when the bench is served over Tailscale Funnel.
+    public = [{k: v for k, v in m.__dict__.items() if k != "path"} for m in assets.models()]
+    return {"models": public,
             "resident": registry.resident(),
             "cached_bundles": sorted(p.stem for p in bundles.CACHE.glob("*.npz"))}
 
@@ -61,7 +64,10 @@ def post_bundle(req: BundleReq):
     k = bundles.key(req.model, req.ld, req.degree)
     if bundles.cached(k):
         return {"key": k, "cached": True}
-    return {"key": k, "cached": False, "job": bundles.start_job(req.model, req.ld, req.degree)}
+    try:
+        return {"key": k, "cached": False, "job": bundles.start_job(req.model, req.ld, req.degree)}
+    except bundles.FitInProgress as exc:
+        raise HTTPException(429, str(exc)) from exc
 
 
 @app.get("/api/jobs/{jid}/events")
