@@ -6351,3 +6351,52 @@ axes table already in `dissociation`, so folding it in loses little.
 
 This remains an authorship decision. What has changed is that it is now a decision between measured
 options rather than impressions.
+
+## 2026-08-29 -- **F6 launched: does the world model encode the simulator's timestep?**
+
+Richard approved the direction. Preregistered in `docs/F6_PREREG.md` before any quantity existed.
+
+### P1 physics gate: PASS 4/4
+
+On ground-truth states, the shadow correction is exact at `r = 1` for every timestep:
+
+| dt | predicted `c*` | argmin `r` | improvement over textbook `E` |
+|---|---|---|---|
+| 0.02 | 0.0500 | **+1.00** | 3858x |
+| 0.035 | 0.0875 | **+1.00** | 1254x |
+| 0.05 | 0.1250 | **+1.00** | 606x |
+| 0.08 | 0.2000 | **+1.00** | 226x |
+
+The improvement **declines with `dt`**, as it should: the shadow is a first-order correction, so the
+`O(dt^2)` remainder grows.
+
+### Data
+
+`make_pendulum_pixels.py` gained an optional `--dt`. It does not change RNG consumption, so the
+default path stays bit-exact and the free-evolution `data_sha256` chain the existing checkpoints
+record remains valid.
+
+Four datasets, identical in every respect but the timestep (256 x 120, same initial conditions, same
+clip rejection). **Verified in the rendered data**, not just the simulator: argmin `r = 1.00` on all
+four, and `dt = 0.05` reproduces E19's `591x` exactly.
+
+### Early observation, n = 1, NO CLAIMS
+
+Smoke-tested the analysis on the first model (`dt = 0.02`, seed 3): argmin `r = +0.75`, adjacent to
+the prediction and a pass under the registered criterion -- **but the discrimination is weak**,
+`rho_obs` 0.01742 at `r = 1` against 0.01827 at `r = 0`, a 5% gap. E19 at `dt = 0.05` had a **6.9x**
+separation.
+
+This is physically expected and is recorded now, before the rest of the results exist, so it cannot
+be presented later as a post-hoc explanation: **the shadow correction scales with `dt`, so at small
+`dt` there is less to discriminate**, while the model's own baseline non-conservation (~0.017 here)
+stays put and swamps it. If that is the cause, discrimination should sharpen at `dt = 0.05` and
+`0.08`. If instead it stays flat at every timestep, P2 fails and the E19 result is specific to
+`dt = 0.05` rather than general.
+
+**Registering the implication now:** a clean argmin at large `dt` and a noisy one at small `dt` is
+**not** a partial success to be reported as support. It would mean the experiment has power only
+where the effect is large, and the scaling law P3 tests would rest on the two largest timesteps. That
+must be said plainly if it happens.
+
+2 of 12 models trained; ~1.75 h remaining.
