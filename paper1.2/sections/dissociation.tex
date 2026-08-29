@@ -96,18 +96,13 @@ that scalar confers no control benefit (Section~\ref{sec:limits}): there is no b
 it to enforce.
 
 \paragraph{Whether conservation \emph{alone} predicts the intervention is not established.}
-The direct control asks whether, among candidates matched in energy correlation, better conservation
-alone produces a larger repair. The 2-DoF system admits such a band, spanning five orders of
-magnitude of conservation at $|\rho|_E \le 0.11$, and the rank correlation with repair is $+0.19$,
-$+0.57$ and $+0.19$ across seeds --- with the 95\% interval excluding zero on \textbf{one of three}.
-We report this as a negative. The informative part is \emph{why} it is hard: on a system whose
-transition conserves energy, the well-conserved latent directions \emph{are} the energy-like ones, so
-a matched band exists only at low decodability and on one seed cannot be built at all (19 of 400
-candidates). The two properties may not be separable by this design on any system where the model has
-learned the physics --- a statement about this control, not about the dissociation, for which the
-supervised probe above and Section~\ref{sec:mechanism} give direct evidence.
-Appendix~\ref{sec:causal-detail} gives the full analysis. What holds on all three seeds is that the
-recovered scalar repairs: $-16.7\%$, $-7.3\%$ and $-6.8\%$.
+Among candidates matched in energy correlation and spanning five orders of magnitude of conservation,
+the rank correlation with repair is $+0.19$, $+0.57$ and $+0.19$ across seeds, with the 95\% interval
+excluding zero on \textbf{one of three}. We report this as a negative, and note why the control is
+hard: on a system whose transition conserves energy the well-conserved latent directions \emph{are}
+the energy-like ones, so a matched band exists only at low decodability and on one seed cannot be
+built at all. Appendix~\ref{sec:causal-detail} gives the full analysis. What holds on all three seeds
+is that the recovered scalar repairs: $-16.7\%$, $-7.3\%$ and $-6.8\%$.
 
 \paragraph{Where the phenomenon stops.}
 Both boundaries above are the same statement seen twice. The invariant is bounded to the

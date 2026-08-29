@@ -6704,3 +6704,32 @@ would rank them:
 
 Each removes something a reader might want. That is why it is Richard's call rather than mine, even
 under a general delegation: the delegation covered *how to cut*, and this is *what to lose*.
+
+### The floor is 10 pages. Measured, not estimated.
+
+Cut the E10b paragraph to its verdict (option 2 of the three I had listed), then tested the other two
+in scratch copies rather than guessing:
+
+| option | result |
+|---|---|
+| E10b -> verdict only | body still **10** |
+| Figure 1 -> appendix | body still **10** |
+| drop the untrained-transition axis row | body still **10** |
+
+None of them moves it, and the arithmetic says why. The body is **5,905 words over 10 pages**; page
+fill runs 498--695 against a ~640-word full page, so there is no layout slack. Fitting 9 pages with
+~1.5 pages of floats leaves a text budget near **4,800 words** --- roughly **1,100 more to cut, 19%**
+of what remains.
+
+Everything demotable is already demoted: method detail, causal protocols, downstream-test detail and
+the full E10b analysis all sit in labelled appendix sections. What is left is the introduction, a
+compact setup, the two core results sections, and three one-page sections. **Cutting 19% more means
+removing a result.**
+
+**Conclusion: this is a 10-page paper.** Reaching 9 is not a craft problem, and I am recording that as
+a measurement rather than continuing to grind prose. The options are to drop a result (the actuation
+axis and the causal-interchange result are the two most severable), or to target a format that
+accommodates 10.
+
+Progress this pass: **13 -> 10 pages**, 63/63 checks passing throughout, nothing lost from the paper
+as a whole.
