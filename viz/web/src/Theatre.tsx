@@ -8,6 +8,7 @@
 import { useEffect, useRef } from "react";
 import type { Rollout } from "./api";
 import { Frame, Line, extent, fmt, scale, ticksFor } from "./plot";
+import { Term } from "./Term";
 
 const RES = 64;
 
@@ -62,21 +63,22 @@ export function Theatre({ roll, frame, onFrame, alpha }:
   return (
     <div className="panel theatre">
       <div className="strips">
-        <Strip src={roll.truth} frame={frame} label="held-out truth" cls="truth" />
-        <Strip src={roll.free} frame={frame} label="free imagination" cls="free" />
-        <Strip src={roll.corrected} frame={frame} label={`corrected · α ${alpha}`} cls="corrected" />
+        <Strip src={roll.truth} frame={frame} label="what actually happened" cls="truth" />
+        <Strip src={roll.free} frame={frame} label="model, left alone" cls="free" />
+        <Strip src={roll.corrected} frame={frame}
+               label={`model, corrected (${alpha.toFixed(2)})`} cls="corrected" />
       </div>
 
       <div className="plotwrap">
         <div className="plothead">
-          <span className="plottitle">pixel MSE per imagined step</span>
+          <span className="plottitle">how wrong each predicted frame is</span>
           <span className="legend">
-            <i className="sw free" /> free
-            <i className="sw corrected" /> corrected
+            <i className="sw free" /> <Term id="free">left alone</Term>
+            <i className="sw corrected" /> <Term id="corrected">corrected</Term>
           </span>
         </div>
         <Frame w={W} h={H} pad={[10, 10, 26, 52]} xLabel="imagined step"
-               yLabel={`pixel MSE${yA.suffix}`}
+               yLabel={`error${yA.suffix}`}
                xTicks={xA.ticks.map((t) => ({ ...t, label: t.label.split(".")[0] }))}
                yTicks={yA.ticks}>
           <Line xs={xs} ys={roll.mse.free} sx={sx} sy={sy} cls="ln-free" width={2.6} />
@@ -90,7 +92,7 @@ export function Theatre({ roll, frame, onFrame, alpha }:
              aria-label="imagined frame" />
       <div className="readout">
         <span>frame <b>{frame}</b> of {n - 1}</span>
-        <span>free <b>{fmt(roll.mse.free[frame], 5)}</b></span>
+        <span>left alone <b>{fmt(roll.mse.free[frame], 5)}</b></span>
         <span>corrected <b>{fmt(roll.mse.corrected[frame], 5)}</b></span>
         <span className={roll.mse.corrected[frame] < roll.mse.free[frame] ? "good" : "bad"}>
           {((roll.mse.corrected[frame] / roll.mse.free[frame] - 1) * 100).toFixed(1)}%

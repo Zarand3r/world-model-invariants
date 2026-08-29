@@ -190,3 +190,40 @@ footer {
   margin-top: 26px; padding-top: 14px; border-top: 1px solid var(--rule);
   font-size: 12.5px; color: var(--muted); max-width: 74ch;
 }
+
+/* ---- plain-language layer ----------------------------------------------------------------
+   The notation stays on screen for readers who know it; these carry the meaning for everyone
+   else. A term is a dotted underline you can hover, never a replacement for the symbol. */
+.term {
+  text-decoration: underline dotted var(--muted);
+  text-underline-offset: 3px;
+  cursor: help;
+}
+.intro {
+  margin: 16px 0 0;
+  padding: 13px 15px;
+  background: var(--surface);
+  border-left: 3px solid var(--accent);
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 92ch;
+}
+.intro b { color: var(--ink); }
+.intro em { font-style: normal; color: var(--accent); }
+.blurb {
+  margin: -2px 0 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.blurb b { color: var(--ink-2); font-weight: 600; }
+.blurb.small { margin: 6px 0 8px; font-size: 12.5px; }
+.scores em {
+  display: block;
+  font-style: normal;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 2px;
+}

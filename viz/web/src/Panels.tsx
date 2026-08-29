@@ -6,6 +6,7 @@
  */
 import type { BundleInfo, Dose, LawScores, Leverage, PaperRefs, Published, Rollout } from "./api";
 import { Dots, Frame, Line, extent, fmt, scale, ticksFor } from "./plot";
+import { Term } from "./Term";
 
 const W = 330;
 
@@ -17,7 +18,7 @@ function EnergyScatter({ law }: { law: LawScores | null }) {
   const sx = scale(ex, exh, 44, W - 10);
   const sy = scale(cy, cyh, H - 26, 10);
   return (
-    <Frame w={W} h={H} xLabel="true energy" yLabel="C"
+    <Frame w={W} h={H} xLabel="real energy" yLabel="C"
            xTicks={ticksFor(ex, exh, sx, 3).ticks} yTicks={ticksFor(cy, cyh, sy, 3).ticks}>
       <Dots xs={law.scatter.E} ys={law.scatter.C} sx={sx} sy={sy} cls="pt-energy" r={1.3} />
     </Frame>
@@ -48,19 +49,31 @@ function DriftTrace({ roll }: { roll: Rollout | null }) {
 export function InvariantPanel({ law, roll }: { law: LawScores | null; roll: Rollout | null }) {
   return (
     <section className="panel">
-      <h2>The invariant</h2>
+      <h2>What the model conserves</h2>
+      <p className="blurb">
+        The search read only the model's internal state and its own one-step dynamics — never
+        position, velocity or energy. It came back with{" "}
+        <Term id="C">a single number, <b>C</b></Term>, that the model holds almost constant.
+        Below: how well it lines up with the pendulum's real energy, and whether it stays put once
+        the model starts imagining.
+      </p>
       <div className="pair">
         <div>
-          <div className="plottitle">C vs true energy</div>
+          <div className="plottitle">C against the pendulum's real energy</div>
           <EnergyScatter law={law} />
-          <div className="stat">|ρ|<sub>E</sub> <b>{law ? law.rho_energy.toFixed(4) : "—"}</b></div>
+          <div className="stat">
+            <Term id="rho_E">agreement with true energy</Term>{" "}
+            <b>{law ? law.rho_energy.toFixed(4) : "—"}</b>
+            <span className="hint">1.0 = perfect · the search never saw energy</span>
+          </div>
         </div>
         <div>
-          <div className="plottitle">C during the rollout</div>
+          <div className="plottitle">C while the model imagines forward</div>
           <DriftTrace roll={roll} />
           <div className="stat">
-            drift <b>{law ? law.drift_of_C.toExponential(2) : "—"}</b>
-            <span className="hint">within-trajectory variance share, held-out half</span>
+            <Term id="drift">how much it wanders</Term>{" "}
+            <b>{law ? law.drift_of_C.toExponential(2) : "—"}</b>
+            <span className="hint">0 = perfectly held · dashed line is its starting value</span>
           </div>
         </div>
       </div>
@@ -88,7 +101,7 @@ function DoseCurve({ dose, published }: { dose: Dose | null; published?: Publish
   const sy = scale(lo, hi, H - 26, 10);
   const xs = dose.alphas.map((_, i) => i);
   return (
-    <Frame w={W} h={H} xLabel="α" yLabel="rel. error"
+    <Frame w={W} h={H} xLabel="correction strength" yLabel="error vs none"
            xTicks={dose.alphas.map((a, i) => ({ at: sx(i), label: String(a) }))}
            yTicks={ticksFor(lo, hi, sy, 3).ticks}>
       <line x1={44} y1={sy(1)} x2={W - 10} y2={sy(1)} className="level" />
@@ -108,7 +121,12 @@ export function LawBench({ info, law, weights, onWeights, onReset, onRandom, dos
   const published = info && paper ? paper.per_model[info.model_key] : undefined;
   return (
     <section className="panel">
-      <h2>The law bench <span className="sub">C = Σ aᵢφᵢ</span></h2>
+      <h2>Propose your own <span className="sub">C = Σ aᵢφᵢ</span></h2>
+      <p className="blurb">
+        The search returns eight candidate quantities and a best mix of them.{" "}
+        <Term id="weights">These eight dials are that mix</Term> — move one and you are proposing a
+        different conserved quantity. The three scores judge it instantly.
+      </p>
       <div className="sliders">
         {weights.map((w, i) => (
           <label key={i} className="slider">
@@ -128,18 +146,34 @@ export function LawBench({ info, law, weights, onWeights, onReset, onRandom, dos
         <button onClick={onRandom}>random draw</button>
       </div>
       <div className="scores">
-        <div><span>|ρ|<sub>E</sub></span><b>{law ? law.rho_energy.toFixed(4) : "—"}</b></div>
-        <div><span>drift</span><b>{law ? law.drift_of_C.toExponential(1) : "—"}</b></div>
-        <div><span>pairing</span><b>{law ? law.pairing_residual.toFixed(4) : "—"}</b></div>
+        <div>
+          <span><Term id="rho_E">matches energy</Term></span>
+          <b>{law ? law.rho_energy.toFixed(4) : "—"}</b><em>higher better</em>
+        </div>
+        <div>
+          <span><Term id="drift">wanders</Term></span>
+          <b>{law ? law.drift_of_C.toExponential(1) : "—"}</b><em>lower better</em>
+        </div>
+        <div>
+          <span><Term id="pairing">drives the dynamics</Term></span>
+          <b>{law ? law.pairing_residual.toFixed(4) : "—"}</b><em>lower better</em>
+        </div>
       </div>
 
       <div className="plottitle">
-        dose response over the fixed alpha grid {busy && <em>· running</em>}
+        does correcting actually help? {busy && <em>· running</em>}
       </div>
+      <p className="blurb small">
+        Prediction error against{" "}
+        <Term id="alpha">how hard the correction pushes</Term>, over all 52 held-out episodes.
+        Below 1.0 means correcting beat leaving the model alone. The grey dashed line is the
+        published result for this model.
+      </p>
       <DoseCurve dose={dose} published={published} />
       {dose && (
         <div className="stat">
-          slope <b>{dose.normalised_slope.toFixed(4)}</b> · at α max{" "}
+          <Term id="slope">overall effect</Term> <b>{dose.normalised_slope.toFixed(4)}</b>
+          {" "}· at the strongest correction{" "}
           <b className={dose.relative_change_at_max_alpha < 0 ? "good" : "bad"}>
             {(dose.relative_change_at_max_alpha * 100).toFixed(2)}%
           </b>
@@ -158,8 +192,9 @@ export function LawBench({ info, law, weights, onWeights, onReset, onRandom, dos
         </div>
       )}
       <p className="caveat">
-        Scored as the slope over the whole grid, never the best α. Differences below ~0.2% are the
-        size of the arithmetic — see the note in <code>rollout.py</code>.
+        Scored across every correction strength, never the single best one — otherwise any method
+        gets five chances to look good. Changes smaller than about 0.2% are below the noise floor of
+        the arithmetic itself, so treat them as no change.
       </p>
     </section>
   );
@@ -173,7 +208,7 @@ function LeverageScatter({ lev }: { lev: Leverage }) {
   const sy = scale(dy, dyh, h - 32, 12);
   const mv = Math.max(...lev.edit_move);
   return (
-    <Frame w={w} h={h} pad={[12, 14, 32, 56]} xLabel="variance V(u)" yLabel="damage D(u)"
+    <Frame w={w} h={h} pad={[12, 14, 32, 56]} xLabel="how much the model uses it" yLabel="how much nudging it hurts"
            xTicks={ticksFor(vx, vxh, sx, 3).ticks} yTicks={ticksFor(dy, dyh, sy, 3).ticks}>
       <line x1={56} y1={sy(0)} x2={w - 14} y2={sy(0)} className="level" />
       {lev.variance.map((v, i) => (
@@ -192,22 +227,29 @@ export function Directions({ lev, published }: { lev: Leverage | null; published
     <div className="placeholder">measuring…</div></section>;
   return (
     <section className="panel">
-      <h2>Directions that matter</h2>
+      <h2>Which directions matter</h2>
+      <p className="blurb">
+        Every direction inside the model's state, plotted by{" "}
+        <Term id="variance">how much the model uses it</Term> against{" "}
+        <Term id="damage">how much damage nudging it does</Term>. If the directions that matter
+        most are the ones the model varies least, then a standard look at the latent would miss
+        exactly the state that counts. Dot size is how hard the correction pushes that direction.
+      </p>
       <LeverageScatter lev={lev} />
       <div className="stat">
-        ρ(V, D) <b className={lev.rho_V_D < 0 ? "good" : "bad"}>{lev.rho_V_D.toFixed(4)}</b>
+        used-vs-matters correlation{" "}
+        <b className={lev.rho_V_D < 0 ? "good" : "bad"}>{lev.rho_V_D.toFixed(4)}</b>
+        <span className="hint">negative = the model under-uses the directions that matter</span>
         {published?.rho_V_D !== undefined &&
           <span className="hint">published {published.rho_V_D.toFixed(4)}</span>}
       </div>
       <div className="stat">
-        ρ(D, edit) <b>{lev.rho_D_edit.toFixed(4)}</b>
+        matters-vs-corrected correlation <b>{lev.rho_D_edit.toFixed(4)}</b>
+        <span className="hint">positive = the correction pushes where it counts</span>
         {published?.rho_D_edit !== undefined &&
           <span className="hint">published {published.rho_D_edit.toFixed(4)}</span>}
       </div>
-      <p className="caveat">
-        Dot size is how hard the projection pushes that direction. A negative ρ(V, D) is the claim:
-        the model gives least variance to directions whose displacement costs most.
-      </p>
+
     </section>
   );
 }

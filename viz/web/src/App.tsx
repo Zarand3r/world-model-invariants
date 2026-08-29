@@ -5,6 +5,7 @@ import { useDebounced } from "./useDebounced";
 import type { BundleInfo, Dose, LawScores, Leverage, Model, PaperRefs, Rollout } from "./api";
 import { Theatre } from "./Theatre";
 import { Directions, InvariantPanel, LawBench } from "./Panels";
+import { Term } from "./Term";
 
 const PAPER = { ld: 12, degree: 4, horizon: 50, alpha: 0.4 };
 
@@ -133,7 +134,8 @@ export default function App() {
           <span className="mark">C</span>
           <div>
             <h1>Invariant Probe Bench</h1>
-            <p>a frozen DreamerV3, its conserved scalar, and what enforcing it does to imagination</p>
+            <p>a video-prediction model that was never taught physics, and the conservation law
+              hiding inside it</p>
           </div>
         </div>
 
@@ -147,22 +149,23 @@ export default function App() {
               ))}
             </select>
           </label>
-          <label>LD
+          <label><Term id="ld">search dimensions</Term>
             <select value={cfg.ld} onChange={(e) => set({ ld: Number(e.target.value) })}>
               {[6, 8, 12, 16].map((v) => <option key={v} value={v}>{v}</option>)}
             </select>
           </label>
-          <label>trajectory
+          <label><Term id="trajectory">episode</Term>
             <input type="number" min={0} max={(info?.n_traj ?? 52) - 1} value={cfg.traj}
                    onChange={(e) => set({
                      traj: clamp(Number(e.target.value), 0, (info?.n_traj ?? 52) - 1) })} />
           </label>
-          <label>horizon
+          <label><Term id="horizon">steps imagined</Term>
             <input type="number" min={5} max={info?.max_horizon ?? 110} step={5} value={cfg.horizon}
                    onChange={(e) => set({
                      horizon: clamp(Number(e.target.value), 1, info?.max_horizon ?? 110) })} />
           </label>
-          <label className="alpha">α {cfg.alpha.toFixed(2)}
+          <label className="alpha">
+            <Term id="alpha">correction strength</Term> {cfg.alpha.toFixed(2)}
             <input type="range" min={0} max={1} step={0.01} value={cfg.alpha}
                    onChange={(e) => set({ alpha: Number(e.target.value) })} />
           </label>
@@ -171,15 +174,26 @@ export default function App() {
         </div>
       </header>
 
+      <p className="intro">
+        This model was trained to do one thing: predict pendulum video, frame by frame. Nobody told
+        it about energy. A label-free search of its internal state nonetheless finds{" "}
+        <Term id="C">a quantity it holds almost constant</Term> — and when the model runs on its
+        own, that quantity slips. Push it back and the predictions get better.{" "}
+        <b>Try it:</b> drag <em>correction strength</em> and watch the third video and the error
+        curve, then move the dials on the right to propose a different quantity and see the scores
+        fall apart.
+      </p>
+
       {status && <div className="status">{status}</div>}
 
       {info && (
         <div className="meta">
-          <span>{info.n_traj} analysis trajectories · warmup {info.warmup} · split from 204</span>
-          <span>rank {info.retained_rank} of {info.ld} · {info.n_monomials.toLocaleString()} monomials
-            · {info.n_basis} basis invariants · degree {info.degree}</span>
+          <span>{info.n_traj} held-out episodes, none used for training</span>
+          <span>searched in {info.retained_rank} directions of the model's state · {info.n_basis}{" "}
+            candidate quantities · polynomials up to degree {info.degree}</span>
           {published?.rho_energy !== undefined &&
-            <span className="pub">published |ρ|<sub>E</sub> {published.rho_energy.toFixed(3)}</span>}
+            <span className="pub">the paper reports {published.rho_energy.toFixed(3)} for this
+              model</span>}
         </div>
       )}
 
@@ -206,9 +220,11 @@ export default function App() {
       </main>
 
       <footer>
-        C is fitted and scored on the same analysis trajectories, so the absolute effect is in-sample
-        with respect to the fit; the comparison against other constraints stays matched. Every number
-        here is recomputed live from the frozen checkpoint.
+        Every number on this page is computed live from the frozen model, not read from a file.
+        One caveat worth stating plainly: the quantity is found and judged on the same set of
+        episodes, so its absolute benefit is flattered — the honest comparison is against the other
+        quantities tested on exactly those episodes, which is what the scores above do. The model is
+        never retrained or altered; the correction only nudges its internal state as it predicts.
       </footer>
     </div>
   );
