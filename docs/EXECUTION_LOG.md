@@ -6400,3 +6400,39 @@ where the effect is large, and the scaling law P3 tests would rest on the two la
 must be said plainly if it happens.
 
 2 of 12 models trained; ~1.75 h remaining.
+
+### F6 partial (5 of 12), and a GPU-contention slowdown that is not ours to fix
+
+**Partial result, no claims.** The pattern registered in advance -- that discrimination should sharpen
+with `dt` -- is what is happening:
+
+| dt | argmin `r` per seed | `rho_obs` r=0 / r=1 / r=-1 (median) | separation |
+|---|---|---|---|
+| 0.02 | +0.75, +0.75, **+1.00** | 0.01714 / 0.01657 / 0.01966 | **1.03x** |
+| 0.035 | **+1.00, +1.00** | 0.02205 / **0.00989** / 0.04360 | **2.2x** |
+
+At `dt = 0.02` the argmin is adjacent to the prediction but barely resolvable; at `0.035` it lands
+exactly on `r = 1` with a clean 2.2x separation. **P4 is 5/5** -- the wrong-sign control is worse on
+every model so far.
+
+The current `P3` slope of `+3.06` and intercept `-0.019` are pulled by the `dt = 0.02` underestimate
+(`c_rec = 0.0375` against `0.0500` on 2 of 3 seeds), which is the low-power regime. The `P2 FAIL`
+line is an artifact of the bar counting 4 timesteps when only 2 exist. Both should be re-read on the
+full set; neither is reported as a result.
+
+### The slowdown
+
+Training dropped from **3.2 min per 2000 steps to 15.6** -- 5x. Diagnosed rather than assumed:
+`nvidia-smi --query-compute-apps` shows two other jobs holding GPU memory, and **neither is ours**:
+
+| pid | process | cwd | memory |
+|---|---|---|---|
+| 3534575 | `uvicorn viz.server.app` | `/home/rbao/world-model-invariants-paper1` | 5.0 GB |
+| 4011836 | `run_metric_transfer.py` | `/home/rbao/world-model-lagrangian` | 1.4 GB |
+
+Both belong to other projects of Richard's. **They have not been touched.** Killing another
+project's running job to speed up ours is not a call this loop gets to make, and the F6 result does
+not depend on finishing sooner.
+
+Revised ETA: **~51 min per model, ~5 hours for the remaining 6**, against ~1.1 h uncontended. The
+guarded driver means an interruption costs nothing: any completed checkpoint is skipped on re-run.
