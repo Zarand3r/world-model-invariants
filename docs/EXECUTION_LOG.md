@@ -6319,3 +6319,35 @@ For the record, the obvious candidates by cost-to-value: `setup` (1,176 words, 2
 methodology that could move to the appendix, which is unlimited at all three venues) and the
 `boundaries` section (398 words but a full page, and its content overlaps the axes table in
 `dissociation`).
+
+### Candidate cuts, measured rather than suggested
+
+Recompiled a scratch copy at ICLR geometry with sections moved *after* `\appendix` -- so the content
+stays in the paper, it just leaves the counted main body:
+
+| variant | main body | verdict |
+|---|---|---|
+| baseline | 12 | 3 over |
+| move `setup` | 10 | 1 over |
+| move `boundaries` | 11 | 2 over |
+| **move `setup` + `boundaries`** | **9** | **fits exactly** |
+| move `setup` + `boundaries` + `related` | 8 | 1 page spare |
+
+**Two of these are not actually available, and the numbers do not say so:**
+
+- **`related` cannot move.** Related work is expected in the main text at all three venues; an
+  appendix-only related-work section reads as evasion and reviewers say so.
+- **`setup` cannot move wholesale.** A main text with no method description is not submittable. What
+  is standard is moving the *details* -- exact hyperparameters, data-split specifics, the free-bits
+  and checkpoint-grid rationale -- and keeping a compact statement of what the model is, what the
+  extraction optimises, and how the readout works.
+
+So the honest reading is: **`setup` + `boundaries` is exactly the right amount of space, but it has
+to be achieved by partial moves rather than wholesale ones.** The measurement gives the target
+(3 pages) and shows those two sections are where it exists; it does not do the editing.
+
+`boundaries` is the cleaner of the two: 398 words occupying a full page, whose content overlaps the
+axes table already in `dissociation`, so folding it in loses little.
+
+This remains an authorship decision. What has changed is that it is now a decision between measured
+options rather than impressions.
