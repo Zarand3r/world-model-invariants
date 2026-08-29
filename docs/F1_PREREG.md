@@ -307,3 +307,60 @@ analogue of what the model actually stores.
 
 Registered before running, as before. Reported at power degrees 1 and 2, since the degree-1 read was
 calibrated at a 17x larger sample size and the rank-3 control recovered only at degree 2.
+
+---
+
+## Amendment 5, 2026-08-29 -- ask the question with the VALIDATED instrument instead of a new one
+
+**Written before any quantity under this amendment exists.**
+
+### Why this is not a fourth repair
+
+Three attempts to fix the bespoke balance extractor each fixed a real defect and none answered the
+question, and this document already registers that we do **not** keep climbing a ladder of variants
+until one works. A fourth extractor would be exactly that pattern.
+
+But the question does not need a new extractor. The **paper's own validated** `fit_hamiltonian_pair`
+already recovers a scalar on the actuated latent at `|rho(C, E)| = 0.91` -- the same tool, unchanged,
+that produced every result in the manuscript. So F1's scientific question can be asked as a
+**measurement on an existing extraction** rather than as a new extraction method:
+
+> Given the scalar the validated search finds on an action-conditioned model, **does its change under
+> the transition track the action's power?**
+
+Nothing is fitted here beyond what the paper already fits. `C` is frozen from `cached_fit` before any
+balance quantity is computed.
+
+### Measurement
+
+For each model and each transition, with `tau` the applied action and `thetadot` from the validated
+pixel readout:
+
+    predicted change   dC_pred = tau * thetadot * dt / (dE/dC)
+    observed change    dC_obs  = C(z_{t+1}) - C(z_t)
+
+`dE/dC` is the frozen scalar already used in F5, fitted once on training data.
+
+**Primary metric: Spearman(`dC_pred`, `dC_obs`).**
+
+### Registered predictions
+
+**A1.** Spearman(`dC_pred`, `dC_obs`) `>= 0.3` on at least 2 of 3 seeds. A balance law implies the
+observed change tracks the predicted source term.
+
+**A2 (specificity).** That correlation exceeds the correlation of `dC_obs` with a **shuffled** power
+term -- the same `tau * thetadot` values permuted across transitions, destroying only their pairing
+with the state.
+
+### Falsifiers
+
+- **A1 fails** -> the model's recovered scalar is **not** governed by the action's power. Combined
+  with `rho(C, E) = 0.91`, that is a substantive and reportable finding: the model carries an
+  energy-like coordinate whose evolution does **not** implement the physical balance relation --
+  decodability without dynamical correctness, in the actuated setting.
+- **A2 fails while A1 passes** -> the correlation is an artifact of the marginal distributions, not
+  of the pairing. Report as such.
+
+**No direction is predicted.** Both outcomes are informative, and the negative is the more interesting
+one because it would extend the paper's central dissociation into a regime the paper does not
+currently cover.
