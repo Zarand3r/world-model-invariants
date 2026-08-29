@@ -1,0 +1,70 @@
+{
+ "models": [
+  {
+   "ckpt": "runs/f1_act_s3.pt",
+   "rho_C_energy": 0.7195951581176507,
+   "dEdC": -1.4959893606897308,
+   "spearman_pred_obs": 0.040808512708662835,
+   "spearman_shuffled_obs": -0.017126416377388286,
+   "pearson_pred_obs": 0.033070057396430694,
+   "scale_obs_over_pred": 5.361472841044814,
+   "n": 5720
+  },
+  {
+   "ckpt": "runs/f1_act_s4.pt",
+   "rho_C_energy": 0.8785332797306695,
+   "dEdC": 1.8246565097753205,
+   "spearman_pred_obs": 0.07554600014274768,
+   "spearman_shuffled_obs": 0.014698077504821197,
+   "pearson_pred_obs": 0.062464915029879976,
+   "scale_obs_over_pred": 4.880349984465456,
+   "n": 5720
+  },
+  {
+   "ckpt": "runs/f1_act_s5.pt",
+   "rho_C_energy": 0.8628634037422356,
+   "dEdC": -1.7916204778284617,
+   "spearman_pred_obs": 0.06507250091763503,
+   "spearman_shuffled_obs": -0.0031860818282549983,
+   "pearson_pred_obs": 0.06475992126302822,
+   "scale_obs_over_pred": 4.515602020084439,
+   "n": 5720
+  }
+ ],
+ "provenance": {
+  "runs": [
+   {
+    "argv": [
+     "scripts/run_f1_balance_measured.py"
+    ],
+    "cwd": "/home/rbao/world-model-invariants",
+    "utc": "2026-08-29T02:42:07+00:00",
+    "git": "964c5d0666eac947b1c704262568bec5ff3470da",
+    "git_dirty": true,
+    "python": "3.13.13",
+    "inputs": {
+     "runs/f1_act_s3.pt": {
+      "sha256": "bc3b4c8156feaa4e0616d566c29c3a6ba67a2acdd2a5e883be7c4a6fb157f8f6",
+      "mtime": "2026-08-28T18:25:26+00:00",
+      "bytes": 53830469
+     },
+     "runs/f1_act_s4.pt": {
+      "sha256": "b1aaa0382fa6ca3267043f569c29e3634e433568c64dc0d2919a9ce40079dcaf",
+      "mtime": "2026-08-28T20:05:00+00:00",
+      "bytes": 53830469
+     },
+     "runs/f1_act_s5.pt": {
+      "sha256": "ce29356c326f1e24159287bfb20905d8aeb82a2034ad15fc60bd1480126bfc61",
+      "mtime": "2026-08-28T21:44:14+00:00",
+      "bytes": 53830469
+     },
+     "runs/pendulum_actuated.npz": {
+      "sha256": "ea7b6c2e19522825188574425c85aca48ccbde520a31738c1a5821985f0b3583",
+      "mtime": "2026-08-28T16:44:03+00:00",
+      "bytes": 7269181
+     }
+    }
+   }
+  ]
+ }
+}

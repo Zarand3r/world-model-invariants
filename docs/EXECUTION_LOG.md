@@ -5948,3 +5948,57 @@ accumulated drift the method removes would matter"* -- with a measurement rather
 correct is the regime where the planner is already worse off. Added to `limits.tex`.
 
 Raw rows kept separately in `runs/f5_planning_H30.json`; the registered n = 3 record is untouched.
+
+## 2026-08-29 -- **F1 answered, with the paper's own instrument: the model carries energy but does not implement its balance law**
+
+Loop iteration. No jobs, no new artefacts. F1's remaining question turned out not to need the
+extractor redesign that had been blocking it.
+
+### Why no new extractor was needed
+
+Three attempts to repair the bespoke balance extractor each fixed a real defect and none answered the
+question. A fourth would have been the ladder-climbing this project registered against. But the
+**paper's own validated `fit_hamiltonian_pair`** already recovers a scalar on the actuated latent, so
+F1 can be asked as a **measurement on an existing extraction** rather than as a new method.
+Registered as amendment 5 before anything was computed; `C` is frozen from `cached_fit` before any
+balance quantity is touched.
+
+### Result, n = 3
+
+| model | `rho(C, E)` | Spearman(pred, obs) | shuffled control | \|obs\|/\|pred\| |
+|---|---|---|---|---|
+| s3 | 0.720 | **+0.041** | -0.017 | 5.36 |
+| s4 | 0.879 | **+0.076** | +0.015 | 4.88 |
+| s5 | 0.863 | **+0.065** | -0.003 | 4.52 |
+
+- **A1 FAILS, 0 of 3.** Registered bar was Spearman `>= 0.3`; observed is `0.04`--`0.08`.
+- **A2 holds in sign, 3 of 3** -- the real power term beats its shuffled control on every model -- but
+  the magnitudes are `~0.05`, so the pairing carries almost nothing.
+- The power term explains **0.31%** of the variance in `dC`, and the observed change is
+  **4.5--5.4x larger** than the balance relation predicts.
+
+### What this establishes
+
+The validated extraction finds an **energy-like scalar on every action-conditioned model**
+(`rho(C, E)` up to 0.88) whose evolution is **not governed by the action's power**. The model
+represents the quantity and does not implement the physical relation that quantity obeys.
+
+That is the paper's central dissociation -- decodability without dynamical correctness -- **extended
+into the actuated setting**, which the manuscript does not currently cover. It was registered in
+advance as the more interesting of the two outcomes, and it is the one that occurred.
+
+It also explains F5 from a second direction. A correction built on a scalar whose evolution ignores
+the action cannot help a controller: there is no balance structure there for it to enforce.
+
+### Scope, stated plainly
+
+The observed `dC` is dominated by the model's own one-step prediction error, not by physics, which is
+consistent with the transition preserving `C` only approximately (`rho_obs` is small but nonzero
+throughout the paper). So the honest claim is **not** "the model violates the balance law by 5x" but
+"the action's power accounts for essentially none of how the model's energy-like coordinate moves."
+
+**F1 is now answered rather than blocked.** The blocked item was the bespoke extractor; the scientific
+question is settled with the instrument the paper already validates.
+
+Whether this belongs in the manuscript is a claim addition rather than a correction, so it is left
+for Richard. It would be a natural extension of Section 4's axes: a fifth axis, actuation.
