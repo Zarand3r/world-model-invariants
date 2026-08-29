@@ -9,12 +9,24 @@ Everything in `runs/` is the output of the script named beside it in the table b
 the paper are generated from those files and nothing else, so every number is checkable without a
 GPU.
 
+The current manuscript is **`paper1.2/`**. `paper/` is the superseded arXiv version and carries a
+documented defect in its random-constraint null — see `paper/README.md`.
+
+## Artifacts
+
+Training curves and the paper's verified numbers are on **Weights & Biases**; checkpoints and
+datasets are on **Hugging Face**. See [`docs/ARTIFACTS.md`](docs/ARTIFACTS.md) for what is published,
+what is deliberately not, and how to regenerate both. The tooling is sidecar-only — no experiment
+imports it, and nothing writes into `runs/` — as described in [`tools/README.md`](tools/README.md).
+
 ## Regenerating the figures (no GPU, seconds)
 
 ```bash
 pip install -e .
-python paper/make_figures.py          # reads runs/*.json, writes paper/figures/*.pdf
-cd paper && tectonic -X compile main.tex
+python paper1.2/make_fig1.py          # Figure 1
+python paper1.2/make_fig2.py          # Figure 2
+python paper1.2/make_figures.py       # Figures 3-5 (appendix)
+cd paper1.2 && tectonic -X compile main.tex
 ```
 
 `make_figures.py` prints every number it plots. Compare its output against the paper.

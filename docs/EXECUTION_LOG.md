@@ -6017,3 +6017,58 @@ four of them negatives (E10b, F2, F5, F1). 39/39 mechanical checks pass.
 
 Nothing else is runnable without a decision. The only open item is whether F1's result enters the
 manuscript as a fifth dissociation axis, which is a claim addition rather than a correction.
+
+## 2026-08-29 -- **W&B and Hugging Face integration; and a visibility mistake I made**
+
+Richard asked for W&B integration modelled on `/home/rbao/cppgpt`, Hugging Face for important
+checkpoints, and both documented.
+
+### Design, taken from cppgpt
+
+cppgpt's rule is that W&B is a **sidecar**, never a feature of the training binary: training writes an
+append-only CSV and a separate process ships it, so training cannot be slowed by, or fail because of,
+a dashboard. That maps directly here, and for a second reason: `docs/ROADMAP.md` requires raw rows in
+`runs/` to stay immutable, and a logger writing into them would break that. **No experiment imports
+either tool.**
+
+One deliberate departure: cppgpt's wrapper has a live mode. Ours is **backfill-only**, because every
+experiment here has already finished. A live mode would be dead code pretending to be a feature.
+
+`--results` reuses `scripts/verify_paper_numbers.py` as its source rather than recomputing anything.
+That script is the single source of truth for what the paper claims; a second extraction path could
+silently disagree with the manuscript.
+
+### Shipped
+
+- **W&B** `richardbao419-substrate/world-model-invariants`: 14 training runs (one per
+  `runs/*_hist.json`) and one results run carrying all 39 verified headline numbers. All marked
+  `backfilled: true`.
+- **Hugging Face** `Zarand3r/world-model-invariants`: 34 files, 1.1 GB -- the checkpoints behind each
+  claim, all 10 datasets, and the frozen pixel-readout calibration. `docs/ARTIFACT_MANIFEST.md`
+  records each file's **sha256** and **the claim it backs**.
+
+### The mistake, and the guard added
+
+**I told Richard the Hugging Face repo would be private. It was public.**
+`create_repo(..., private=True, exist_ok=True)` does **not** change the visibility of a repo that
+already exists, and this one had been created public on **2026-08-27**. The tool printed "private",
+uploaded 1.1 GB into a public repo, and I only caught it because I checked `repo_info` afterwards.
+
+Nothing that had been private was exposed -- the repo was already public with checkpoints in it --
+but I asserted a state I had not verified, which is the same class of error as the paper defects
+found earlier in this project: a claim made without checking.
+
+**Set private**, because the manuscript is unpublished and NeurIPS, ICML and ICLR all review
+double-blind; a public repo under an author's account, named for the paper, is an anonymity risk.
+That direction is reversible and the other is not.
+
+`hf_upload.py` now reads back the **real** visibility after `create_repo` and refuses to upload into a
+public repo unless `--public` is passed knowingly. **Verified in both directions**: with the repo
+temporarily set public the tool refuses; set private, it proceeds.
+
+### Documented
+
+`tools/README.md` (why each sidecar exists, in the cppgpt format), `docs/ARTIFACTS.md` (what is
+published, what is deliberately not, how to regenerate), `docs/ARTIFACT_MANIFEST.md` (generated), and
+the top-level `README.md`, which also still pointed at the superseded `paper/` for figure
+regeneration and now points at `paper1.2/` with its three generators.
