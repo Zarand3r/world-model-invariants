@@ -1,49 +1,26 @@
 \section{The privileged direction is causally deployed}
 \label{sec:causality}
 
-If the recovered scalar is only a descriptive correlate, enforcing it has no reason to help and
-setting it has no reason to steer. Three interventions test the alternative, each with matched
-controls.
+If the recovered scalar were only a descriptive correlate, enforcing it would have no reason to help
+and setting it no reason to steer. Three interventions say otherwise, each against matched controls
+that differ only in \emph{where} they push, never in how hard --- a distinction that matters, since
+the obvious norm-matched null controls nothing (Appendix~\ref{sec:causal-detail}).
 
-\paragraph{A magnitude-matched null.}
-Arms differ only in \emph{where} they push, never in how hard: we fix the step size and vary
-direction, $z \leftarrow z - \varepsilon\,\mathrm{sign}(C - C_0)\,\nabla C / \lVert \nabla C \rVert$,
-over a frozen $\varepsilon$ grid. The obvious alternative --- a level-set projection with random
-draws matched in \emph{coefficient} norm --- controls nothing, because the step is invariant under
-$C \to \lambda C$; measured, random draws then take steps $29\times$ larger than the recovered
-constraint. Appendix~\ref{sec:details} gives the derivation.
+Evaluated on decoded physical energy rather than pixels, projecting the latent back toward its level
+set during imagination reduces drift by \textbf{55--76\%} at $H=190$ on 512 trajectories from a
+disjoint generator seed, with the scalar and coordinate frame frozen --- and \textbf{0 of 60}
+magnitude-matched random directions and \textbf{0 of 15} equal-norm tangent directions beat it.
+Setting the scalar to an independent donor trajectory's value moves the imagined world's \emph{true
+decoded} energy toward that trajectory's \emph{true} energy (rank correlation
+$\mathbf{0.802}$--$\mathbf{0.914}$, \textbf{0 of 75} controls), with a preregistered offset sweep
+monotone in both directions on every model. Repeating that interchange \textbf{50 steps into an
+autonomous rollout} --- on a state the model reached by itself, not one the encoder produced --- costs
+little ($0.762$--$0.849$ against $0.803$--$0.924$ at depth 0, 0 of 13 controls), which a dormant
+pathway would not survive \citep{makelov2024illusion}.
 
-\paragraph{Correcting the invariant repairs the imagined physics.}
-We evaluate on decoded physical energy rather than pixels: a non-learned geometric readout recovers
-$\theta$ by image moments and $\dot\theta$ by backward differences, matching the simulator's
-semi-implicit convention, with median decoded-energy error $1.6\%$ of the across-trajectory spread.
-The statistic is secular drift of decoded energy over a rollout.
-
-At $H = 100$ the recovered direction reduces drift by 32--51\% across three models. On 512
-trajectories from a disjoint generator seed, with $C$ and the entire coordinate frame frozen, the
-effect does not shrink: $-54.6\%$, $-58.8\%$, $-75.9\%$ at $H = 190$. Across both horizons
-\textbf{0 of 60} magnitude-matched random directions and \textbf{0 of 15} equal-norm tangent
-directions beat the recovered one on any model.
-
-\paragraph{Setting the invariant steers the imagined physics.}
-Repair shows drift is costly, not that $C$ is a control variable. We move a recipient state minimally
-along the local $C$-normal until $C(z) = C(z_{\mathrm{donor}})$ for an independent donor trajectory,
-then let the rollout run free; the target is read from the model's own latent, never from true
-energy. The imagined world's \emph{true decoded} energy moves toward the donor's \emph{true} energy,
-rank correlation $0.802$--$0.914$ across three models, with \textbf{0 of 75} random and tangent
-controls beating it and a preregistered offset sweep monotone in both directions on every model.
-
-\paragraph{The subspace is used by the model's own dynamics, not only reachable from encoder states.}
-A subspace edit can produce the expected output change through a pathway the model does not normally
-use \citep{makelov2024illusion}, so we repeat the donor interchange \emph{50 steps into an autonomous
-rollout} --- on a state the model reached by itself. The effect barely degrades: rank correlation
-$0.762$--$0.849$ at depth 50 against $0.803$--$0.924$ at depth 0, with 0 of 13 controls beating it at
-either depth, and equal-norm tangent edits near zero throughout. A dormant pathway would lose its
-effect precisely where this test applies it.
-
-\paragraph{The same pipeline refuses when there is nothing to find.}
-On matched dissipative models, where no nontrivial first integral exists, the extraction returns a
-direction that is not distinguished from a random one: 24 of 60 random draws beat it, and it harms
-rollouts on 2 of 3 models. Its operator statistic sits at $3.4$--$3.7\times10^{-1}$, in the same range
-as an untrained network and $39\times$ worse than any conservative model, with no overlap between the
-two groups.
+The same pipeline refuses when there is nothing to find. On matched dissipative models, where no
+nontrivial first integral exists, the extraction returns a direction indistinguishable from random:
+24 of 60 random draws beat it, it harms rollouts on 2 of 3 models, and its operator statistic sits at
+$3.4$--$3.7\times10^{-1}$ --- the range of an untrained network, $39\times$ worse than any
+conservative model, with no overlap between the groups. Appendix~\ref{sec:causal-detail} gives the
+protocols and per-model numbers.

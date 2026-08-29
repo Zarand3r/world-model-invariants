@@ -6672,3 +6672,35 @@ require deciding which evidence leaves the main text: most plausibly demoting `c
 now supporting rather than headline evidence under the F6 framing) to a summary paragraph with the
 detail in the appendix. **That is an authorship judgement about what the paper argues, not a
 correction, so it stops here.**
+
+### Compression continued: 13 -> 10 pages. The last page needs content, not craft.
+
+| change | words |
+|---|---|
+| `causality` -> summary + full protocols in appendix | 508 -> 273 |
+| `limits` -> summary + F5/F2 detail in appendix | 695 -> 486 |
+| E10b paragraph -> summary + full analysis in appendix | -180 |
+| `introduction` contributions list -> inline prose | 668 -> 607 |
+| `conclusion` tightened | 323 -> 280 |
+
+**Main body 13 -> 10 pages** at ICLR geometry, 63/63 checks passing after every step. Nothing was
+lost: each demoted block moved to a labelled appendix section that the main text points at.
+
+**I could not reach 9 without removing content, and I stopped rather than doing so silently.** The
+body is now intro (2) + setup (1) + dissociation (3) + mechanism (2) + causality/limits/related (1
+each) + conclusion, with four floats consuming roughly 1.5 pages. Measured page fill is 500-660 words
+against a ~640-word full page, so there is no layout slack left either; text cuts have stopped
+converting into pages.
+
+The last page has to come from a decision about what the paper argues. The candidates, in the order I
+would rank them:
+
+1. **Drop one dissociation axis from the main text** (the untrained-transition row is the least
+   surprising of the five) and leave it in the appendix table.
+2. **Cut the E10b paragraph entirely**, keeping only its one-line verdict. It is a NOT-ESTABLISHED
+   result already relegated to the appendix in detail.
+3. **Merge Figure 1 into Figure 2** as a single multi-panel figure, saving one float's worth of
+   caption and whitespace.
+
+Each removes something a reader might want. That is why it is Richard's call rather than mine, even
+under a general delegation: the delegation covered *how to cut*, and this is *what to lose*.

@@ -70,6 +70,129 @@ to $0.876$. Recovery already reaches $0.967$ at dimension 8, where the residual 
 The added dimensions do not carry energy while resisting the Hamiltonian fit: directions 7--12
 account for 44.9\% of the residual and 43.5\% of the flow. Figure~\ref{fig:ldsweep} gives the sweep.
 
+\section{Causal-intervention protocols and per-model numbers}
+\label{sec:causal-detail}
+
+If the recovered scalar is only a descriptive correlate, enforcing it has no reason to help and
+setting it has no reason to steer. Three interventions test the alternative, each with matched
+controls.
+
+\paragraph{A magnitude-matched null.}
+Arms differ only in \emph{where} they push, never in how hard: we fix the step size and vary
+direction, $z \leftarrow z - \varepsilon\,\mathrm{sign}(C - C_0)\,\nabla C / \lVert \nabla C \rVert$,
+over a frozen $\varepsilon$ grid. The obvious alternative --- a level-set projection with random
+draws matched in \emph{coefficient} norm --- controls nothing, because the step is invariant under
+$C \to \lambda C$; measured, random draws then take steps $29\times$ larger than the recovered
+constraint. Appendix~\ref{sec:details} gives the derivation.
+
+\paragraph{Correcting the invariant repairs the imagined physics.}
+We evaluate on decoded physical energy rather than pixels: a non-learned geometric readout recovers
+$\theta$ by image moments and $\dot\theta$ by backward differences, matching the simulator's
+semi-implicit convention, with median decoded-energy error $1.6\%$ of the across-trajectory spread.
+The statistic is secular drift of decoded energy over a rollout.
+
+At $H = 100$ the recovered direction reduces drift by 32--51\% across three models. On 512
+trajectories from a disjoint generator seed, with $C$ and the entire coordinate frame frozen, the
+effect does not shrink: $-54.6\%$, $-58.8\%$, $-75.9\%$ at $H = 190$. Across both horizons
+\textbf{0 of 60} magnitude-matched random directions and \textbf{0 of 15} equal-norm tangent
+directions beat the recovered one on any model.
+
+\paragraph{Setting the invariant steers the imagined physics.}
+Repair shows drift is costly, not that $C$ is a control variable. We move a recipient state minimally
+along the local $C$-normal until $C(z) = C(z_{\mathrm{donor}})$ for an independent donor trajectory,
+then let the rollout run free; the target is read from the model's own latent, never from true
+energy. The imagined world's \emph{true decoded} energy moves toward the donor's \emph{true} energy,
+rank correlation $0.802$--$0.914$ across three models, with \textbf{0 of 75} random and tangent
+controls beating it and a preregistered offset sweep monotone in both directions on every model.
+
+\paragraph{The subspace is used by the model's own dynamics, not only reachable from encoder states.}
+A subspace edit can produce the expected output change through a pathway the model does not normally
+use \citep{makelov2024illusion}, so we repeat the donor interchange \emph{50 steps into an autonomous
+rollout} --- on a state the model reached by itself. The effect barely degrades: rank correlation
+$0.762$--$0.849$ at depth 50 against $0.803$--$0.924$ at depth 0, with 0 of 13 controls beating it at
+either depth, and equal-norm tangent edits near zero throughout. A dormant pathway would lose its
+effect precisely where this test applies it.
+
+\paragraph{The same pipeline refuses when there is nothing to find.}
+On matched dissipative models, where no nontrivial first integral exists, the extraction returns a
+direction that is not distinguished from a random one: 24 of 60 random draws beat it, and it harms
+rollouts on 2 of 3 models. Its operator statistic sits at $3.4$--$3.7\times10^{-1}$, in the same range
+as an untrained network and $39\times$ worse than any conservative model, with no overlap between the
+two groups.
+
+
+\paragraph{Downstream tests in full.}
+\paragraph{No downstream benefit, and we measured why.}
+Both practical uses we tested fail, for one reason. Planning with CEM over the learned model on an
+energy-targeting task, scoring return from the simulator's true state, the model plans well ---
+beating a random-action policy by $+1.65$, 95\% CI $[+0.50, +2.79]$. But no correction arm, including
+one supplied with the action's power as a source term, differs from no correction over three models
+and 20 episodes each: the largest effect is $0.0014$ against an across-episode return standard
+deviation of $0.575$, \textbf{0.24\% of one episode's spread}, and all four registered predictions
+failed. The cause is structural. The correction acts on \emph{accumulated} drift, and at the
+planner's horizon it shifts imagined energy by $0.3\%$ of the spread across candidate action
+sequences --- the quantity the planner ranks plans by --- so it cannot change which plan is chosen.
+Our repair is measured over 100 autonomous steps; a controller that re-plans every step never
+imagines long enough to accumulate what the method removes. Nor can one simply look further ahead:
+tripling the horizon leaves every arm indistinguishable (largest effect $0.007$ against a return
+standard deviation of $0.862$) while planning quality itself degrades, $-0.34$ to $-0.56$ in mean
+return. The regime where the correction would have something to correct is the regime where the
+planner is already worse off.
+
+The same effect-size limit defeats the other use. Accumulated drift at rollout step 25 predicts
+decoded energy error at step 100 at Spearman $-0.02$, $+0.09$ and $-0.24$, against $+0.27$, $+0.29$
+and $+0.31$ for plain latent displacement, with a random-constraint control beating it on two of
+three; the registered prediction went the other way on every model. A conserved quantity being
+causally deployed in imagination does not imply its drift is a useful online signal. The effect on
+pixel error alone is also small ($1.7\%$ at $H{=}50$); the large effects here are on decoded physical
+energy, a metric we introduce because it measures the property in question.
+
+\paragraph{The method finds only what the data gave the model a reason to represent.}
+The pendulum's rod length is fixed, so the rendered bob's distance from the pivot is constant to
+$0.67\%$ --- an exact constraint. Searching for a residual $G(z)=0$ rather than a conserved scalar
+fails: the recovered direction correlates with the true residual at $0.004$--$0.032$. Two measured
+causes. Minimising $\mathbb{E}[G^2]$ is the wrong objective, ranking the true constraint $1525$th of
+$1819$ directions; and the constraint is barely encoded at all, predicted from the latent at held-out
+$|\rho| = 0.19$ with a residual four times its own variation. A quantity that never varies carries no
+information, so nothing in a reconstruction objective pushes it into the latent --- it can live in
+the decoder's weights. This bounds the approach to quantities that \emph{vary}, and it is why we
+report no released-checkpoint experiment: limb lengths do not vary either.
+
+Finally, the two-invariant case limits the extraction rather than the model. On a system conserving
+both energy and angular momentum the conserved subspace reliably contains both (angular-momentum
+correlation $0.94$--$0.98$ in every measurement), while the joint fit isolates either in only 1 of 7
+measurements. The flow-alignment criterion selects a single direction inside that subspace, and has
+no unique answer when two independent invariants exist.
+
+
+\paragraph{Conservation at matched decodability, in full.}
+\paragraph{Whether conservation \emph{alone} predicts the intervention is not established.}
+The control that would show this directly asks whether, among candidates matched in energy
+correlation, better conservation alone produces a larger repair. The 2-DoF system admits such a band:
+on two of three seeds, 397 and 398 of 400 candidates lie within $0.10$ of the recovered scalar's
+$|\rho|_E$, spanning five orders of magnitude of conservation quality at $|\rho|_E \le 0.11$. Across
+20 candidates stratified by conservation, the rank correlation with repair is $+0.19$, $+0.57$ and
+$+0.19$ on the three seeds, with the 95\% confidence interval excluding zero on \textbf{one of
+three}. We report this as a negative result: the relationship is visible but not established at
+$n = 3$.
+
+Two further facts belong with it. The point estimate moves with the size of the candidate pool
+($+0.29 \to +0.19$ on one seed between pools of 150 and 400), so the statistic is not stable to a
+design choice that should be immaterial --- though the one-of-three verdict is identical under both
+pools. And on the third seed the band cannot be built at all: its reference $|\rho|_E$ is $0.111$ and
+only 19 of 400 candidates fall within $0.10$ of it, with an increase from 150 to 400 candidates
+adding none.
+
+That last failure is the informative part. On a system whose transition conserves energy, the
+well-conserved latent directions \emph{are} the energy-like ones. This is why E10's original
+high-decodability form could not be constructed on the pendulum at any pool size, why the matched
+band here exists only at low decodability, and why on one seed it does not exist at all. The two
+properties may not be separable by this design on any system where the model has learned the physics.
+That is a statement about the difficulty of \emph{this control}, not about the dissociation itself,
+for which the supervised probe above and Section~\ref{sec:mechanism} give direct evidence. What does
+hold across all three seeds is that the recovered scalar repairs: $-16.7\%$, $-7.3\%$ and $-6.8\%$.
+
+
 \section{Latent sensitivity analyses}
 \label{sec:sensitivity}
 

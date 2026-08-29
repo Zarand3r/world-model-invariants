@@ -96,30 +96,18 @@ that scalar confers no control benefit (Section~\ref{sec:limits}): there is no b
 it to enforce.
 
 \paragraph{Whether conservation \emph{alone} predicts the intervention is not established.}
-The control that would show this directly asks whether, among candidates matched in energy
-correlation, better conservation alone produces a larger repair. The 2-DoF system admits such a band:
-on two of three seeds, 397 and 398 of 400 candidates lie within $0.10$ of the recovered scalar's
-$|\rho|_E$, spanning five orders of magnitude of conservation quality at $|\rho|_E \le 0.11$. Across
-20 candidates stratified by conservation, the rank correlation with repair is $+0.19$, $+0.57$ and
-$+0.19$ on the three seeds, with the 95\% confidence interval excluding zero on \textbf{one of
-three}. We report this as a negative result: the relationship is visible but not established at
-$n = 3$.
-
-Two further facts belong with it. The point estimate moves with the size of the candidate pool
-($+0.29 \to +0.19$ on one seed between pools of 150 and 400), so the statistic is not stable to a
-design choice that should be immaterial --- though the one-of-three verdict is identical under both
-pools. And on the third seed the band cannot be built at all: its reference $|\rho|_E$ is $0.111$ and
-only 19 of 400 candidates fall within $0.10$ of it, with an increase from 150 to 400 candidates
-adding none.
-
-That last failure is the informative part. On a system whose transition conserves energy, the
-well-conserved latent directions \emph{are} the energy-like ones. This is why E10's original
-high-decodability form could not be constructed on the pendulum at any pool size, why the matched
-band here exists only at low decodability, and why on one seed it does not exist at all. The two
-properties may not be separable by this design on any system where the model has learned the physics.
-That is a statement about the difficulty of \emph{this control}, not about the dissociation itself,
-for which the supervised probe above and Section~\ref{sec:mechanism} give direct evidence. What does
-hold across all three seeds is that the recovered scalar repairs: $-16.7\%$, $-7.3\%$ and $-6.8\%$.
+The direct control asks whether, among candidates matched in energy correlation, better conservation
+alone produces a larger repair. The 2-DoF system admits such a band, spanning five orders of
+magnitude of conservation at $|\rho|_E \le 0.11$, and the rank correlation with repair is $+0.19$,
+$+0.57$ and $+0.19$ across seeds --- with the 95\% interval excluding zero on \textbf{one of three}.
+We report this as a negative. The informative part is \emph{why} it is hard: on a system whose
+transition conserves energy, the well-conserved latent directions \emph{are} the energy-like ones, so
+a matched band exists only at low decodability and on one seed cannot be built at all (19 of 400
+candidates). The two properties may not be separable by this design on any system where the model has
+learned the physics --- a statement about this control, not about the dissociation, for which the
+supervised probe above and Section~\ref{sec:mechanism} give direct evidence.
+Appendix~\ref{sec:causal-detail} gives the full analysis. What holds on all three seeds is that the
+recovered scalar repairs: $-16.7\%$, $-7.3\%$ and $-6.8\%$.
 
 \paragraph{Where the phenomenon stops.}
 Both boundaries above are the same statement seen twice. The invariant is bounded to the

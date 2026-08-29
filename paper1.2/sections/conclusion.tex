@@ -1,26 +1,22 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-A probe fitted to the correct physical quantity, at a correlation of $0.9999$, identifies a direction
-a world model's dynamics do not use --- and enforcing it degrades the model's imagined physics, while
-a label-free scalar that is better conserved and slightly less accurate improves it. Decodability and
-dynamical structure are different properties of a representation, they come apart in every setting we
-could construct, and only a measurement on the transition operator tells them apart.
+A world model trained only on pendulum video learns a conserved quantity, and it is the one its
+\emph{simulator} conserves rather than the one physics prescribes. Vary the simulator's timestep and
+the recovered coefficient follows the integrator's parameter-free prediction, slope
+$2.484 \pm 0.058$ against $2.500$. What the model has internalised is the numerical scheme, not the
+physics that scheme approximates.
 
-The gap has a cause, and it is not a defect of the probe. The training data is produced by a
-symplectic integrator, which conserves a shadow Hamiltonian $\tilde H = H + \mathcal{O}(\Delta t)$
-rather than $H$ itself. Sweeping the regression target through a family containing both signs and
-wrong magnitudes, the direction the learned transition conserves best sits at exactly the coefficient
-the integrator predicts --- no free parameters, 3 of 3 models --- and correcting that
-$\mathcal{O}(\Delta t)$ term turns a harmful intervention into a helpful one on every model. The
-perfect probe was fitted to a quantity the generating process does not conserve. No amount of probe
-hygiene detects that, because nothing is wrong with the probe. This also names what the label-free
-search buys: it optimises conservation under the learned transition, so it is not confined to targets
-a human can write down, and here it recovered an integrator correction nobody supplied.
+That reframes a failure of interpretability rather than excusing it. A probe fitted to true energy at
+$|\rho| = 0.9999$ identifies a direction the dynamics do not use, and enforcing it degrades the
+model's imagined physics --- not because the probe is poor, but because it is fitted to a quantity
+the generating process does not conserve. No probe hygiene detects that. Decodability and dynamical
+structure are different properties, they come apart in every setting we could construct, and only a
+measurement on the transition operator tells them apart.
 
-The practical consequence is narrow and concrete. Finding that a physical variable is decodable from
-a world model's latent says little about whether the model's rollouts respect it, and it says least
-in the situations that matter most: outside the training distribution, in architectures that predict
-well without conserving, and when the variable is supplied by supervision rather than found in the
-dynamics. Reporting a probe result in those settings will overstate what the model has learned. The
-operator statistic costs one autonomous step per state to compute.
+The practical consequence is narrow and we state it plainly. Finding a physical variable decodable
+from a latent says little about whether the model's rollouts respect it, and says least where it
+matters most: outside the training distribution, in architectures that predict well without
+conserving, and when the variable is supplied by supervision rather than found in the dynamics. The
+operator statistic costs one autonomous step per state. It does not, on the evidence here, buy a
+better controller --- and we measure why.

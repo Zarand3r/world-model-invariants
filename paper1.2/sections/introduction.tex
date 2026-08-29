@@ -42,19 +42,15 @@ steps into an autonomous rollout --- on a state the model reached by itself --- 
 which a dormant pathway would not \citep{makelov2024illusion}.
 
 \paragraph{Contributions.}
-\begin{enumerate}
-\item \textbf{World models learn their simulator's numerical scheme.} The recovered invariant is the
+(i) \textbf{World models learn their simulator's numerical scheme}: the recovered invariant is the
 integrator's shadow Hamiltonian, and its coefficient tracks the simulator timestep across a $4\times$
-range with a parameter-free slope of $2.484 \pm 0.058$ against $2.500$.
-\item \textbf{A demonstration that probing over-reports, with a decisive control and a mechanism.} A
-supervised probe of the true quantity, at $|\rho| = 0.9999$, identifies a direction the dynamics do
-not use --- because it is fitted to a quantity the generating process does not conserve. The
-dissociation appears on five independent axes and is directional in all of them.
-\item \textbf{An operator statistic that discriminates where probes cannot}, with matched controls
---- magnitude-matched rather than norm-matched --- that make its intervention interpretable. The
-norm-matched null used in prior work on this system controls nothing, because the correction is
-scale-invariant in the constraint.
-\item \textbf{Causal evidence and stated boundaries.} The selected direction is deployed, including
-50 steps into autonomous imagination; and the correction confers no benefit to a planner, for a
-reason we measure.
-\end{enumerate}
+range with a parameter-free slope of $2.484 \pm 0.058$ against $2.500$. (ii) \textbf{A demonstration
+that probing over-reports, with a decisive control and a mechanism}: a supervised probe of the true
+quantity, at $|\rho| = 0.9999$, identifies a direction the dynamics do not use, because it is fitted
+to a quantity the generating process does not conserve; the dissociation appears on five independent
+axes and is directional in all of them. (iii) \textbf{An operator statistic that discriminates where
+probes cannot}, with magnitude-matched rather than norm-matched controls --- the norm-matched null
+used in prior work on this system controls nothing, because the correction is scale-invariant in the
+constraint. (iv) \textbf{Causal evidence and stated boundaries}: the selected direction is deployed,
+including 50 steps into autonomous imagination, and the correction confers no benefit to a planner,
+for a reason we measure.
