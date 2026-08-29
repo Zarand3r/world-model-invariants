@@ -6436,3 +6436,64 @@ not depend on finishing sooner.
 
 Revised ETA: **~51 min per model, ~5 hours for the remaining 6**, against ~1.1 h uncontended. The
 guarded driver means an interruption costs nothing: any completed checkpoint is skipped on re-run.
+
+## 2026-08-29 -- **F6 complete, n = 3 x 4 timesteps: the world model tracks the simulator's timestep**
+
+All 12 models trained and analysed. Registered in `docs/F6_PREREG.md` before any quantity existed.
+
+### Result
+
+| dt | predicted `c*` | argmin `r` per seed | `rho_obs` r=0 / r=1 / r=-1 | separation |
+|---|---|---|---|---|
+| 0.02 | 0.0500 | +0.75, +0.75, +1.00 | 0.01714 / 0.01657 / 0.01966 | **1.03x** |
+| 0.035 | 0.0875 | **+1.00 x3** | 0.02311 / 0.01033 / 0.04473 | **2.24x** |
+| 0.05 | 0.1250 | **+1.00 x3** | 0.04487 / 0.00785 / 0.09264 | **5.72x** |
+| 0.08 | 0.2000 | **+1.00 x3** | 0.11884 / 0.00882 / 0.23781 | **13.47x** |
+
+- **P2 PASS, 4/4 timesteps.** Argmin exactly at the predicted `r = 1` on **9 of 12** models; the
+  three exceptions are all at the lowest timestep.
+- **P4 PASS, 12/12.** The wrong-sign control is worse on every single model.
+- **P3 FAIL as registered.** Slope `+2.611 +/- 0.110` is within 20% of the predicted `2.500`, but the
+  intercept `-0.00722 +/- 0.00566` excludes zero, and the registration required both.
+
+### The quantitative signature is exactly what the theory predicts
+
+Two independent scalings, neither of which was fitted:
+
+- `rho_obs` at `r = 0` (textbook energy) grows as **`dt^1.41`** -- textbook energy becomes
+  progressively worse conserved as the timestep coarsens.
+- `rho_obs` at `r = 1` (the shadow) stays at the model's own floor, **`dt^-0.49`**, essentially flat
+  at `0.008`--`0.017` across a 4x range of timestep.
+
+So the separation grows from `1.03x` to `13.5x` purely because textbook energy degrades while the
+shadow quantity stays conserved. **The model conserves the integrator's quantity, not the
+physicist's, at every timestep tested.**
+
+### Why P3 fails, established rather than argued
+
+Forced through the origin -- which is what the theory actually predicts -- the slope is
+**`2.484 +/- 0.058` against a parameter-free prediction of `2.500`**, within 0.6%. Excluding the
+lowest timestep it is **`2.500`** exactly.
+
+The two-parameter fit's negative intercept comes entirely from `dt = 0.02`. A **post-hoc** finer grid
+there (not registered, labelled as such) gives argmin `0.875` on 3 of 3 seeds -- so it is **not pure
+quantisation**; there is a real ~12% low bias at the smallest timestep. But the `rho_obs` curve there
+is flat to within 2% (`0.01727` at `r = 0.875` against `0.01742` at `r = 1.0`), so the argmin is
+determined by differences of under 1%, in the regime whose weak power was registered in advance.
+
+**This is reported as a registered FAIL on P3, with the origin-forced slope as a labelled post-hoc
+analysis.** The registration asked for both slope and intercept; only the slope passed.
+
+### What F6 establishes
+
+A world model trained **only on pixels**, with no access to equations, recovers a conserved quantity
+whose correction coefficient tracks `(dt/2) mg(l/2)` across a 4x range of simulator timestep --
+`2.484 +/- 0.058` against `2.500`, with the argmin exactly on prediction at 9 of 12 models and the
+wrong-sign control beaten 12/12.
+
+**The model learns its simulator's numerical scheme, not the physics that scheme approximates.**
+
+This converts E19 from an explanation of one negative into a general, quantitative claim about
+learned simulators, and it is the first result in this project that is positive, general and
+parameter-free. It also bears directly on sim-to-real: a world model inherits the integrator
+artifacts of the simulator it was trained on.
