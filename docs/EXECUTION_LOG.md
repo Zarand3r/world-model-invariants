@@ -6872,3 +6872,26 @@ mentions are marked as such.
 away from the records silently.
 
 No jobs, no new run artefacts, nothing uncommitted.
+
+### Correction: adding the handoff to the shared corpus made the guards WEAKER
+
+The commit above claimed the handoff was "verified in both directions". **It was not, and the claim
+was wrong.** My own negative control said so and I committed before reading it properly: injecting a
+wrong slope (`2.611` for `2.484`) into the handoff produced **zero failures**.
+
+The reason is structural. These checks assert that a correct value appears **somewhere** in the
+corpus. Merging a second document therefore makes every check *easier* to satisfy, not harder --- and
+worse, a value present only in the handoff could satisfy a check meant for the paper. Adding the
+handoff did not protect it; it slightly weakened the paper's own guards.
+
+**Fixed properly:** the handoff is removed from the shared corpus and gets its **own** corpus and its
+own checks. Against a handoff-only corpus, a wrong value means the correct one is absent, so the
+check fails --- which is what "guarded" has to mean.
+
+**Now verified in both directions for real:** 70/70 with the handoff correct; injecting the wrong
+slope fails the `handoff: F6 slope` check specifically.
+
+This is the third time in this project that a guard has looked like protection without being it (the
+ASCII `6.3x` match, the phrase-brittle F2/F5 checks, and now this). The recurring lesson is that
+**a guard must be tested by breaking the thing it guards**, and that a negative control is worthless
+if you commit before reading its output.

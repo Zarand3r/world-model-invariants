@@ -19,10 +19,11 @@ RUNS, TEX = ROOT / "runs", ROOT / "paper1.2" / "sections"
 # verifier only ever globbed sections/*.tex, and nothing else compared the two.
 _RAW = "\n".join(p.read_text() for p in sorted(TEX.glob("*.tex")))
 _RAW += "\n" + (TEX.parent / "CLAIMS.md").read_text()
-# The reviewer handoff restates the paper's figures, so it carries the same drift risk and is
-# guarded by the same checks. CLAIMS.md silently held mean-based numbers for a day before it
-# was added here; the handoff is the same shape of risk.
-_RAW += "\n" + (ROOT / "docs" / "REVIEWER_HANDOFF.md").read_text()
+# The handoff is deliberately NOT merged into this corpus. These checks assert a correct value
+# appears SOMEWHERE in it, so adding a second document makes every check easier to satisfy, not
+# harder -- a value present only in the handoff would satisfy a check meant for the paper.
+# Verified: injecting a wrong slope into the handoff while it was merged produced ZERO
+# failures. It gets its own corpus and its own checks below.
 # Lines marked `<!-- superseded: ... -->` deliberately NAME an old value in order to record that it
 # was wrong. A repo that documents its own corrections will otherwise trip every stale-value guard
 # it owns, so those annotations are excluded from the corpus the guards read.
@@ -97,6 +98,24 @@ for _sig in ("acc_drift", "latent_disp"):
 # training you to ignore it. The numbers themselves are checked above.
 CHECKS.append(("F2 not described as untested", "-",
                not re.search(r"drift[^.]{0,60}(is|remains) untested", CORPUS, re.I)))
+
+# --- reviewer handoff: checked against its OWN corpus ---
+_HAND = (ROOT / "docs" / "REVIEWER_HANDOFF.md").read_text()
+_HAND = "\n".join(l for l in _HAND.split("\n") if "<!-- superseded:" not in l)
+_HAND = _HAND.replace("**", "")
+
+def check_handoff(label, value, fmt="{:.3f}"):
+    s = fmt.format(value)
+    CHECKS.append((f"handoff: {label} ({s})", s, s in _HAND))
+
+_hx = np.array([m["dt"] for m in f6["models"]]); _hy = np.array([m["c_recovered"] for m in f6["models"]])
+_hs = float((_hx @ _hy) / (_hx @ _hx))
+_hr = _hy - _hs * _hx
+check_handoff("F6 slope", _hs)
+check_handoff("F6 slope CI", 1.96 * float(np.sqrt(((_hr ** 2).sum() / (len(_hx) - 1)) / (_hx @ _hx))))
+check_handoff("E18 ratio", st.median(r["rho_obs"] for r in sup) / st.median(r["rho_obs"] for r in lf), "{:.1f}")
+check_handoff("F1 variance explained",
+              100 * float(np.mean([m["pearson_pred_obs"] ** 2 for m in f1b["models"]])), "{:.2f}")
 
 # --- F6 timestep scaling (the paper's positive general result) ---
 import collections as _c
