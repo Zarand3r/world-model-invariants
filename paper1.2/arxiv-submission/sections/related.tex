@@ -2,47 +2,42 @@
 \label{sec:related}
 
 \paragraph{What probes establish.}
-Probing shows a variable is recoverable from a representation, not that the model's computation uses
-it \citep{alain2017probing}. Control tasks \citep{hewitt2019control} and later critiques
-\citep{belinkov2022probing} address the confound between what the representation stores and what the
-probe can learn. Our result is a different failure: the probe in Section~\ref{sec:dissociation} is
-fitted to the true physical quantity and reaches $0.9999$, so no control-task correction applies to
-it, and it still identifies a direction the dynamics do not use. Work on emergent world
-representations goes beyond probing by intervening \citep{li2023othello,nanda2023othello}, which is
-the logic our interventions follow; \citet{makelov2024illusion} show such interventions can succeed
-through pathways the model does not normally use, which is the objection our depth-50 interchange is
-designed to answer.
+Probing shows a variable is recoverable, not that the computation uses it \citep{alain2017probing}.
+Control tasks \citep{hewitt2019control} and later critiques \citep{belinkov2022probing} address the
+confound between what the representation stores and what the probe can learn. Ours is a different
+failure: the probe in Section~\ref{sec:dissociation} is fitted to the true quantity and reaches
+$0.9999$, so no control-task correction applies, and it still identifies a direction the dynamics do
+not use. Work on emergent world representations goes beyond probing by intervening
+\citep{li2023othello,nanda2023othello}, the logic ours follows; \citet{makelov2024illusion} show such
+interventions can succeed through pathways the model does not normally use, which our depth-50
+interchange answers.
 
 \paragraph{Discovering conserved quantities.}
-A substantial literature finds conservation laws from data. ConservNet minimises a noise-regularised
-within-group variance \citep{ha2021conservnet}, of which our invariance ratio is the closed-form
-Rayleigh-quotient analogue; AI Poincar\'e counts conserved quantities from trajectory manifolds
-\citep{liu2021aipoincare}. ConCerNet learns a conservation law and then projects the learned dynamics
-onto it \citep{zhang2023concernet}, and FINDE finds first integrals and preserves them by projection
-\citep{matsubara2023finde}; Noether Networks meta-learn a conserved quantity and apply it at test
-time, including on pixel pendulums \citep{alet2021noether}. All of these \emph{impose or co-train}
-conservation. We ask a different question: whether a model trained with no such term has a scalar its
-transition already preserves, and we measure that on the frozen transition rather than building it in.
+ConservNet minimises a noise-regularised within-group variance \citep{ha2021conservnet}, of which our
+invariance ratio is the closed-form Rayleigh-quotient analogue; AI Poincar\'e counts conserved
+quantities from trajectory manifolds \citep{liu2021aipoincare}. ConCerNet learns a conservation law
+then projects the learned dynamics onto it \citep{zhang2023concernet}, FINDE finds first integrals and
+preserves them by projection \citep{matsubara2023finde}, and Noether Networks meta-learn a conserved
+quantity and apply it at test time, including on pixel pendulums \citep{alet2021noether}. All
+\emph{impose or co-train} conservation. We ask whether a model trained with no such term already has
+a scalar its transition preserves, measured on the frozen transition rather than built in.
 
 \paragraph{Structure by design, and whether it is what helps.}
 Hamiltonian and Lagrangian networks build conservation into an architecture
-\citep{greydanus2019hnn,cranmer2020lnn}. \citet{gruver2022deconstructing} find that HNN generalisation
-comes from modelling acceleration and coordinate choice \emph{rather than} from symplectic structure
-or energy conservation --- which licenses the objection that our projection is a generic regulariser.
-Our magnitude-matched null answers it directly: with step size fixed, 0 of 60 random directions and
-0 of 15 equal-norm tangent directions match the recovered one, and on dissipative models the same
-pipeline returns a direction indistinguishable from random.
+\citep{greydanus2019hnn,cranmer2020lnn}. \citet{gruver2022deconstructing} find HNN generalisation
+comes from modelling acceleration and coordinate choice \emph{rather than} from symplectic structure,
+which licenses the objection that our projection is a generic regulariser. The magnitude-matched null
+answers it: with step size fixed, 0 of 60 random and 0 of 15 equal-norm tangent directions match the
+recovered one, and on dissipative models the pipeline returns a direction indistinguishable from
+random.
 
-\paragraph{Drift in learned dynamics.}
-That accurate one-step models drift over long rollouts is documented across fields. In machine-learned
-force fields, force accuracy and simulation stability decouple sharply \citep{fu2023forces}. In
-numerical analysis, projection onto a level set is a standard structure-preserving device
-\citep{hairer2006geometric2}, and our correction is that device applied to a \emph{discovered} rather
-than a given invariant, in a learned latent rather than the physical state.
-
-\paragraph{Evaluating physics in world models.}
-World models are normally evaluated by prediction quality or control performance
+\paragraph{Drift, and evaluating physics in world models.}
+That accurate one-step models drift over long rollouts is documented across fields; in machine-learned
+force fields, force accuracy and simulation stability decouple sharply \citep{fu2023forces}. Projection
+onto a level set is a standard structure-preserving device \citep{hairer2006geometric2}, and our
+correction applies it to a \emph{discovered} rather than a given invariant, in a learned latent. World
+models are otherwise evaluated by prediction quality or control performance
 \citep{hafner2023dreamerv3,ha2018world,schrittwieser2020muzero}, and physics benchmarks evaluate
-generated output. Neither reads the model's internal state. The disentanglement literature
+generated output --- neither reads the internal state. The disentanglement literature
 \citep{locatello2019challenging} documents how readily an appealing structural claim about
 representations survives without the control that would falsify it.

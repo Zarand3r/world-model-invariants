@@ -33,28 +33,16 @@ constraints differently.}
 \label{fig:probe_vs_operator}
 \end{figure}
 
-\begin{table}[t]
-\centering\small
-\caption{The correct physical quantity, fitted optimally, is worse conserved and does not repair
-rollouts. Median across three independently trained models, with the per-seed range in brackets;
-20 magnitude-matched random constraints per model (60 total, pooled).}
-\label{tab:supervised}
-\begin{tabular}{lccc}
-\toprule
-constraint & $|\rho|_E$ & $\rho_{\mathrm{obs}}$ & change in energy drift \\
-\midrule
-label-free $C$ & 0.966 \,[0.930, 0.973] & \textbf{6.9\,[6.3, 8.7]$\times10^{-3}$} & \textbf{$-$42.2\% \,[$-$50.9, $-$32.2]} \\
-supervised energy probe & \textbf{0.9999} & 4.58\,[4.57, 4.59]$\times10^{-2}$ & $+$26.8\% \,[$-$0.3, $+$33.4] \\
-random, magnitude-matched & 0.126 & 1.07 & $+$4.0\% \,[$-$20.7, $+$42.6] \\
-\bottomrule
-\end{tabular}
-\end{table}
 
-Table~\ref{tab:supervised} and Figure~\ref{fig:probe_vs_operator} show the outcome. The supervised
-probe tracks energy better than the label-free scalar on every seed, and is $6.7\times$ less preserved
-by the transition ($5.3$--$7.3\times$ per seed); both hold on 3 of 3 models. It also never repairs the
+
+Figure~\ref{fig:probe_vs_operator} shows the outcome. The supervised
+probe tracks energy better than the label-free scalar on every seed, yet is $6.7\times$ less
+preserved by the transition --- median $\rho_{\mathrm{obs}}$ of $4.58\times10^{-2}$ against
+$6.9\times10^{-3}$, and $5.3$--$7.3\times$ per seed; both hold on 3 of 3 models. It also never repairs the
 rollout: its effect on energy drift is $+26.8\%$ and $+33.4\%$ on two models and $-0.3\%$ on the third,
-against a $32$--$51\%$ reduction from the label-free scalar on all three. The direction that best
+against a median $-42.2\%$ ($32$--$51\%$) reduction from the label-free scalar on all three. A
+magnitude-matched random constraint sits at $\rho_{\mathrm{obs}} \approx 1.07$ and changes drift by
+$+4.0\%$. The direction that best
 predicts the physical variable and the direction the model's dynamics actually respect are not the
 same direction.
 
@@ -85,57 +73,28 @@ actuation & torque applied & $|\rho|_E$ 0.72--0.88 & balance law absent \\
 \end{tabular}
 \end{table}
 
-The out-of-distribution row is the cleanest, because it holds the model fixed and varies only the
-region of state space. Outside the training energy band a freely fitted probe recovers energy at
-$0.999$ --- the encoder generalises --- while the transition conserves it $55$--$267\times$ worse,
-reaching values statistically indistinguishable from a random constraint at the earliest checkpoint.
-Decodability and conservation come apart inside a single trained model, split by where in state space
-it is asked.
+The out-of-distribution row is cleanest: it holds the model fixed and varies only the region of
+state space. Outside the training energy band a freely fitted probe still recovers energy at $0.999$
+--- the encoder generalises --- while the transition conserves it $55$--$267\times$ worse, reaching
+values indistinguishable from a random constraint. The two properties come apart inside a single
+trained model, split by where in state space it is asked.
 
-\paragraph{Under actuation the same split appears against a different law.}
-The four axes above all vary how well a \emph{conserved} quantity survives. A fifth varies the law
-itself. We train three further world models on the same pendulum under piecewise-constant random
-torque, where energy is no longer conserved but obeys a balance relation,
-$\mathrm{d}E/\mathrm{d}t = \tau\dot\theta$. The models use their actions: a 20-step open-loop rollout
-driven by the true action sequence beats one driven by the same actions shuffled across trajectories,
-at a ratio of $0.740$--$0.761$ on 3 of 3 seeds.
-
-Running the \emph{unchanged} extraction on these models recovers an energy-like scalar on every one,
-$|\rho|_E = 0.72$, $0.88$, $0.86$. Its motion under the model's own transition is then compared
-against the balance relation the physics demands, with the torque known and $\dot\theta$ taken from
-the same decoded readout used throughout. The rank correlation between the predicted source term and
-the observed change in $C$ is $0.041$, $0.076$ and $0.065$; the power term accounts for
-\textbf{0.31\%} of the variance in $\Delta C$, and the observed change is $4.5$--$5.4\times$ larger
-than the relation predicts. A control that shuffles the power term across transitions is beaten on
-3 of 3 seeds, so the pairing carries something --- but almost nothing.
-
-The model represents the quantity and does not implement the relation that quantity obeys. This is
-the same dissociation as above, stated against a balance law rather than a conservation law, and it
-is the reason a correction built on the recovered scalar has no control benefit
-(Section~\ref{sec:limits}): there is no balance structure in the latent for it to enforce.
+The actuation row is the only axis testing a \emph{balance} law rather than a conservation law;
+Appendix~\ref{sec:causal-detail} gives it in full.
 
 \paragraph{Whether conservation \emph{alone} predicts the intervention is not established.}
-The control that would show this directly asks whether, among candidates matched in energy
-correlation, better conservation alone produces a larger repair. The 2-DoF system admits such a band:
-on two of three seeds, 397 and 398 of 400 candidates lie within $0.10$ of the recovered scalar's
-$|\rho|_E$, spanning five orders of magnitude of conservation quality at $|\rho|_E \le 0.11$. Across
-20 candidates stratified by conservation, the rank correlation with repair is $+0.19$, $+0.57$ and
-$+0.19$ on the three seeds, with the 95\% confidence interval excluding zero on \textbf{one of
-three}. We report this as a negative result: the relationship is visible but not established at
-$n = 3$.
+Among candidates matched in energy correlation and spanning five orders of magnitude of conservation,
+the rank correlation with repair is $+0.19$, $+0.57$ and $+0.19$ across seeds, with the 95\% interval
+excluding zero on \textbf{one of three}. We report this as a negative, and note why the control is
+hard: on a system whose transition conserves energy the well-conserved latent directions \emph{are}
+the energy-like ones, so a matched band exists only at low decodability and on one seed cannot be
+built at all. Appendix~\ref{sec:causal-detail} gives the full analysis. What holds on all three seeds
+is that the recovered scalar repairs: $-16.7\%$, $-7.3\%$ and $-6.8\%$.
 
-Two further facts belong with it. The point estimate moves with the size of the candidate pool
-($+0.29 \to +0.19$ on one seed between pools of 150 and 400), so the statistic is not stable to a
-design choice that should be immaterial --- though the one-of-three verdict is identical under both
-pools. And on the third seed the band cannot be built at all: its reference $|\rho|_E$ is $0.111$ and
-only 19 of 400 candidates fall within $0.10$ of it, with an increase from 150 to 400 candidates
-adding none.
-
-That last failure is the informative part. On a system whose transition conserves energy, the
-well-conserved latent directions \emph{are} the energy-like ones. This is why E10's original
-high-decodability form could not be constructed on the pendulum at any pool size, why the matched
-band here exists only at low decodability, and why on one seed it does not exist at all. The two
-properties may not be separable by this design on any system where the model has learned the physics.
-That is a statement about the difficulty of \emph{this control}, not about the dissociation itself,
-for which the supervised probe above and Section~\ref{sec:mechanism} give direct evidence. What does
-hold across all three seeds is that the recovered scalar repairs: $-16.7\%$, $-7.3\%$ and $-6.8\%$.
+\paragraph{Where the phenomenon stops.}
+Both boundaries are the same statement twice: the invariant is bounded to the \emph{training
+distribution} and to \emph{RSSM-like architectures}. On a deterministic conv-GRU, identification
+transfers on 2 of 3 seeds under both training budgets while conservation transfers on none --- a
+$767\times$ gap --- and seven times more open-loop training moves the median barely. That comparison
+does not isolate architecture, since an open-loop reconstruction term and a prior--posterior KL are
+different losses; Appendix~\ref{sec:causal-detail} gives both boundaries in full.

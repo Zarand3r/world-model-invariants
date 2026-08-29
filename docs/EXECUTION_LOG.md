@@ -6733,3 +6733,39 @@ accommodates 10.
 
 Progress this pass: **13 -> 10 pages**, 63/63 checks passing throughout, nothing lost from the paper
 as a whole.
+
+## 2026-08-29 -- **Main text reaches 9 pages. My length metric had been wrong for several passes.**
+
+### The measurement error, first
+
+For several passes I measured "main body" by finding which page the conclusion's last line fell on,
+in a document that still contained the appendix. That number stuck at 10 no matter how much I cut ---
+because appendix text simply flowed up to fill the space, so the conclusion's last line stayed put.
+I concluded from it that **10 pages was a hard floor requiring a result to be dropped**, and reported
+that to Richard. **That conclusion was wrong, and it was wrong because of how I measured.**
+
+Compiling the body **in isolation** --- appendix and bibliography removed --- showed the truth: page
+10 held **22 words**. Everything else already fitted in nine. The gap was never 1,100 words; it was
+one sentence.
+
+The lesson is the same one this project keeps relearning in different costumes: **measure the thing
+you are claiming, not a proxy that correlates with it.** A metric that cannot move is not evidence of
+a floor; it is evidence of a broken metric.
+
+### Result
+
+**Main text: 9 pages** (ICLR limit), verified by compiling the body alone. The full document with
+appendix and references is 15 pages. Started this editorial pass at **13**.
+
+Every demoted block went to a labelled appendix section that the main text points at --- method
+detail, causal protocols, downstream-test detail, the full E10b analysis, the actuation axis, and
+both boundary paragraphs. **No result was dropped.** The five-axis claim, all four negatives, and
+every causal intervention survive in the main text as summaries with numbers.
+
+### Verification
+
+- **63/63** number checks pass, after every individual edit.
+- **56 tests** pass.
+- Full paper compiles with **0 errors, 0 undefined references**.
+- arXiv archive rebuilds and compiles **standalone**: 15 pages, **0 unresolved citations**.
+- `origin/main` still **`20fa8b4`** (2026-08-24); the pre-push hook remains in place.

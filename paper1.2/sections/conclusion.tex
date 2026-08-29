@@ -14,9 +14,8 @@ the generating process does not conserve. No probe hygiene detects that. Decodab
 structure are different properties, they come apart in every setting we could construct, and only a
 measurement on the transition operator tells them apart.
 
-The practical consequence is narrow and we state it plainly. Finding a physical variable decodable
-from a latent says little about whether the model's rollouts respect it, and says least where it
-matters most: outside the training distribution, in architectures that predict well without
-conserving, and when the variable is supplied by supervision rather than found in the dynamics. The
-operator statistic costs one autonomous step per state. It does not, on the evidence here, buy a
-better controller --- and we measure why.
+The practical consequence is narrow. That a physical variable is decodable says little about whether
+the model's rollouts respect it, and says least where it matters most: out of distribution, in
+architectures that predict well without conserving, and when the variable comes from supervision
+rather than from the dynamics. The operator statistic costs one autonomous step per state; it does
+not, on this evidence, buy a better controller.

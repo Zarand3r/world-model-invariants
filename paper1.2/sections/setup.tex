@@ -7,14 +7,14 @@ convolutional encoder and decoder, KL balancing, and unimix. We train only the w
 actor or critic.
 
 Data come from Gymnasium's \texttt{Pendulum-v1} \citep{towers2024gymnasium}, rendered per step and
-block-averaged to $64\times64$. We set the simulator state directly, sampling
-$\theta\sim U[-1.8,1.8]$ and $\dot\theta\sim U[-2.2,2.2]$, and reject any trajectory reaching the
-$|\dot\theta|=8$ speed clip, which would break conservation. Actions are zero unless stated. A single
-frame does not reveal velocity, so the model must infer $\dot\theta$ from the sequence. We train on
-204 trajectories of 120 frames, about 6{,}500 gradient steps, reserving 52 trajectories as a
-post-training \emph{analysis set}. Three independently trained seeds pass checks fixed before
-analysis: KL above 1 nat, one-step decoding at least $4\times$ better than predicting the dataset
-mean, and finite rollouts. Appendix~\ref{sec:details} gives the rest. Our claims concern a DreamerV3
+block-averaged to $64\times64$, with the simulator state set directly
+($\theta\sim U[-1.8,1.8]$, $\dot\theta\sim U[-2.2,2.2]$) and any trajectory reaching the
+$|\dot\theta|=8$ clip rejected, since clipping breaks conservation. Actions are zero unless stated,
+and a single frame does not reveal velocity, so the model must infer $\dot\theta$ from the sequence.
+We train on 204 trajectories of 120 frames for about 6{,}500 gradient steps, reserving 52 as a
+post-training \emph{analysis set}. Three seeds pass checks fixed before analysis: KL above 1 nat,
+one-step decoding $4\times$ better than the dataset mean, and finite rollouts;
+Appendix~\ref{sec:details} gives the rest. Our claims concern a DreamerV3
 world model trained on pendulum video, not DreamerV3 as a full reinforcement-learning agent.
 
 \paragraph{Latent coordinates.} After training we freeze the model. Let $h$ be the deterministic

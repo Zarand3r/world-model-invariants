@@ -110,20 +110,18 @@ $12\%$ low bias rather than grid coarseness, in the regime where the whole separ
 $1.03\times$ and the residual curve is flat to within $2\%$.
 
 \paragraph{What this does and does not settle.}
-The residual matters and we report it: the median $\rho_{\mathrm{obs}}$ at $c^\star$ is
-$7.5\times10^{-3}$ against the label-free scalar's $6.9\times10^{-3}$, a remaining gap of
-$1.10\times$. The shadow Hamiltonian therefore accounts for essentially all of the
-$6.7\times$ gap in Section~\ref{sec:dissociation}. It does \emph{not} follow that the model conserves
-$\tilde H$ exactly: the model is a learned approximation to the integrator, so its own invariant is
-its own modified quantity, of which $\tilde H$ is a first-order proxy. That $1.10\times$ is the
-measure of the difference.
+The residual matters and we report it: median $\rho_{\mathrm{obs}}$ at $c^\star$ is
+$7.5\times10^{-3}$ against the label-free scalar's $6.9\times10^{-3}$, a gap of $1.10\times$ --- so
+the shadow Hamiltonian accounts for essentially all of the $6.7\times$ gap in
+Section~\ref{sec:dissociation}. It does \emph{not} follow that the model conserves $\tilde H$ exactly:
+it is a learned approximation to the integrator, so its own invariant is its own modified quantity,
+of which $\tilde H$ is a first-order proxy. That $1.10\times$ measures the difference.
 
-Two consequences are worth stating plainly. First, a probe reaching $|\rho|_E = 0.9999$ can be
-fitted to a quantity \emph{the generating process does not conserve}, and no amount of probe hygiene
-detects this, because nothing is wrong with the probe --- the target is wrong. Second, the label-free
-method's advantage now has a name. It optimises conservation under the learned transition, so it is
-not restricted to targets a human knows how to write down; here it recovered an
-$\mathcal{O}(\Delta t)$ integrator correction that nobody supplied. The sharpest statement of this
-paper's thesis is internal to a single sweep: at $c^\star$ the probe correlates with textbook energy
-\emph{worse} than at $c=0$ ($|\rho|_E$ $0.977$ against $0.9999$), while being conserved six times
-better and repairing the rollout instead of harming it.
+Two consequences follow. A probe reaching $|\rho|_E = 0.9999$ can be fitted to a quantity \emph{the
+generating process does not conserve}, and no probe hygiene detects this, because nothing is wrong
+with the probe --- the target is. And the label-free method's advantage has a name: it optimises
+conservation under the learned transition, so it is not restricted to targets a human knows how to
+write down, and here it recovered an $\mathcal{O}(\Delta t)$ correction nobody supplied. The thesis
+is internal to a single sweep: at $c^\star$ the probe correlates with textbook energy \emph{worse}
+than at $c=0$ ($0.977$ against $0.9999$) while being conserved six times better and repairing the
+rollout instead of harming it.
