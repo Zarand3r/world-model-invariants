@@ -5720,3 +5720,74 @@ pixels**, with no reward, no policy and no actor-critic, supports competent plan
 never saw. Two random-policy episodes hit the speed clip; none of the planned episodes did.
 
 The five-arm comparison is now running on seed 3. **Nothing is claimed about the arms yet.**
+
+### F5 arms, seed 3: all five tie. The correction is far too small to change plan selection.
+
+| arm | mean return | median | clipped |
+|---|---|---|---|
+| none | -0.341 | -0.139 | 0/20 |
+| conserve | -0.340 | -0.139 | 0/20 |
+| balance | -0.339 | -0.140 | 0/20 |
+| probe | -0.341 | -0.139 | 0/20 |
+| random | -0.342 | -0.139 | 0/20 |
+
+Agreement to three decimals across a 40-step closed loop is not a null result, it is a signal that
+the edit is not reaching the decision. **Diagnosed before reporting anything.**
+
+**An execution defect of mine, owned:** `F5_PREREG` requires planner hyperparameters to be frozen
+from a pilot on seed 3 *before* any arm comparison. I set `plan_H = 10` without running that pilot.
+The diagnostics below were therefore run *after* seeing the tie, and are labelled **exploratory**
+throughout. They are reported as diagnosis, not as a result, and no registered prediction is re-read
+at a horizon chosen after the fact.
+
+### Why the arms tie (exploratory)
+
+The correction's effect on imagined energy, relative to the spread of imagined energy **across
+candidate action sequences** -- which is the quantity CEM actually discriminates on:
+
+| plan horizon | spread | conserve | balance | probe | random |
+|---|---|---|---|---|---|
+| **10 (used)** | 1.515 | **0.3%** | **0.3%** | 1.0% | 0.4% |
+| 20 | 1.129 | 0.8% | 0.9% | 2.3% | 1.3% |
+| 40 | 0.915 | 1.5% | 1.7% | 4.1% | 2.5% |
+| 80 | 0.911 | 2.2% | 3.0% | 7.1% | 4.3% |
+
+At the horizon used, the correction moves imagined energy by **0.3% of the signal the planner ranks
+plans by**. It cannot change which plan is chosen, so the arms must tie -- and they do.
+
+**The reason is structural, not a parameter choice.** The repair acts on *accumulated* drift. E1
+measured it over **100** free steps; a planner re-plans every step and imagines **10**. There is
+almost no accumulated drift for the correction to remove. Even at 80 steps the effect stays under 8%.
+
+### Does the correction at least improve prediction? (exploratory, n = 12 episodes, one seed)
+
+The mechanism a correction would have to work through is making imagined energy closer to what
+actually happens. Measured against the simulator under known actions, 40-step horizon:
+
+| arm | mean \|imagined - actual\| energy error | vs none |
+|---|---|---|
+| none | 0.2801 | -- |
+| conserve | 0.2709 | **-3.3%** |
+| balance | 0.2775 | -0.9% |
+| **probe** | **0.2588** | **-7.6%** |
+| random | 0.2862 | +2.2% |
+
+Two things worth recording, neither claimed: the random direction is **worse** than no correction, so
+there is some specificity; and the **supervised probe does best**, which is the *opposite* order to
+E18. That is a different regime -- actuated rather than free, prediction error rather than accumulated
+drift -- so it does not contradict E18, but it is a reason not to assume E18's ordering transfers.
+All effects are single-digit percentages on 12 episodes and one seed, and nothing is concluded.
+
+### What F5 establishes so far
+
+- **Gate 0 passes**: a world model trained only on pixels, with no reward or policy, plans
+  competently. Paired margin +1.646, CI [+0.503, +2.789].
+- **P1 fails at the registered configuration**, and the reason is measured rather than guessed: the
+  correction's influence on plan selection is ~0.3%, two orders of magnitude below the signal.
+- The honest statement for the paper is sharper than "it did not help": **the operator-privileged
+  correction acts on accumulated drift, and a re-planning controller never accumulates enough for it
+  to matter.** That bounds the method's practical significance precisely, and it explains F2's
+  negative too -- both failures are the same effect-size problem in different clothes.
+
+Seeds 4 and 5 not yet run. Whether to run them, or to treat the effect-size diagnosis as the result,
+is a judgement worth Richard's input given the seed-3 arms are separated by 0.003.
