@@ -139,3 +139,16 @@ properties may not be separable by this design on any system where the model has
 That is a statement about the difficulty of \emph{this control}, not about the dissociation itself,
 for which the supervised probe above and Section~\ref{sec:mechanism} give direct evidence. What does
 hold across all three seeds is that the recovered scalar repairs: $-16.7\%$, $-7.3\%$ and $-6.8\%$.
+
+\paragraph{Where the phenomenon stops.}
+Both boundaries above are the same statement seen twice. The invariant is bounded to the
+\emph{training distribution}: outside the training energy band a freely fitted probe still recovers
+energy at $0.999$ while the transition conserves it $55$--$267\times$ worse, reaching values
+indistinguishable from a random constraint. And it is bounded to the \emph{architecture}: on a
+deterministic convolutional GRU with no stochastic latent, no KL term and no unimix, identification
+transfers on 2 of 3 seeds under both training budgets while conservation transfers on none
+($\rho_{\mathrm{obs}}$ $4.83$--$5.55$ against the RSSM's ${\sim}7\times10^{-3}$, a $767\times$ gap;
+seven times more open-loop training moved the median from $5.33$ to $5.26$). We are explicit that
+this comparison does not isolate architecture --- an open-loop reconstruction term and a
+prior--posterior KL are different losses, not the same loss at different strengths --- so the
+supportable scope of every claim here is RSSM-like models, in distribution.

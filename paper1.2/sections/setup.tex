@@ -21,24 +21,6 @@ least $4\times$ better than predicting the dataset mean, and finite rollouts.
 Appendix~\ref{sec:details} gives the remaining training details. Our claims concern a DreamerV3
 world model trained on pendulum video, not DreamerV3 as a full reinforcement-learning agent.
 
-\paragraph{Three kinds of latent trajectories.} We use three latent trajectories and keep them
-separate throughout.
-
-An \emph{observation-conditioned} trajectory is the sequence of deterministic recurrent states
-produced when the model receives the next real frame at every step. This is what the encoder returns
-on the analysis set.
-
-The \emph{one-step transition} $T$ is the model's autonomous recurrent update with zero action and
-no new observation.
-
-An \emph{imagination rollout} starts from one encoded state and repeatedly applies $T$ without
-supplying any later frames.
-
-We estimate the latent flow by applying $T$ once at each state of an observation-conditioned
-trajectory, so the transition is autonomous even though the states come from real video.
-Section~\ref{sec:dissociation} measures conservation along observation-conditioned trajectories.
-Section~\ref{sec:causality} tests what happens to the same scalar under autonomous imagination.
-
 \paragraph{Latent coordinates.} After training we freeze the model. Let $h$ denote the deterministic
 recurrent state on the analysis set and $\bar h$ its mean. We take the top 12 principal directions
 of $h$, remove any direction with no support in the data, and let $P$ denote the resulting
@@ -111,10 +93,3 @@ $\dot\theta$ or $E$, and nothing in Equations~\ref{eq:ratio} and~\ref{eq:pair} r
 truth enters afterward, when we score the recovered $C$ against $E$. We selected the extraction
 dimension on three development models and fixed it before evaluating the three models reported here.
 
-\paragraph{Code and data.} The extraction code, the run logs behind every figure and table, and
-the source of this paper are at \url{https://github.com/Zarand3r/world-model-invariants}. The figures
-regenerate from the committed logs without a GPU.
-
-\paragraph{Preliminary experiments.} We developed the extraction procedure in preliminary
-experiments on smaller recurrent models. Those experiments motivated the untrained, dissipative, and
-intervention controls used here, and we do not use them as evidence for the DreamerV3 results.
