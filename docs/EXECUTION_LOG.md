@@ -6241,3 +6241,31 @@ is explained rather than observed. Specifically: **latent-space extraction can o
 the training data gave the model a reason to represent.** Orbit labels vary and are represented;
 constraints do not vary and are not. That is a statement about representation learning, not about
 this pendulum.
+
+### F3's bound added to the paper -- and a submission blocker found while doing it
+
+Before adding anything I checked something never checked in this project: **how long the paper is
+against main-track limits.**
+
+- `paper1.2/main.tex` uses plain `\documentclass[10pt]{article}` -- **no venue template**.
+- **Main body is 11 pages** (abstract through conclusion; appendix starts p12), 6,326 words of prose
+  plus 2 tables and 2 figures.
+- Limits are **9 pages** (ICLR, NeurIPS) and **8** (ICML), excluding references and appendix.
+
+Without the actual style file the exact reformatted length is unknown, but 11 pages of `article`
+10pt is **at or over** every target limit, not comfortably under. **This is the most concrete
+submission blocker in the project and it argues for compression, not addition.**
+
+So F3 went in **tightly** -- one paragraph in `limits.tex`, not a new section -- and only because it
+pre-empts an obvious reviewer question ("why not run it on a released checkpoint?") with a measured
+answer rather than silence. Main body stayed at 11 pages.
+
+Four F3 checks added, including a guard that fails if the paper ever claims a released-checkpoint
+result. **54/54 checks pass.**
+
+### Recommended next action, which is not mine to take
+
+The paper needs a venue template applied and then compressing by roughly 2-3 pages. That is a
+substantive editorial pass -- deciding what to cut is an authorship judgement, not a correction --
+so it is left for Richard. `setup` (1,176 words) and `dissociation` (996) are the largest sections
+and the most likely sources of slack.

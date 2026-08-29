@@ -37,6 +37,7 @@ f5 = load("f5_planning.json")
 f5g = load("f5_gate0.json")
 f1b = load("f1_balance_measured.json")
 f1a = load("f1_action_use.json")
+f3 = load("f3_constraint.json")
 lf  = [m["unsupervised"] for m in e18["models"]]
 sup = [m["supervised"] for m in e18["models"]]
 at  = lambda m, c: next(r for r in m["sweep"] if r["c"] == c)
@@ -88,6 +89,15 @@ for _sig in ("acc_drift", "latent_disp"):
         check(f"F2 {_sig} {_m['ckpt'][-16:-3]}", _s, fmt="{:+.2f}")
 CHECKS.append(("F2 stated as tested, not 'untested'", "-",
                "was tested" in CORPUS and "predicts rollout failure usefully, or" not in CORPUS))
+
+# --- F3 constraint-residual bound (registered NEGATIVE; A1 gate fired) ---
+_r = sorted(m["rho_G_Gtrue"] for m in f3["models"])
+check("F3 rho(G,Gtrue) low", _r[0], fmt="{:.3f}")
+check("F3 rho(G,Gtrue) high", _r[-1], fmt="{:.3f}")
+CHECKS.append((f"F3 A1 failed on all {len(f3['models'])} models (gate fired)", "-",
+               not any(m["A1_pass"] for m in f3["models"])))
+CHECKS.append(("F3: no released-checkpoint result claimed", "-",
+               not re.search(r"walker|DMC|released checkpoint experiment", CORPUS, re.I)))
 
 # --- F1 actuation axis (the paper's fifth dissociation axis) ---
 for _m in f1b["models"]:

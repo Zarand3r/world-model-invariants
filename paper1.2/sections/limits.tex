@@ -57,6 +57,19 @@ effect on pixel error alone at short horizon is also small (1.7\% at $H=50$); th
 reported here are on decoded physical energy, a metric we introduce because it measures the property
 in question.
 
+The method also finds only what the data gave the model a reason to represent. We tested this on a
+constraint the pendulum satisfies exactly --- its rod length is fixed, so the rendered bob's distance
+from the pivot is constant to $0.67\%$ --- by searching for a residual $G(z)=0$ rather than a
+conserved scalar. The search fails: the recovered direction correlates with the true residual at
+$0.004$--$0.032$ across three models. Two causes, both measured. Minimising $\mathbb{E}[G^2]$ is the
+wrong objective, since $1525$ of $1819$ candidate directions have a smaller second moment than the
+true constraint. And the constraint is barely encoded at all: predicting the rod length from the
+latent gives held-out $|\rho| = 0.19$, with a residual four times larger than the quantity's own
+variation. A quantity that never varies carries no information, so nothing in a reconstruction
+objective pushes it into the latent --- it can live in the decoder's weights. This bounds the
+approach to quantities that vary, and it is why we do not report a released-checkpoint experiment:
+limb lengths do not vary either.
+
 Finally, the two-invariant case exposes a limitation of the extraction rather than of the model. On a
 system conserving both energy and angular momentum, the conserved subspace reliably contains both
 (angular-momentum correlation 0.94--0.98 in every measurement) while the joint fit isolates either in
