@@ -63,13 +63,13 @@ missing labels: it finds something a supervised fit on perfect labels does not, 
 conservation by the transition rather than agreement with the variable.
 Section~\ref{sec:mechanism} identifies what it finds, and why fitting true energy cannot find it.
 
-\paragraph{The dissociation is directional, and appears on four further axes.}
+\paragraph{The dissociation is directional, and appears on five further axes.}
 In every case we can construct, decodability survives where conservation fails; we have not found the
 converse. Table~\ref{tab:axes} collects them. On each row a probe would report success.
 
 \begin{table}[t]
 \centering\small
-\caption{Decodability is retained while conservation degrades, across four independent axes.
+\caption{Decodability is retained while dynamical structure degrades, across five independent axes.
 $\rho_{\mathrm{obs}}$ for the trained conservative model in-distribution is $6.3$--$8.7\times10^{-3}$.}
 \label{tab:axes}
 \begin{tabular}{llcc}
@@ -80,6 +80,7 @@ training & untrained network & $|\rho|_E$ up to 0.908 & 74$\times$ \\
 state space & outside training energies & free probe 0.999 & 55--267$\times$ \\
 architecture & deterministic conv-GRU & $|\rho|_E$ 0.91 (2 of 3 seeds) & 767$\times$ \\
 objective & transition never trained & $|\rho|_E$ 0.97 & $\sim$10\,000$\times$ \\
+actuation & torque applied & $|\rho|_E$ 0.72--0.88 & balance law absent \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -90,6 +91,28 @@ $0.999$ --- the encoder generalises --- while the transition conserves it $55$--
 reaching values statistically indistinguishable from a random constraint at the earliest checkpoint.
 Decodability and conservation come apart inside a single trained model, split by where in state space
 it is asked.
+
+\paragraph{Under actuation the same split appears against a different law.}
+The four axes above all vary how well a \emph{conserved} quantity survives. A fifth varies the law
+itself. We train three further world models on the same pendulum under piecewise-constant random
+torque, where energy is no longer conserved but obeys a balance relation,
+$\mathrm{d}E/\mathrm{d}t = \tau\dot\theta$. The models use their actions: a 20-step open-loop rollout
+driven by the true action sequence beats one driven by the same actions shuffled across trajectories,
+at a ratio of $0.740$--$0.761$ on 3 of 3 seeds.
+
+Running the \emph{unchanged} extraction on these models recovers an energy-like scalar on every one,
+$|\rho|_E = 0.72$, $0.88$, $0.86$. Its motion under the model's own transition is then compared
+against the balance relation the physics demands, with the torque known and $\dot\theta$ taken from
+the same decoded readout used throughout. The rank correlation between the predicted source term and
+the observed change in $C$ is $0.041$, $0.076$ and $0.065$; the power term accounts for
+\textbf{0.31\%} of the variance in $\Delta C$, and the observed change is $4.5$--$5.4\times$ larger
+than the relation predicts. A control that shuffles the power term across transitions is beaten on
+3 of 3 seeds, so the pairing carries something --- but almost nothing.
+
+The model represents the quantity and does not implement the relation that quantity obeys. This is
+the same dissociation as above, stated against a balance law rather than a conservation law, and it
+is the reason a correction built on the recovered scalar has no control benefit
+(Section~\ref{sec:limits}): there is no balance structure in the latent for it to enforce.
 
 \paragraph{Whether conservation \emph{alone} predicts the intervention is not established.}
 The control that would show this directly asks whether, among candidates matched in energy

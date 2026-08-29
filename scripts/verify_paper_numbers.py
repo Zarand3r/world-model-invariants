@@ -35,6 +35,8 @@ e10b = load("e10b_matched_band_pool400.json")
 f2 = load("f2_trust_signal.json")
 f5 = load("f5_planning.json")
 f5g = load("f5_gate0.json")
+f1b = load("f1_balance_measured.json")
+f1a = load("f1_action_use.json")
 lf  = [m["unsupervised"] for m in e18["models"]]
 sup = [m["supervised"] for m in e18["models"]]
 at  = lambda m, c: next(r for r in m["sweep"] if r["c"] == c)
@@ -86,6 +88,22 @@ for _sig in ("acc_drift", "latent_disp"):
         check(f"F2 {_sig} {_m['ckpt'][-16:-3]}", _s, fmt="{:+.2f}")
 CHECKS.append(("F2 stated as tested, not 'untested'", "-",
                "was tested" in CORPUS and "predicts rollout failure usefully, or" not in CORPUS))
+
+# --- F1 actuation axis (the paper's fifth dissociation axis) ---
+for _m in f1b["models"]:
+    _s = _m["ckpt"][-9:-3]
+    check(f"F1 rho(C,E) {_s}", _m["rho_C_energy"], fmt="{:.2f}")
+    check(f"F1 Spearman(power,dC) {_s}", _m["spearman_pred_obs"], fmt="{:.3f}")
+_var = 100 * float(np.mean([m["pearson_pred_obs"] ** 2 for m in f1b["models"]]))
+check("F1 variance of dC explained by power (%)", _var, fmt="{:.2f}")
+_scale = [m["scale_obs_over_pred"] for m in f1b["models"]]
+check("F1 obs/pred scale low", min(_scale), fmt="{:.1f}")
+check("F1 obs/pred scale high", max(_scale), fmt="{:.1f}")
+# The paper quotes the RANGE, not per-seed values, so check the endpoints. Checking each seed
+# fails on a value that is inside the stated range but never written down -- which it did.
+_fin = [m["ratio_true_over_shuffled"] for m in f1a["models"] if not re.search(r"step\d+", m["ckpt"])]
+check("F1 action-use range low", min(_fin), fmt="{:.3f}")
+check("F1 action-use range high", max(_fin), fmt="{:.3f}")
 
 # --- F5 (registered NEGATIVE: no control benefit) ---
 _arms = ("none", "conserve", "balance", "probe", "random")

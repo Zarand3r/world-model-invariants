@@ -45,7 +45,7 @@ matching the figures. <!-- superseded: the mean-based 6.3x / +20.0% quoted here 
 
 **Supporting, each an independent axis:** untrained models (`rho_obs` 74x worse at `rho_E` up to
 0.908); out of distribution (free probe 0.999, conservation 55-267x worse); a second architecture
-(`rho_E` 0.91 on 2 of 3 seeds, conservation 767x worse, n=3 at both training budgets); an untrained transition (`rho_E` 0.97, conservation
+(`rho_E` 0.91 on 2 of 3 seeds, conservation 767x worse, n=3 at both training budgets); actuation (`rho_E` 0.72-0.88, the action's power explains 0.31% of the motion of `C`, n=3); an untrained transition (`rho_E` 0.97, conservation
 ~10,000x worse).
 
 **Strongest alternative.** The supervised probe is worse simply because it is *different* from the

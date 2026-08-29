@@ -6072,3 +6072,47 @@ temporarily set public the tool refuses; set private, it proceeds.
 published, what is deliberately not, how to regenerate), `docs/ARTIFACT_MANIFEST.md` (generated), and
 the top-level `README.md`, which also still pointed at the superseded `paper/` for figure
 regeneration and now points at `paper1.2/` with its three generators.
+
+## 2026-08-29 -- **Actuation added as the paper's fifth dissociation axis**
+
+Richard approved proceeding in directions that strengthen the paper. Took the cheaper of the two
+candidates first: F1's result is already complete, verified and at n = 3, and it extends the paper's
+central claim into a regime the manuscript did not cover.
+
+### What was added
+
+A paragraph in `dissociation.tex` and a fifth row in the axes table. The framing matters: the four
+existing axes all vary **how well a conserved quantity survives**; this one varies **the law itself**.
+Under torque, energy is not conserved -- it obeys `dE/dt = tau * thetadot` -- so the question becomes
+whether the model implements *that* relation.
+
+- The models demonstrably **use** their actions: open-loop rollout MSE under true actions beats
+  shuffled actions at `0.740`--`0.761`, 3 of 3 seeds.
+- The **unchanged** extraction recovers an energy-like scalar on every one: `|rho|_E` `0.72`, `0.88`,
+  `0.86`.
+- Its motion does **not** follow the balance relation: rank correlation with the predicted source term
+  `0.041` / `0.076` / `0.065`, the power term explaining **0.31%** of the variance in `dC`, observed
+  change `4.5`--`5.4x` larger than predicted. A shuffled-power control is beaten 3 of 3, so the
+  pairing carries something -- but almost nothing.
+
+The paragraph states the consequence explicitly: this is why the correction has no control benefit
+(F5). There is no balance structure in the latent for it to enforce. Two negatives, one cause, now
+connected in the manuscript rather than only in this log.
+
+### Count consistency
+
+Adding a fifth axis meant "four" was now wrong in three places -- the abstract, the introduction, and
+the table caption -- each of which would have contradicted the table. All updated, plus `CLAIMS.md`.
+Paper is **15 pages** (was 14).
+
+### Guards
+
+Eleven F1 checks added to `verify_paper_numbers.py`: per-seed `rho(C,E)` and Spearman, the variance
+fraction, the obs/pred scale range, and the action-use range.
+
+**One of my new checks failed, and the check was wrong, not the paper.** I checked action-use
+per seed, but the paper quotes the **range** `0.740--0.761`; seed 3's `0.748` sits inside it and is
+never written down. Changed to check the endpoints. A guard that fails on a correct paper is worse
+than no guard, because it trains you to ignore it.
+
+**50/50 checks pass.** Archive rebuilt and re-verified in a clean extraction: 15 pages, 0 errors.
