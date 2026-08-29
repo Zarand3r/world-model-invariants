@@ -5673,3 +5673,50 @@ the same terms as F2.
 ### Status
 
 Awaiting approval. Estimated 2-4 GPU-hours, no training required.
+
+## 2026-08-29 -- **F5 approved and started. Gate 0 PASSES: the world model can plan.**
+
+Richard approved exploring the control-return direction. F5 preregistered in `docs/F5_PREREG.md`
+before any number existed.
+
+### Infrastructure
+
+`latent_noether/planning_readout.py` -- the validated numpy pixel readout ported to torch, because
+CEM evaluates thousands of imagined frames per control step and the numpy path would dominate
+runtime. **Pinned by `tests/test_planning_readout.py`**, which asserts agreement with
+`decode_physics` on real rendered frames from both datasets; a silent divergence there would be
+invisible in every planning number downstream.
+
+`scripts/run_f5_planning.py` -- CEM over the world model, **no actor-critic trained**. Design points
+that matter:
+
+- Arms differ **only** in the direction of an equal-size latent edit, using the **direction-matched**
+  step `z <- z - eps*sign(C - C_target)*gradC/||gradC||`, never the level-set projection. The
+  projection is scale-invariant in `C` -- exactly the defect the 2026-08-26 audit found in the
+  published paper's null -- so using it here would have reproduced that mistake in a new experiment.
+- The **balance** arm *supplies* the source term rather than learning it. A planner knows its own
+  action, so the target accumulates `tau * thetadot * dt` from the planned torque and the thetadot it
+  decodes as it goes. This is why F5 does not depend on F1's blocked extraction.
+- Return is scored from the **simulator's true state**, never the model's own decode, so the model
+  cannot score its own success.
+- Episode targets `E*` and seeds are drawn **once** and shared by every arm and model, so arms never
+  differ by task.
+
+### Gate 0 -- can this model plan at all?
+
+Registered as: plain imagination must beat a random-action policy by a margin excluding zero over 20
+episodes. Comparison is paired, since targets and seeds are shared.
+
+| | mean return | median |
+|---|---|---|
+| CEM over the world model | **-0.341** | -0.139 |
+| random actions | -1.987 | -0.676 |
+
+**Paired difference +1.646, 95% CI [+0.503, +2.789], excludes zero. Better on 14 of 20 episodes.
+G0 PASSES.**
+
+This is a real result in its own right and was not guaranteed: a world model trained **only on
+pixels**, with no reward, no policy and no actor-critic, supports competent planning on a task it
+never saw. Two random-policy episodes hit the speed clip; none of the planned episodes did.
+
+The five-arm comparison is now running on seed 3. **Nothing is claimed about the arms yet.**
