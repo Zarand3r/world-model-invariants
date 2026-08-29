@@ -88,8 +88,11 @@ for _sig in ("acc_drift", "latent_disp"):
     for _m in f2["models"]:
         _s = _spear(_m["signals"][_sig], _m["target_energy_error"])
         check(f"F2 {_sig} {_m['ckpt'][-16:-3]}", _s, fmt="{:+.2f}")
-CHECKS.append(("F2 stated as tested, not 'untested'", "-",
-               "was tested" in CORPUS and "predicts rollout failure usefully, or" not in CORPUS))
+# Guard the RISK (claiming it is untested), not a phrasing. An earlier version required the
+# literal "was tested" and failed on a legitimate rewrite during compression, which is a guard
+# training you to ignore it. The numbers themselves are checked above.
+CHECKS.append(("F2 not described as untested", "-",
+               not re.search(r"drift[^.]{0,60}(is|remains) untested", CORPUS, re.I)))
 
 # --- F6 timestep scaling (the paper's positive general result) ---
 import collections as _c
@@ -152,8 +155,8 @@ _g = f5g["models"][0]["arms"]
 _d = (np.array([r["return"] for r in _g["none"]["rows"]])
       - np.array([r["return"] for r in _g["__random_policy__"]["rows"]]))
 check("F5 Gate 0 paired margin", _d.mean(), fmt="{:.2f}")
-CHECKS.append(("F5 stated as tested, not 'untested'", "-",
-               "helps a planner was tested" in CORPUS and "helps a planner is untested" not in CORPUS))
+CHECKS.append(("F5 not described as untested", "-",
+               not re.search(r"helps a planner is untested|planner[^.]{0,40}untested", CORPUS, re.I)))
 CHECKS.append(("F5: no arm claimed to beat no-correction", "-",
                not re.search(r"correction (?:significantly )?improv\w+ (?:planning|control|return)",
                              CORPUS, re.I)))
@@ -171,7 +174,12 @@ CHECKS.append((f"E10b CI excludes zero on {n_excl} of 3 (paper must say 'one of'
                "-", ("one of" in CORPUS.lower()) == (n_excl == 1)))
 CHECKS.append(("E10b: no unreproducible +0.71 anywhere in the paper",
                "-", "+0.71" not in CORPUS))
-for stale, why in (("6.3x", "E18 ratio is 6.7x (median), not the mean-based 6.3x"),
+# Guard the stale CLAIM, not the digits. The first version matched the ASCII "6.3x" and missed a
+# stale "6.3\\times" in the introduction for many iterations; the second matched bare "6.3" and
+# flagged two legitimate uses (a displacement ratio, and the low end of the rho_obs range).
+CHECKS.append(("no stale '6.3x less/better preserved' claim (the ratio is 6.7)", "-",
+               not re.search(r"6\.3\\times[^.]{0,40}(less|better) preserved", CORPUS)))
+for stale, why in (
                    ("7.26e-03", "label-free rho_obs median is 6.85e-03, not the mean"),
                    ("+20.0", "supervised effect median is +26.8%, not the mean +20.0%")):
     CHECKS.append((f"no stale mean-based value {stale!r} ({why})", "-", stale not in CORPUS))

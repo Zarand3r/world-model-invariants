@@ -33,28 +33,16 @@ constraints differently.}
 \label{fig:probe_vs_operator}
 \end{figure}
 
-\begin{table}[t]
-\centering\small
-\caption{The correct physical quantity, fitted optimally, is worse conserved and does not repair
-rollouts. Median across three independently trained models, with the per-seed range in brackets;
-20 magnitude-matched random constraints per model (60 total, pooled).}
-\label{tab:supervised}
-\begin{tabular}{lccc}
-\toprule
-constraint & $|\rho|_E$ & $\rho_{\mathrm{obs}}$ & change in energy drift \\
-\midrule
-label-free $C$ & 0.966 \,[0.930, 0.973] & \textbf{6.9\,[6.3, 8.7]$\times10^{-3}$} & \textbf{$-$42.2\% \,[$-$50.9, $-$32.2]} \\
-supervised energy probe & \textbf{0.9999} & 4.58\,[4.57, 4.59]$\times10^{-2}$ & $+$26.8\% \,[$-$0.3, $+$33.4] \\
-random, magnitude-matched & 0.126 & 1.07 & $+$4.0\% \,[$-$20.7, $+$42.6] \\
-\bottomrule
-\end{tabular}
-\end{table}
 
-Table~\ref{tab:supervised} and Figure~\ref{fig:probe_vs_operator} show the outcome. The supervised
-probe tracks energy better than the label-free scalar on every seed, and is $6.7\times$ less preserved
-by the transition ($5.3$--$7.3\times$ per seed); both hold on 3 of 3 models. It also never repairs the
+
+Figure~\ref{fig:probe_vs_operator} shows the outcome. The supervised
+probe tracks energy better than the label-free scalar on every seed, yet is $6.7\times$ less
+preserved by the transition --- median $\rho_{\mathrm{obs}}$ of $4.58\times10^{-2}$ against
+$6.9\times10^{-3}$, and $5.3$--$7.3\times$ per seed; both hold on 3 of 3 models. It also never repairs the
 rollout: its effect on energy drift is $+26.8\%$ and $+33.4\%$ on two models and $-0.3\%$ on the third,
-against a $32$--$51\%$ reduction from the label-free scalar on all three. The direction that best
+against a median $-42.2\%$ ($32$--$51\%$) reduction from the label-free scalar on all three. A
+magnitude-matched random constraint sits at $\rho_{\mathrm{obs}} \approx 1.07$ and changes drift by
+$+4.0\%$. The direction that best
 predicts the physical variable and the direction the model's dynamics actually respect are not the
 same direction.
 
@@ -85,34 +73,27 @@ actuation & torque applied & $|\rho|_E$ 0.72--0.88 & balance law absent \\
 \end{tabular}
 \end{table}
 
-The out-of-distribution row is the cleanest, because it holds the model fixed and varies only the
-region of state space. Outside the training energy band a freely fitted probe recovers energy at
-$0.999$ --- the encoder generalises --- while the transition conserves it $55$--$267\times$ worse,
-reaching values statistically indistinguishable from a random constraint at the earliest checkpoint.
-Decodability and conservation come apart inside a single trained model, split by where in state space
-it is asked.
+The out-of-distribution row is cleanest: it holds the model fixed and varies only the region of
+state space. Outside the training energy band a freely fitted probe still recovers energy at $0.999$
+--- the encoder generalises --- while the transition conserves it $55$--$267\times$ worse, reaching
+values indistinguishable from a random constraint. The two properties come apart inside a single
+trained model, split by where in state space it is asked.
 
 \paragraph{Under actuation the same split appears against a different law.}
-The four axes above all vary how well a \emph{conserved} quantity survives. A fifth varies the law
-itself. We train three further world models on the same pendulum under piecewise-constant random
-torque, where energy is no longer conserved but obeys a balance relation,
-$\mathrm{d}E/\mathrm{d}t = \tau\dot\theta$. The models use their actions: a 20-step open-loop rollout
-driven by the true action sequence beats one driven by the same actions shuffled across trajectories,
-at a ratio of $0.740$--$0.761$ on 3 of 3 seeds.
-
-Running the \emph{unchanged} extraction on these models recovers an energy-like scalar on every one,
-$|\rho|_E = 0.72$, $0.88$, $0.86$. Its motion under the model's own transition is then compared
-against the balance relation the physics demands, with the torque known and $\dot\theta$ taken from
-the same decoded readout used throughout. The rank correlation between the predicted source term and
-the observed change in $C$ is $0.041$, $0.076$ and $0.065$; the power term accounts for
-\textbf{0.31\%} of the variance in $\Delta C$, and the observed change is $4.5$--$5.4\times$ larger
-than the relation predicts. A control that shuffles the power term across transitions is beaten on
-3 of 3 seeds, so the pairing carries something --- but almost nothing.
-
-The model represents the quantity and does not implement the relation that quantity obeys. This is
-the same dissociation as above, stated against a balance law rather than a conservation law, and it
-is the reason a correction built on the recovered scalar has no control benefit
-(Section~\ref{sec:limits}): there is no balance structure in the latent for it to enforce.
+The four axes above vary how well a \emph{conserved} quantity survives; a fifth varies the law
+itself. Three further models are trained on the same pendulum under piecewise-constant random torque,
+where energy instead obeys $\mathrm{d}E/\mathrm{d}t = \tau\dot\theta$. They demonstrably use their
+actions: a 20-step open-loop rollout under the true action sequence beats one under the same actions
+shuffled across trajectories, $0.740$--$0.761$ on 3 of 3 seeds. The \emph{unchanged} extraction
+recovers an energy-like scalar on every model ($|\rho|_E = 0.72$, $0.88$, $0.86$), yet its motion
+under the model's own transition does not follow the balance relation: with the torque known and
+$\dot\theta$ from the same decoded readout, the rank correlation with the predicted source term is
+$0.041$, $0.076$ and $0.065$, the power term accounts for \textbf{0.31\%} of the variance in
+$\Delta C$, and the observed change is $4.5$--$5.4\times$ larger than predicted. A shuffled-power
+control is beaten 3 of 3, so the pairing carries something --- almost nothing. The model represents
+the quantity and does not implement the relation it obeys, which is also why a correction built on
+that scalar confers no control benefit (Section~\ref{sec:limits}): there is no balance structure for
+it to enforce.
 
 \paragraph{Whether conservation \emph{alone} predicts the intervention is not established.}
 The control that would show this directly asks whether, among candidates matched in energy

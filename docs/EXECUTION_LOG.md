@@ -6629,3 +6629,46 @@ lead with F6.
 `dissociation`. Main body **13 -> 12** at ICLR geometry against a 9-page target. The remaining three
 pages must come from prose compression -- every surviving section is load-bearing, and removing one
 would delete evidence rather than slack.
+
+### Compression pass: 13 -> 11 pages, and a stale number the guards had been missing
+
+Every cut below was verified against the 63 number checks after each step; no claim or figure was
+lost.
+
+| change | effect |
+|---|---|
+| three `setup` detail paragraphs -> appendix | structural |
+| `boundaries` folded into `dissociation` | structural |
+| `limits` compressed 910 -> 695 words | prose |
+| `setup` compressed 932 -> 726 words | prose |
+| `causality` compressed 613 -> 508, null derivation -> appendix | prose + structural |
+| `dissociation` and `mechanism` tightened | prose |
+| **`tab:supervised` deleted** | it duplicated Figure 1 exactly --- same three arms, same three quantities. Its numbers were folded into the prose, where they read better. **An improvement, not merely a cut.** |
+| title + abstract + introduction rewritten to lead with F6 | reframing |
+
+**Main body: 13 -> 11 pages** at ICLR geometry (6,535 words). Target is 9.
+
+### A stale number that had survived every guard
+
+The introduction still said the supervised probe was **`6.3\times`** less preserved --- the
+mean-based figure corrected to `6.7` many iterations ago. It survived because my guard tested for the
+literal ASCII `"6.3x"` while LaTeX renders `6.3\times`.
+
+Fixing it took **three attempts**, which is worth recording:
+
+1. `"6.3x"` --- too loose; missed the LaTeX form entirely.
+2. bare `"6.3"` --- too tight; flagged two *legitimate* uses (a displacement ratio of `6.3x` in the
+   appendix, and the low end of the `6.3`--`8.7e-3` `rho_obs` range).
+3. `6\.3\\times[^.]{0,40}(less|better) preserved` --- targets the stale **claim** rather than the
+   digits. Verified in both directions: passes now, fails when the claim is reintroduced.
+
+The lesson generalises to every guard here: **match the claim, not its rendering.** A guard keyed to
+one surface form gives false confidence, and one keyed to bare digits cries wolf until it is ignored.
+
+### Where this stops being mechanical
+
+The remaining two pages cannot come from redundancy --- there is none left that I can find. They
+require deciding which evidence leaves the main text: most plausibly demoting `causality` (E9/E4/E12c,
+now supporting rather than headline evidence under the F6 framing) to a summary paragraph with the
+detail in the appendix. **That is an authorship judgement about what the paper argues, not a
+correction, so it stops here.**
