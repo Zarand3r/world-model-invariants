@@ -128,6 +128,8 @@ drift out of the prose. A claim resting on n = 1 is flagged, not omitted.
 | Second architecture, longer-trained (F4b) | model seeds | 3 | n>=3 |
 | F5 control return (NEGATIVE) | model seeds | 3 | n>=3 |
 | F1 balance law under action (NEGATIVE) | model seeds | 3 | n>=3 |
+| F3 constraint residual (NEGATIVE) | model seeds | 3 | n>=3 |
+| F6 timestep scaling (POSITIVE) | model seeds | 3 | n>=3 |
 
 ---
 

@@ -38,6 +38,7 @@ f5g = load("f5_gate0.json")
 f1b = load("f1_balance_measured.json")
 f1a = load("f1_action_use.json")
 f3 = load("f3_constraint.json")
+f6 = load("f6_models.json")
 lf  = [m["unsupervised"] for m in e18["models"]]
 sup = [m["supervised"] for m in e18["models"]]
 at  = lambda m, c: next(r for r in m["sweep"] if r["c"] == c)
@@ -89,6 +90,30 @@ for _sig in ("acc_drift", "latent_disp"):
         check(f"F2 {_sig} {_m['ckpt'][-16:-3]}", _s, fmt="{:+.2f}")
 CHECKS.append(("F2 stated as tested, not 'untested'", "-",
                "was tested" in CORPUS and "predicts rollout failure usefully, or" not in CORPUS))
+
+# --- F6 timestep scaling (the paper's positive general result) ---
+import collections as _c
+_by = _c.defaultdict(list)
+for _m in f6["models"]:
+    _by[_m["dt"]].append(_m)
+for _dt in sorted(_by):
+    _r0 = float(np.median([z["rho_obs_at_r0"] for z in _by[_dt]]))
+    _r1 = float(np.median([z["rho_obs_at_r1"] for z in _by[_dt]]))
+    # the paper quotes these to the precision it uses: 2 dp for the small ones, 1 dp for 13.5
+    check(f"F6 separation dt={_dt}", _r0 / _r1, fmt=("{:.1f}" if _r0 / _r1 >= 10 else "{:.2f}"))
+_x = np.array([m["dt"] for m in f6["models"]]); _y = np.array([m["c_recovered"] for m in f6["models"]])
+_slope0 = float((_x @ _y) / (_x @ _x))
+_res = _y - _slope0 * _x
+_se0 = float(np.sqrt(((_res ** 2).sum() / (len(_x) - 1)) / (_x @ _x)))
+check("F6 origin-forced slope", _slope0, fmt="{:.3f}")
+check("F6 origin-forced slope CI", 1.96 * _se0, fmt="{:.3f}")
+_exact = sum(1 for m in f6["models"] if abs(m["argmin_r"] - 1.0) < 1e-9)
+CHECKS.append((f"F6 argmin exactly at r=1 on {_exact} of {len(f6['models'])} models", "-",
+               f"{_exact} of {len(f6['models'])}" in CORPUS or f"{_exact} of\n12" in CORPUS))
+_p4 = sum(1 for m in f6["models"] if m["rho_obs_at_rm1"] > m["rho_obs_at_r1"])
+CHECKS.append((f"F6 wrong-sign control beaten {_p4}/12", "-", _p4 == len(f6["models"])))
+CHECKS.append(("F6 registered P3 failure is stated", "-",
+               "registered failure" in CORPUS.lower() or "excludes zero" in CORPUS.lower()))
 
 # --- F3 constraint-residual bound (registered NEGATIVE; A1 gate fired) ---
 _r = sorted(m["rho_G_Gtrue"] for m in f3["models"])

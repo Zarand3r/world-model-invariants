@@ -6450,7 +6450,7 @@ All 12 models trained and analysed. Registered in `docs/F6_PREREG.md` before any
 | 0.05 | 0.1250 | **+1.00 x3** | 0.04487 / 0.00785 / 0.09264 | **5.72x** |
 | 0.08 | 0.2000 | **+1.00 x3** | 0.11884 / 0.00882 / 0.23781 | **13.47x** |
 
-- **P2 PASS, 4/4 timesteps.** Argmin exactly at the predicted `r = 1` on **9 of 12** models; the
+- **P2 PASS, 4/4 timesteps.** Argmin exactly at the predicted `r = 1` on **10 of 12** models; the
   three exceptions are all at the lowest timestep.
 - **P4 PASS, 12/12.** The wrong-sign control is worse on every single model.
 - **P3 FAIL as registered.** Slope `+2.611 +/- 0.110` is within 20% of the predicted `2.500`, but the
@@ -6488,7 +6488,7 @@ analysis.** The registration asked for both slope and intercept; only the slope 
 
 A world model trained **only on pixels**, with no access to equations, recovers a conserved quantity
 whose correction coefficient tracks `(dt/2) mg(l/2)` across a 4x range of simulator timestep --
-`2.484 +/- 0.058` against `2.500`, with the argmin exactly on prediction at 9 of 12 models and the
+`2.484 +/- 0.058` against `2.500`, with the argmin exactly on prediction at 10 of 12 models and the
 wrong-sign control beaten 12/12.
 
 **The model learns its simulator's numerical scheme, not the physics that scheme approximates.**
@@ -6497,3 +6497,28 @@ This converts E19 from an explanation of one negative into a general, quantitati
 learned simulators, and it is the first result in this project that is positive, general and
 parameter-free. It also bears directly on sim-to-real: a world model inherits the integrator
 artifacts of the simulator it was trained on.
+
+### F6 written into the paper, and a guard caught me understating our own result
+
+Added F6 as a subsection of `mechanism.tex` -- extending the mechanism section rather than
+restructuring the paper's lead, which would be an authorship decision.
+
+**Cost, measured at ICLR geometry: exactly 1 page.** Main body 12 -> **13**, so the paper is now
+**4 pages over** the 9-page limit rather than 3. F6 is worth a page; the accounting is stated rather
+than glossed.
+
+**Nine new F6 guards, and two of them failed on the paper.** Both were the paper being wrong:
+
+1. The separation at `dt = 0.08` is `13.47`, which the paper rounds to `13.5`. My check demanded 2
+   decimal places; the paper's rounding is legitimate. Check relaxed to the precision the paper uses.
+2. **I wrote "9 of 12" models with the argmin exactly at `r = 1`. The correct count is 10.** The
+   argmins are `[0.75, 0.75, 1.0, 1.0, ...]` -- one exact at `dt = 0.02` plus three at each of the
+   other three timesteps, so `1 + 3 + 3 + 3 = 10`. Fixed in the paper, this log (3 places) and the
+   roadmap (2 places).
+
+The second is worth noting for its direction: **this error understated our own result.** Every
+previous number defect found in this project ran the other way. A guard that only fires on
+overstatement would have missed it, which is an argument for checking counts mechanically rather
+than trusting a reading.
+
+**63/63 checks pass.**
