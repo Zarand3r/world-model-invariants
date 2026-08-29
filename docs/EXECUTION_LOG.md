@@ -6002,3 +6002,18 @@ question is settled with the instrument the paper already validates.
 
 Whether this belongs in the manuscript is a claim addition rather than a correction, so it is left
 for Richard. It would be a natural extension of Section 4's axes: a fifth axis, actuation.
+
+
+### Documentation brought in line with F1's resolution
+
+`ROADMAP.md`'s execution-status table still listed F1 as **IN PROGRESS -- analysis blocked**, which
+stopped being true when amendment 5 answered the question. Updated to **DONE -- NEGATIVE, n = 3**
+with the numbers, the reason the bespoke extractor was abandoned rather than repaired a fourth time,
+and the two consequences: the dissociation extends to the actuated setting, and F5's negative has a
+second explanation.
+
+`RESULTS.md` regenerated. The evidence-base guard now carries **15 claims, every one at n >= 3**, with
+four of them negatives (E10b, F2, F5, F1). 39/39 mechanical checks pass.
+
+Nothing else is runnable without a decision. The only open item is whether F1's result enters the
+manuscript as a fifth dissociation axis, which is a claim addition rather than a correction.
