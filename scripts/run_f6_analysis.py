@@ -53,9 +53,58 @@ def run(ckpt, data, dt):
             "rho_obs_at_r0": next(x["rho_obs"] for x in sweep if x["r"] == 0.0)}
 
 
+def summarize(recs):
+    """P2, P3 and P4 as registered. P3 is the headline: a parameter-free line through the origin."""
+    import collections
+    by_dt = collections.defaultdict(list)
+    for r in recs:
+        by_dt[r["dt"]].append(r)
+    print(f"\n  {'dt':>6} {'pred c*':>8} {'argmin r per seed':>22} {'P2 hit':>7} "
+          f"{'rho_obs r=0 / r=1 / r=-1 (median)':>36}")
+    p2_ok = 0
+    for dt in sorted(by_dt):
+        rs = by_dt[dt]
+        args = [x["argmin_r"] for x in rs]
+        hit = sum(1 for a in args if abs(a - 1.0) <= 0.25 + 1e-9)      # 1.0 or adjacent grid point
+        p2_ok += hit >= 2
+        med = lambda k: float(np.median([x[k] for x in rs]))
+        print(f"  {dt:6} {c_star(dt):8.4f} {str([f'{a:+.2f}' for a in args]):>22} {hit:>4}/{len(rs)} "
+              f"{med('rho_obs_at_r0'):11.5f} /{med('rho_obs_at_r1'):9.5f} /{med('rho_obs_at_rm1'):9.5f}")
+    print(f"\n  P2 (argmin at r=1 or adjacent, >=2 of 3 seeds): {p2_ok}/{len(by_dt)} timesteps "
+          f"-> {'PASS' if p2_ok >= 3 else 'FAIL'} (bar: >=3 of 4)")
+
+    x = np.array([r["dt"] for r in recs]); y = np.array([r["c_recovered"] for r in recs])
+    n = len(x)
+    if len(set(x.tolist())) < 2:
+        # a slope-and-intercept fit needs at least two distinct timesteps; with one the design
+        # matrix is singular. Report rather than crash, so partial runs can still be inspected.
+        print(f"\n  P3 skipped: only {len(set(x.tolist()))} distinct dt among {n} models")
+        return {"P2_timesteps_passing": p2_ok, "P3_pass": None, "n_models": n}
+    A = np.vstack([x, np.ones_like(x)]).T
+    (slope, inter), res, *_ = np.linalg.lstsq(A, y, rcond=None)
+    yhat = A @ np.array([slope, inter]); dof = max(n - 2, 1)
+    s2 = float(((y - yhat) ** 2).sum() / dof)
+    cov = s2 * np.linalg.inv(A.T @ A)
+    se_s, se_i = float(np.sqrt(cov[0, 0])), float(np.sqrt(cov[1, 1]))
+    print(f"\n  P3 scaling law, c_recovered = slope * dt + intercept, over {n} models:")
+    print(f"    slope     {slope:+.3f} +/- {1.96*se_s:.3f}   (predicted 2.500; within 20%? "
+          f"{abs(slope-2.5) <= 0.5})")
+    print(f"    intercept {inter:+.5f} +/- {1.96*se_i:.5f}  (CI contains 0? "
+          f"{abs(inter) <= 1.96*se_i})")
+    p3 = abs(slope - 2.5) <= 0.5 and abs(inter) <= 1.96 * se_i
+    print(f"    P3 -> {'PASS' if p3 else 'FAIL'}")
+
+    p4 = sum(1 for r in recs if r["rho_obs_at_rm1"] > r["rho_obs_at_r1"])
+    print(f"\n  P4 (wrong-sign r=-1 worse than r=+1): {p4}/{n} models")
+    return {"P2_timesteps_passing": p2_ok, "P3_slope": slope, "P3_slope_ci": 1.96*se_s,
+            "P3_intercept": inter, "P3_intercept_ci": 1.96*se_i, "P3_pass": bool(p3),
+            "P4_models_passing": p4, "n_models": n}
+
+
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
-    p.add_argument("--ckpts", nargs="+", required=True)
+    p.add_argument("--ckpts", nargs="*", default=[])
+    p.add_argument("--summarize", action="store_true")
     p.add_argument("--out", default="runs/f6_models.json")
     a = p.parse_args()
     op = pathlib.Path(a.out)
@@ -70,6 +119,8 @@ if __name__ == "__main__":
               f"rho_obs r=1 {r['rho_obs_at_r1']:.5f} vs r=0 {r['rho_obs_at_r0']:.5f} vs r=-1 {r['rho_obs_at_rm1']:.5f}",
               flush=True)
         out["models"].append(r); op.write_text(json.dumps(out, indent=1) + "\n")
+    if a.summarize and out["models"]:
+        out["summary"] = summarize(out["models"])
     attach(out, op, inputs=inputs_from_args(a))
     op.write_text(json.dumps(out, indent=1) + "\n")
     print(f"wrote {op}")
