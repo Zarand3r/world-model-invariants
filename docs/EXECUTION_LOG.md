@@ -6895,3 +6895,47 @@ This is the third time in this project that a guard has looked like protection w
 ASCII `6.3x` match, the phrase-brittle F2/F5 checks, and now this). The recurring lesson is that
 **a guard must be tested by breaking the thing it guards**, and that a negative control is worthless
 if you commit before reading its output.
+
+## 2026-08-29 -- **Mutation-testing the guards: one real weakness, and a false alarm I raised myself**
+
+Having found three guards that did not guard, I audited all 70 rather than wait to trip over a
+fourth. The audit flagged **20 of 51 numeric checks** as able to pass for the wrong reason --- their
+expected string is short or common. The worst: the E19 wrong-sign check looks for `"12"`, which
+appears **30 times** in the corpus as "12-dimensional", "12 models" and so on.
+
+### The false alarm, and why I raised it
+
+I then ran mutations and reported that **all three passed** --- that the guards do not catch their
+claims being falsified. **That was wrong, and it was my test that was broken, twice.**
+
+- First round: I mutated `6.7\times` in `dissociation.tex` only. The same claim also appears in
+  `abstract.tex` and `introduction.tex`, so the anchored check correctly still found it.
+- Second round: I mutated `"slope of $2.484"`, missing the conclusion's `"slope 2.484"` without the
+  *of*. Same mistake in a new costume.
+
+This is precisely the trap `cppgpt/tools/mutate.sh` documents --- *"verifies the mutation applied
+before running the test; a sed that matches nothing otherwise survives every time and looks like a
+test gap"* --- and I hit it even after quoting it. Verifying that a mutation applied **somewhere** is
+not enough; it has to apply **everywhere the claim appears**.
+
+### What is actually true, tested properly
+
+Mutating **every** occurrence of the value:
+
+| check | kind | mutation result |
+|---|---|---|
+| E18 `rho_obs` ratio | anchored | **FAIL** (correct) |
+| E19 wrong-sign control | anchored | **FAIL** (correct) |
+| F6 origin-forced slope | anchored | **FAIL** (correct) |
+| F4b degradation | presence-only | **PASS** --- does not catch it |
+
+**The four anchored checks work. The 43 presence-only checks do not**, and that is now visible: they
+are labelled `[presence only]` in the output, so "70/70 pass" can no longer be read as "70 claims
+verified". `check()` gained a `near=` parameter that ties a value to the claim it belongs to.
+
+### What I have been over-claiming
+
+I have repeatedly cited "N/N checks pass" as evidence the paper's numbers are verified. For the
+anchored checks that is true. For the presence-only majority it means only that the digits occur
+somewhere in the corpus --- weaker than I implied. The labels now say so, and the remaining anchors
+should be added as the claims they guard are touched.

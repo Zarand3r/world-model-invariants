@@ -49,9 +49,23 @@ sup = [m["supervised"] for m in e18["models"]]
 at  = lambda m, c: next(r for r in m["sweep"] if r["c"] == c)
 
 CHECKS = []
-def check(label, value, *, fmt="{:.1f}", must_appear=None):
+def check(label, value, *, fmt="{:.1f}", must_appear=None, near=None):
+    """Assert the formatted value appears in the corpus -- optionally NEAR its claim.
+
+    Without `near`, this only asserts the digits occur somewhere. Mutation testing on 2026-08-29
+    showed that is far weaker than it looks: changing "6.7x less preserved" to "9.9x less preserved"
+    in the paper still PASSED, because "6.7" occurs elsewhere. Three of three mutations passed.
+
+    `near` supplies a regex anchoring the value to the claim it belongs to, so falsifying the claim
+    makes the check fail. Headline numbers use it; a check without it is presence-only and its label
+    says so.
+    """
     s = must_appear if must_appear is not None else fmt.format(value)
-    CHECKS.append((label, s, s in CORPUS))
+    if near is None:
+        CHECKS.append((label + " [presence only]", s, s in CORPUS))
+    else:
+        pat = near.replace("VALUE", re.escape(s))
+        CHECKS.append((label, s, bool(re.search(pat, CORPUS, re.S | re.I))))
 
 # --- E18 ---
 check("E18 label-free rho_obs median (6.9e-3)", st.median(r["rho_obs"] for r in lf) * 1e3, fmt="{:.1f}")
@@ -59,14 +73,16 @@ check("E18 supervised rho_obs median (4.58e-2)", st.median(r["rho_obs"] for r in
 check("E18 label-free effect median", st.median(r["effect_pct"] for r in lf), fmt="{:.1f}")
 check("E18 supervised effect median", st.median(r["effect_pct"] for r in sup), fmt="{:.1f}")
 check("E18 rho_obs ratio sup/lf",
-      st.median(r["rho_obs"] for r in sup) / st.median(r["rho_obs"] for r in lf), fmt="{:.1f}")
+      st.median(r["rho_obs"] for r in sup) / st.median(r["rho_obs"] for r in lf), fmt="{:.1f}",
+      near=r"VALUE\\times[^.]{0,40}less\s+preserved")
 
 # --- E19 ---
 phys = e19["physics_P1"]
 check("E19 physics improvement at c*", phys["improvement_x"], fmt="{:.0f}")
 check("E19 shadow coefficient", CS, fmt="{:.3f}")
 wrong = [at(m, -CS)["rho_obs"] / at(m, CS)["rho_obs"] for m in e19["models"]]
-check("E19 wrong-sign control (median, NOT best seed)", st.median(wrong), fmt="{:.0f}")
+check("E19 wrong-sign control (median, NOT best seed)", st.median(wrong), fmt="{:.0f}",
+      near=r"VALUE\\times[^.]{0,60}worse")
 red = sorted(at(m, 0.0)["rho_obs"] / at(m, CS)["rho_obs"] for m in e19["models"])
 check("E19 P3 reduction range low", red[0], fmt="{:.1f}")
 check("E19 P3 reduction range high", red[-1], fmt="{:.1f}")
@@ -131,7 +147,8 @@ _x = np.array([m["dt"] for m in f6["models"]]); _y = np.array([m["c_recovered"] 
 _slope0 = float((_x @ _y) / (_x @ _x))
 _res = _y - _slope0 * _x
 _se0 = float(np.sqrt(((_res ** 2).sum() / (len(_x) - 1)) / (_x @ _x)))
-check("F6 origin-forced slope", _slope0, fmt="{:.3f}")
+check("F6 origin-forced slope", _slope0, fmt="{:.3f}",
+      near=r"slope[^.]{0,60}VALUE")
 check("F6 origin-forced slope CI", 1.96 * _se0, fmt="{:.3f}")
 _exact = sum(1 for m in f6["models"] if abs(m["argmin_r"] - 1.0) < 1e-9)
 CHECKS.append((f"F6 argmin exactly at r=1 on {_exact} of {len(f6['models'])} models", "-",
@@ -143,7 +160,8 @@ CHECKS.append(("F6 registered P3 failure is stated", "-",
 
 # --- F3 constraint-residual bound (registered NEGATIVE; A1 gate fired) ---
 _r = sorted(m["rho_G_Gtrue"] for m in f3["models"])
-check("F3 rho(G,Gtrue) low", _r[0], fmt="{:.3f}")
+check("F3 rho(G,Gtrue) low", _r[0], fmt="{:.3f}",
+      near=r"correlates[^.]{0,80}VALUE")
 check("F3 rho(G,Gtrue) high", _r[-1], fmt="{:.3f}")
 CHECKS.append((f"F3 A1 failed on all {len(f3['models'])} models (gate fired)", "-",
                not any(m["A1_pass"] for m in f3["models"])))
