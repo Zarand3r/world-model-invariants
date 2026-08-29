@@ -6269,3 +6269,53 @@ The paper needs a venue template applied and then compressing by roughly 2-3 pag
 substantive editorial pass -- deciding what to cut is an authorship judgement, not a correction --
 so it is left for Richard. `setup` (1,176 words) and `dissociation` (996) are the largest sections
 and the most likely sources of slack.
+
+## 2026-08-29 -- **Length blocker measured properly: 12 pages against a 9-page limit**
+
+Loop iteration. No jobs, no new artefacts. Last iteration I called the paper "at or over" the limit
+**by estimate**. Estimating was not good enough, and my follow-up guess -- that `article` defaults
+might make it *shorter* under a venue style -- was also wrong. `main.tex` sets
+`\usepackage[margin=1in]{geometry}`, giving a **6.5in** text block; ICLR's is **5.5in**, i.e.
+**narrower**, so the paper gets **longer**, not shorter.
+
+### Measured, by recompiling a copy at ICLR-like geometry
+
+| geometry | total | main body |
+|---|---|---|
+| current, `margin=1in` (6.5in x 9in) | 16 | **11** |
+| ICLR-like (5.5in x 9in) | 18 | **12** |
+
+**Main body 12 pages against a 9-page limit (ICLR, NeurIPS) or 8 (ICML). Three pages over -- a ~25%
+cut.** That is the largest concrete obstacle to submission in this project, and it is not a judgement
+call: it is a measurement.
+
+### Per-section cost, measured by removal
+
+Recompiled with each section dropped in turn:
+
+| section | cost (pages) |
+|---|---|
+| **setup** | **2.0** |
+| **dissociation** | **2.0** |
+| introduction | 1.0 |
+| mechanism | 1.0 |
+| causality | 1.0 |
+| boundaries | 1.0 |
+| limits | 1.0 |
+| related | 1.0 |
+| conclusion | 0.0 |
+
+`setup` and `dissociation` are the only two-page sections and together account for a third of the
+body. `conclusion` costs nothing measurable -- it fits in slack on an existing page -- so cutting it
+would save no space while removing the paper's closing argument.
+
+### What is NOT mine to do
+
+Deciding *what* to cut is authorship, not correction. Three pages is not trimming; it is choosing
+which evidence stops being in the paper. Recorded here with the numbers so the decision can be made
+against measurements rather than impressions.
+
+For the record, the obvious candidates by cost-to-value: `setup` (1,176 words, 2 pages, mostly
+methodology that could move to the appendix, which is unlimited at all three venues) and the
+`boundaries` section (398 words but a full page, and its content overlaps the axes table in
+`dissociation`).
