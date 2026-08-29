@@ -5860,3 +5860,31 @@ practitioner precisely when the method could matter -- long open-loop imaginatio
 control.
 
 Raw rows immutable in `runs/f5_planning.json` and `runs/f5_gate0.json`, both provenance-stamped.
+
+### F5 written into the paper, and the derived documents brought in line
+
+`limits.tex` said "Whether the correction helps a planner **is untested**." That is now **false**, in
+exactly the way the F2 sentence was false before it was corrected on 2026-08-28. Reporting a
+completed test is a correctness fix, not a claim change, and I was over-cautious in deferring it.
+
+The paragraph now reports: the planner works (Gate 0, `+1.65`, CI `[+0.50, +2.79]`); no correction arm
+differs from no correction over 3 models x 20 episodes; the largest effect is `0.0014` against an
+across-episode return SD of `0.575`, i.e. **0.24%** of one episode's spread; all four registered
+predictions failed, including the prediction that the label-free scalar would beat the supervised
+probe. It then gives the measured reason -- the correction shifts imagined energy by `0.3%` of the
+spread the planner ranks plans by, because it acts on accumulated drift and a re-planning controller
+never accumulates any -- and states the boundary this implies: **long open-loop imagination, not
+closed-loop control**, which is the same effect-size limit that defeats F2.
+
+Nothing beyond the evidence was added. No arm is claimed to help.
+
+**Derived documents updated, all generated rather than hand-edited where possible:**
+
+- `verify_paper_numbers.py`: five F5 checks -- largest arm effect, return SD, Gate 0 margin, a guard
+  that fails if "untested" returns, and a guard that fails if any arm is ever claimed to improve
+  planning. **39/39 pass.** The "untested" guard was **verified in both directions**: reinstating the
+  old wording makes it FAIL, and it was restored.
+- `make_results_summary.py` + `RESULTS.md`: F5 listed at **n = 3**.
+- `ROADMAP.md`: F5 added to the execution-status table; the "Not yet attempted" list no longer claims
+  the planner demonstration is unattempted, because it is now a measured negative.
+- arXiv archive rebuilt and re-verified in a clean extraction: **14 pages, 0 errors**.

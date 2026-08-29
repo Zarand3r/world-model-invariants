@@ -126,6 +126,7 @@ drift out of the prose. A claim resting on n = 1 is flagged, not omitted.
 | Supervised-probe dissociation (E18) | model seeds | 3 | n>=3 |
 | Second architecture, conv-GRU (F4) | model seeds | 3 | n>=3 |
 | Second architecture, longer-trained (F4b) | model seeds | 3 | n>=3 |
+| F5 control return (NEGATIVE) | model seeds | 3 | n>=3 |
 
 ---
 

@@ -641,13 +641,13 @@ what happened. Every number is checked mechanically by `scripts/verify_paper_num
 | **E18** supervised probe | **DONE -- headline** | A probe fitted to *true* energy reaches `\|rho_E\| = 0.9999` yet is **6.7x** less conserved by the transition, and **never repairs** (increases drift on 2 of 3, reduces on none) where the label-free scalar repairs 3/3 at median **-42.2%**. |
 | **E19** shadow Hamiltonian | **DONE -- strongest result** | The data comes from a symplectic integrator conserving `H~ = H + O(dt)`, not `H`. Sweeping the target family, `rho_obs` is minimised at **exactly** the coefficient the integrator predicts (`c* = 0.125`, no free parameters), on **3/3** seeds, **591x** better conserved than textbook `E` on ground truth, and correcting that `O(dt)` term flips the intervention from harmful to repairing on every seed. Residual gap to the label-free scalar: **1.10x** -- it accounts for essentially the whole of E18's gap. |
 | **F1** balance laws | **IN PROGRESS -- analysis blocked** | Gate 0 passed (relation closes at 0.017 with shadow + midpoint power; the **textbook** balance law explains almost nothing, residual 0.90). Three seeds trained and accepted. The balance **extractor** is at fault, not the model: the paper's validated search finds energy at `rho = 0.91` on the same latent where the balance fit returns 0.18. **Not a negative about the model.** |
+| **F5** control return | **DONE -- NEGATIVE, n=3** | Gate 0 passes: the world model plans competently with no reward or policy (+1.65, CI [+0.50, +2.79] over random actions). But **no correction arm beats no correction**: largest effect `0.0014` against an across-episode return SD of `0.575`, **0.24%** of one episode's spread, all four registered predictions failed. Reason measured: the correction shifts imagined energy by **0.3%** of the spread the planner ranks plans by, because it acts on *accumulated* drift and a re-planning controller never accumulates any. Same effect-size limit as F2. |
 | **F2** trust signal | **DONE -- NEGATIVE** | Accumulated drift predicts rollout failure at Spearman -0.02 / +0.09 / -0.24, **beaten on 3/3 by plain latent displacement** (+0.27 / +0.29 / +0.31). Registered falsifier fired. |
 | **F4 / F4b** architecture | **DONE** | Conservation transfers to **no** conv-GRU seed: `rho_obs` 4.83--5.55 against the RSSM's ~7e-3, a **767x** gap. 7x more prior training moved the median from 5.33 to 5.26, so **architecture matters, not training amount**. Identification transfers on 2 of 3 under *both* budgets. |
 
 **Not yet attempted:** F3 (released checkpoints / constraint residuals `G(z) = 0`), contacts,
-multiple interacting objects, and any downstream demonstration that the privileged direction helps a
-planner. The last of these is the paper's most reviewer-visible gap and is recorded in
-`paper1.2/sections/limits.tex`.
+and multiple interacting objects. The downstream planner demonstration is **no longer unattempted**:
+F5 tested it at n = 3 and it is a measured negative, recorded in `paper1.2/sections/limits.tex`.
 
 ## Stage 1 — Immediate gates, existing checkpoints
 

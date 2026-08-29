@@ -33,6 +33,8 @@ e18, e19 = load("e18_supervised_baseline.json"), load("e19_shadow_sweep.json")
 f4b = load("f4b_recovery.json")
 e10b = load("e10b_matched_band_pool400.json")
 f2 = load("f2_trust_signal.json")
+f5 = load("f5_planning.json")
+f5g = load("f5_gate0.json")
 lf  = [m["unsupervised"] for m in e18["models"]]
 sup = [m["supervised"] for m in e18["models"]]
 at  = lambda m, c: next(r for r in m["sweep"] if r["c"] == c)
@@ -84,6 +86,24 @@ for _sig in ("acc_drift", "latent_disp"):
         check(f"F2 {_sig} {_m['ckpt'][-16:-3]}", _s, fmt="{:+.2f}")
 CHECKS.append(("F2 stated as tested, not 'untested'", "-",
                "was tested" in CORPUS and "predicts rollout failure usefully, or" not in CORPUS))
+
+# --- F5 (registered NEGATIVE: no control benefit) ---
+_arms = ("none", "conserve", "balance", "probe", "random")
+_ret = {a: np.concatenate([[r["return"] for r in m["arms"][a]["rows"]] for m in f5["models"]])
+        for a in _arms}
+_base = _ret["none"]
+_largest = max(abs(_ret[a].mean() - _base.mean()) for a in _arms[1:])
+check("F5 largest arm effect", _largest, fmt="{:.4f}")
+check("F5 across-episode return SD", _base.std(), fmt="{:.3f}")
+_g = f5g["models"][0]["arms"]
+_d = (np.array([r["return"] for r in _g["none"]["rows"]])
+      - np.array([r["return"] for r in _g["__random_policy__"]["rows"]]))
+check("F5 Gate 0 paired margin", _d.mean(), fmt="{:.2f}")
+CHECKS.append(("F5 stated as tested, not 'untested'", "-",
+               "helps a planner was tested" in CORPUS and "helps a planner is untested" not in CORPUS))
+CHECKS.append(("F5: no arm claimed to beat no-correction", "-",
+               not re.search(r"correction (?:significantly )?improv\w+ (?:planning|control|return)",
+                             CORPUS, re.I)))
 
 # --- E10b (400-pool, the matched-design primary set) ---
 import math

@@ -221,6 +221,7 @@ CLAIMS = [
      ["e18_supervised_baseline.json"]),
     ("Second architecture, conv-GRU (F4)", "model seeds", ["f4_recovery.json"]),
     ("Second architecture, longer-trained (F4b)", "model seeds", ["f4b_recovery.json"]),
+    ("F5 control return (NEGATIVE)", "model seeds", ["f5_planning.json"]),
 ]
 for name, unit, files in CLAIMS:
     n = _n_seeds(files)

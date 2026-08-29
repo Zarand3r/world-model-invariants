@@ -19,8 +19,27 @@ The architecture comparison does not isolate architecture. An open-loop reconstr
 prior--posterior KL are different losses, not the same loss at different strengths, so the conv-GRU
 result narrows the explanation toward the latent design without establishing it.
 
-We show no downstream consequence, and the one use we tested does not work. Whether the correction
-helps a planner is untested. Whether invariant drift predicts rollout failure was tested
+We show no downstream consequence, and both uses we tested fail --- for the same measurable reason.
+
+Whether the correction helps a planner was tested directly. We plan with CEM over the learned world
+model on an energy-targeting task inside the training distribution, scoring return from the
+simulator's true state. The model plans well: it beats a random-action policy by $+1.65$ in mean
+return, 95\% CI $[+0.50, +2.79]$. But no correction arm --- enforcing the recovered scalar, enforcing
+it with the action's power supplied as a source term, enforcing the supervised probe, or a
+magnitude-matched random direction --- differs from no correction at all, over three models and 20
+episodes each. The largest arm effect is $0.0014$ against an across-episode return standard deviation
+of $0.575$: \textbf{0.24\% of one episode's spread}. All four registered predictions failed, including
+the prediction that the label-free scalar would beat the supervised probe.
+
+The reason is measured rather than inferred, and it is structural. The correction acts on
+\emph{accumulated} drift: at the planner's horizon it shifts imagined energy by $0.3\%$ of the spread
+across candidate action sequences, which is the quantity the planner ranks plans by, so it cannot
+change which plan is chosen. Our repair result is measured over 100 autonomous steps; a controller
+that re-plans every step never imagines long enough to accumulate the drift the method removes. This
+bounds where the method can matter --- long open-loop imagination, not closed-loop control --- and it
+is the same effect-size limit that defeats the trust signal below.
+
+Whether invariant drift predicts rollout failure was tested
 directly, and it does not: accumulated drift at rollout step 25 correlates with decoded energy error
 at step 100 at Spearman $-0.02$, $+0.09$ and $-0.24$ across three models, against $+0.27$, $+0.29$
 and $+0.31$ for plain latent displacement $\lVert z_k - z_0 \rVert$, with a random-constraint control
