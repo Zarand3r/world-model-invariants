@@ -6829,3 +6829,25 @@ removed. No dangling cross-references anywhere else --- every `\ref` resolves.
 
 Main text still **9 pages**, **66/66** checks, no errors or undefined references. Transitions checked
 in the **rendered PDF**, not the source, since that is where a reader meets them.
+
+## 2026-08-29 -- **Handoff verified against the records; project at rest**
+
+Step (2) applied to the newest artefact. `docs/REVIEWER_HANDOFF.md` is a document made almost
+entirely of numbers, so it was checked against `runs/` rather than trusted:
+
+| quantity | recomputed | handoff |
+|---|---|---|
+| E18 `rho_obs` ratio | 6.7 | 6.7x |
+| F6 origin-forced slope | 2.484 | 2.484 |
+| F6 slope CI | 0.058 | 0.058 |
+| F6 argmin exactly at `r=1` | 10 | 10 of 12 |
+| F1 variance explained by power | 0.31% | 0.31% |
+| F3 encoding correlation | 0.19 | 0.19 |
+
+**No stale numbers.** The handoff is a derived summary, so it carries the same drift risk as the
+paper; unlike the paper it is not yet under `verify_paper_numbers.py`. That is a known gap, recorded
+rather than papered over: if the handoff outlives this session it should be brought under the same
+guard, or trimmed to point at `docs/RESULTS.md` instead of restating figures.
+
+No jobs, no new run artefacts, nothing uncommitted. Roadmap complete; the paper is in ICLR submission
+format at 9 pages with 66/66 checks passing.
