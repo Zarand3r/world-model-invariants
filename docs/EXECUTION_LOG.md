@@ -5625,7 +5625,7 @@ than findings, and that has been communicated. **Nothing was invented to fill th
 > modified logs, no new artefacts, 34/34 checks green. Deliberately **not** written up as a second
 > entry: a log that repeats "nothing changed" every thirty minutes degrades the record it exists
 > to preserve. Subsequent no-op firings will be counted here rather than appended as entries.
-> **No-op firings since:** 4
+> **No-op firings since:** 23
 
 
 ## 2026-08-28 -- **F5 preregistered: does the privileged direction improve control return? (not yet run)**
@@ -6558,3 +6558,33 @@ and proceeded without needing `--public`.
 
 No experiment run. One provenance gap found and closed the honest way, F6's records verified against
 their registration, and both integrations current with the newest result. 63/63 checks pass.
+
+## 2026-08-29 -- **Judgement: stop adding evidence. The binding constraint is length, not evidence.**
+
+Loop iteration. No jobs, no artefacts, 63/63 checks, 56 tests, 17 claims all at n >= 3.
+
+There **is** an obvious next experiment, and I am recording the decision not to start it.
+
+**F7, the natural follow-up to F6.** F6 shows the recovered coefficient tracks the simulator's
+*timestep*. The stronger claim is that it tracks the *scheme*: train on data from explicit Euler and
+from semi-implicit Euler at the **same** `dt`, and show the recovered invariant matches each one's
+own shadow Hamiltonian. Explicit Euler is not symplectic and has no conserved shadow at all, so the
+prediction is sharp and the two conditions are cleanly separated. It would upgrade "learns the
+timestep" to "learns the integrator", and it is cheap -- the infrastructure exists and F6's models
+train in ~11 minutes each.
+
+**I am not starting it, because more evidence currently has negative marginal value.**
+
+The paper is **4 pages over** a 9-page limit with F6 in it. Every result added without a
+corresponding cut makes the restructuring harder and pushes the strongest result further from the
+lead. F6 already establishes the claim at `n = 3 x 4` timesteps with a parameter-free slope of
+`2.484 +/- 0.058`; a second confirmation would not change whether a reviewer believes it, while one
+more page would.
+
+The binding constraint moved from evidence to structure the moment F6 landed. Continuing to run
+experiments because experiments are what this loop does would be optimising the wrong quantity --
+the same error as adding a sixth dissociation axis, which was declined for the same reason.
+
+**F7 is recorded here as the best next experiment *if and when* the paper has room for it.** The
+right next action is editorial: choose a venue, make F6 the lead, and cut 4 pages. That is Richard's
+call, and it is the only thing standing between this project and a submission.
