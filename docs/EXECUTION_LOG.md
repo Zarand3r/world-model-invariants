@@ -6795,3 +6795,37 @@ extraction cannot build**, since the venue style is not in TeX Live. Rebuilt and
 room: 16 pages, **0 errors, 0 unresolved citations, 0 author leaks**.
 
 **66/66 checks pass.** `origin/main` remains `20fa8b4`.
+
+## 2026-08-29 -- **Coherence pass: the body still read as the old paper**
+
+The mechanical work was finished --- 9 pages, ICLR template, anonymised, 66 checks --- but I had
+rewritten the title, abstract, introduction and conclusion around F6 and compressed six sections in
+the same pass, which is exactly when an argument comes apart at the seams. Read it end to end.
+
+### What was wrong
+
+**The front matter promised one paper and the body delivered another.** The abstract and introduction
+opened on *"we show it learns the integrator"*, but Section 4 still opened as though probing were the
+thesis, and Section 5 was titled *"Why the perfect probe fails"* and framed as merely explaining
+Section 4. A reader would meet an integrator paper and then find a probing paper.
+
+Fixed by signposting rather than reordering --- Section 5 genuinely depends on `rho_obs`, defined in
+Section 4, so reordering would mean rewriting that dependency for no gain the front matter does not
+already deliver:
+
+- Section 4 now opens by naming its role: separating the two properties a probe conflates is the
+  *prerequisite* for asking which quantity the transition preserves, with a forward pointer.
+- Section 5 retitled from *"Why the perfect probe fails"* to **"What the model conserves: the
+  integrator's shadow Hamiltonian"**, and reopened as the payoff --- *"We can now ask the paper's
+  central question"* --- rather than as a footnote to Section 4.
+
+### Also found
+
+`sections/boundaries.tex` was still on disk, no longer included anywhere, its content having been
+folded into `dissociation` and the appendix. A dead section file invites someone re-including it;
+removed. No dangling cross-references anywhere else --- every `\ref` resolves.
+
+### Verification
+
+Main text still **9 pages**, **66/66** checks, no errors or undefined references. Transitions checked
+in the **rendered PDF**, not the source, since that is where a reader meets them.
