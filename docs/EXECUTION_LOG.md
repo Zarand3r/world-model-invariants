@@ -5625,7 +5625,7 @@ than findings, and that has been communicated. **Nothing was invented to fill th
 > modified logs, no new artefacts, 34/34 checks green. Deliberately **not** written up as a second
 > entry: a log that repeats "nothing changed" every thirty minutes degrades the record it exists
 > to preserve. Subsequent no-op firings will be counted here rather than appended as entries.
-> **No-op firings since:** 25
+> **No-op firings since:** 26
 
 
 ## 2026-08-28 -- **F5 preregistered: does the privileged direction improve control return? (not yet run)**
