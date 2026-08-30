@@ -8014,3 +8014,45 @@ account of *why* it holds was wrong, and it was wrong in the pessimistic directi
 - `docs/ROADMAP.md`'s execution table was already corrected when the retraction was logged.
 
 `paper1.2/` prose untouched. `origin/main` unchanged at `20fa8b4`.
+
+---
+
+## 2026-08-30 --- Auditing the handoff's own checkable claims: three verified, two wrong
+
+Having corrected what the handoff *says about the science*, I checked the claims it makes about
+**itself** --- the ones a reviewer would test first, and which I wrote without ever running.
+
+### Verified
+
+| claim | result |
+|---|---|
+| `docs/ARTIFACT_MANIFEST.md` lets a download be checked against the record | **50/50 hashes match**, 0 missing, 0 mismatched |
+| `docs/RESULTS.md` regenerates byte-identically | **yes** (checked in the previous entry) |
+| the arXiv archive "extracts anywhere and compiles standalone" | **yes** --- extracted to a clean directory and built with `tectonic` |
+| "9-page main text (16 with appendix and references)" | **16 pages** confirmed in the built PDF |
+
+The manifest result is worth stating plainly: its whole purpose is that "a download can be checked
+against the record the experiments were run on", and that is only true if the hashes are right. They
+had never been checked. They are right. `scripts/verify_artifact_manifest.py` makes it repeatable.
+
+### Wrong
+
+- **"28 preregistrations"** --- there are **33**. Stale by five, all added on 2026-08-29/30. It
+  understated our own work, which is the direction these errors have gone before (the "9 of 12" that
+  was 10 of 12).
+- **"17 claims, all at n >= 3"** --- not substantiable. `paper1.2/CLAIMS.md` sets out **three**
+  claims. Whatever the 17 counted, it is not recoverable from the documents, so I replaced it with
+  what is checkable rather than restating a number I cannot defend.
+
+### Two tool failures of my own, both caught
+
+Counting the PDF's pages by grepping `/Type /Page` returned **0**, because the PDF uses compressed
+object streams. I reported that as a tool failure rather than as a page count, and re-ran with a real
+PDF reader (`pdfinfo` and `pypdf` agree on 16). Had I reported the 0, it would have looked like a
+broken build.
+
+Earlier the same session, the provenance audit's schema misread produced a false alarm I acted on
+(previous entry). The pattern across the week is consistent enough to name: **my checking tools fail
+about as often as the things they check**, so a tool's output gets the same scrutiny as a result.
+
+`paper1.2/` prose untouched. `origin/main` unchanged at `20fa8b4`.

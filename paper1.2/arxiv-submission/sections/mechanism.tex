@@ -1,8 +1,10 @@
-\section{Why the perfect probe fails}
+\section{What the model conserves: the integrator's shadow Hamiltonian}
 \label{sec:mechanism}
 
-Section~\ref{sec:dissociation} shows the optimal readout of true energy is a poor invariant of the
-model's transition, but not why. The reason is that the probe is fitted to the wrong quantity.
+We can now ask the paper's central question. The transition preserves \emph{something}; the previous
+section shows it is not the optimal readout of true energy. What it preserves is the conserved
+quantity of the \emph{integrator that generated the training data} --- and that identification, not
+the dissociation itself, is what explains why a perfect probe fails.
 
 \paragraph{The data does not conserve textbook energy.}
 Trajectories come from semi-implicit (symplectic) Euler,

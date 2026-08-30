@@ -199,8 +199,16 @@ uv run python scripts/make_results_summary.py   # regenerates docs/RESULTS.md by
 ./scripts/make_arxiv_archive.sh paper1.2        # archive; extract anywhere and it compiles standalone
 ```
 
-**17 claims, all at n >= 3.** 28 preregistrations with falsifiers written before results; amendments
-are dated and state which direction they move the expected outcome. Artifacts: W&B
+**33 preregistrations** with falsifiers written before results; amendments are dated and state which
+direction they move the expected outcome. (This previously read "17 claims, all at n >= 3" and "28
+preregistrations". The count was stale --- five were added on 2026-08-29/30 --- and the "17 claims"
+figure could not be substantiated against `CLAIMS.md`, which sets out **three**, so it is replaced
+here by what is checkable rather than restated.)
+
+**Verified 2026-08-30, having been asserted here unchecked until then:** the 50 artifact hashes in
+`docs/ARTIFACT_MANIFEST.md` all match their local files (50/50, `scripts/verify_artifact_manifest.py`);
+`docs/RESULTS.md` regenerates byte-identically; and the arXiv archive extracts to a clean directory
+and compiles standalone with `tectonic` to a **16-page** PDF, matching the page count claimed above. Artifacts: W&B
 `richardbao419-substrate/world-model-invariants`; Hugging Face `Zarand3r/world-model-invariants`
 (**private**, for double-blind), with `docs/ARTIFACT_MANIFEST.md` giving each file's sha256 and the
 claim it backs.
