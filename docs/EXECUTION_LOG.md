@@ -7965,3 +7965,52 @@ another. Corrected as a derived summary, with no raw rows touched.
 how-to-check block now also lists the mutation harness and the two new audits.
 
 `paper1.2/` untouched. `origin/main` unchanged at `20fa8b4`.
+
+---
+
+## 2026-08-30 --- Correcting my own provenance alarm, and signposting the derived summaries
+
+### I was wrong about `f4b_recovery.json`
+
+Two entries ago I reported that it "records no input paths", and told Richard the published-paper
+assessment's same-data fact "rests on two scripts sharing an argparse default rather than on the
+artefact". **Both statements are wrong.**
+
+`scripts/run_f4_recovery.py` hand-rolls its provenance instead of calling `attach()`, and records
+
+    data: runs/pendulum_pixels.npz
+    data_sha256: 9eed2d0776a17796...
+    ckpts_requested: [5 checkpoints]
+
+which is **stronger** than a bare path --- it pins the file's contents, not just its name. My audit
+looked only for the key `inputs` and reported anything using another schema as recording nothing.
+
+So the audit had a false-**alarm** class, where its earlier defects were false passes. It is the same
+underlying failure as the rest of the week --- a checking tool weaker than the claim it makes --- but
+in the direction that produces an incorrect report rather than a missed one, and I acted on it.
+
+Fixed to recognise `data` and `ckpts_requested` alongside `inputs`. The corrected sweep:
+
+| | before | after |
+|---|---|---|
+| record their inputs | 25 | **30** |
+| stamped with empty inputs | 9 | **5** |
+
+and all five remaining --- `f1_gate0`, `f1_positive_control`, `f1_positive_control_lagged`,
+`f6_physics`, `f7_gate0` --- are **pure simulations with no file inputs**, where empty is correct.
+
+**The corrected conclusion: every artefact that reads files records what it read.** The provenance
+record is complete, and the same-data claim underpinning the published-paper assessment is supported
+by the artefact itself, with a content hash. That assessment's conclusion is unchanged; only my
+account of *why* it holds was wrong, and it was wrong in the pessimistic direction.
+
+### Derived summaries signposted
+
+- `docs/RESULTS.md` **verified to regenerate byte-identically** --- a claim the handoff makes and
+  which I had not checked. It does.
+- `paper1.2/CLAIMS.md` gains a status pointer at the top. **No claim text was altered**: changing
+  what the paper asserts is Richard's decision, but a reader arriving at the claim architecture
+  should not have to reach the handoff to learn the central claim is unattributed.
+- `docs/ROADMAP.md`'s execution table was already corrected when the retraction was logged.
+
+`paper1.2/` prose untouched. `origin/main` unchanged at `20fa8b4`.

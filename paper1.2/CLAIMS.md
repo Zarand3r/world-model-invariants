@@ -3,6 +3,15 @@
 **Not part of the manuscript.** Written first, per the build-by-compression order, so the prose has
 something to serve. Every number below traces to a run record named in `docs/RESULTS.md`.
 
+> **Status, 2026-08-30 — read before using this document.** The claims below are left as written,
+> because changing what the paper asserts is the author's decision. But the central one is currently
+> **unsupported**: the measurements reproduce, and the attribution of the recovered coefficient to
+> the *model* rather than to the *data it was measured on* is **untested**, and not testable by
+> cross-evaluation with the present assets. Four experiments built to settle it were withdrawn as
+> invalid by construction. See **§0 of `docs/REVIEWER_HANDOFF.md`** for what changed and what still
+> stands — the negatives, the dissociation, the `767x` architecture gap and the causal interventions
+> are unaffected.
+
 ## One-sentence central claim
 
 > Decodability is not dynamical structure: a physical quantity can be perfectly readable from a

@@ -36,7 +36,13 @@ def main() -> int:
         prov = d.get("provenance")
         if not prov or not prov.get("runs"):
             unstamped.append(p.name)
-        elif any(r.get("inputs") for r in prov["runs"]):
+        # Some scripts hand-roll their provenance instead of using attach(), recording the data
+        # path under `data` (often with `data_sha256`) and checkpoints under `ckpts_requested`.
+        # An earlier version of this audit looked only for `inputs` and reported those artefacts as
+        # recording nothing -- which led me to tell Richard that f4b_recovery.json's data path was
+        # unrecorded when it is in fact stored WITH a sha256, i.e. better than a bare path.
+        elif any(r.get("inputs") or r.get("data") or r.get("ckpts_requested")
+                 for r in prov["runs"]):
             ok.append(p.name)
         else:
             empty.append(p.name)
@@ -48,7 +54,8 @@ def main() -> int:
           f"older outputs)\n  and cannot carry a provenance dict in this format -- excluded, and "
           f"counted here so the\n  exclusion is visible rather than silent.\n")
     if empty:
-        print("  stamped but recording no inputs -- check whether the script hardcodes its paths:")
+        print("  stamped but recording no inputs under any known key -- check whether the script")
+        print("  hardcodes its paths (attach(inputs=[...])) or uses a schema this audit lacks:")
         for n in empty:
             print(f"    {n}")
         print("\n  A script with no file inputs (a pure simulation) is legitimately empty here.")
