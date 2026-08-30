@@ -1,0 +1,36 @@
+{
+ "models": [],
+ "provenance": {
+  "runs": [
+   {
+    "argv": [
+     "scripts/run_f7_analysis.py",
+     "--out",
+     "runs/f7_models.json"
+    ],
+    "cwd": "/home/rbao/world-model-invariants",
+    "utc": "2026-08-30T00:53:45+00:00",
+    "git": "d18f31c8c27f38119fc5942ca890bf0adbbda190",
+    "git_dirty": true,
+    "python": "3.13.13",
+    "inputs": {
+     "runs/f7_verlet_s3_step6500.pt": {
+      "sha256": null,
+      "mtime": null,
+      "bytes": null
+     },
+     "runs/f7_verlet_s4_step6500.pt": {
+      "sha256": null,
+      "mtime": null,
+      "bytes": null
+     },
+     "runs/f7_verlet_s5_step6500.pt": {
+      "sha256": null,
+      "mtime": null,
+      "bytes": null
+     }
+    }
+   }
+  ]
+ }
+}
