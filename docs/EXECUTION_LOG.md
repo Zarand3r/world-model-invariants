@@ -7457,3 +7457,77 @@ optimum at exactly `c = -0.125`, mirroring the forward scheme's `+0.125` --- was
 training and stands, since it involves no model.
 
 `paper1.2/` untouched. `origin/main` unchanged at `20fa8b4`.
+
+---
+
+## 2026-08-30 --- F8: the imagined-rollout measurement has no power. F6/E19 stay unresolved.
+
+I had been treating this experiment as needing Richard's approval. On reflection that was the wrong
+line: what needs his sign-off is **how far to re-audit or rewrite the paper**, an authorial call.
+Running a control on an existing result --- existing checkpoints, no training, no claim changed ---
+is the same class of work as the six controls already run this week, and withholding it left him
+deciding blind. Preregistered in `docs/F8_PREREG.md` before anything was written.
+
+### The idea
+
+F7's control showed the shared one-step statistic is determined by the evaluation dataset. F8 removes
+the evaluation trajectory: the data supplies only `h_0`, and every later state comes from
+`m.transition`. Semi-implicit-trained and Verlet-trained models roll **from the same real frames**,
+so only the model differs.
+
+### Result at horizon 100 --- uninformative, and my script said otherwise
+
+Rollouts were healthy (imagined spread 1.02--1.06x the real spread, so P2 passed), and the two
+families did not separate: argmins `[+1.50, +1.00, +1.25]` against `[+1.50, +1.25, +2.00]`.
+
+The script printed **"the families do NOT separate: F6/E19 model-side claims fail as F7's did"**.
+That was **wrong**. The sweep contrast across the *whole* `r` grid is **1.12x--1.45x**, against
+roughly **5.7x** for the one-step measure between `r = 0` and `r = 1` alone. With a curve that flat
+the argmin is noise, and "no separation detected" is a statement about the instrument, not the
+models --- the identical error to `run_f6_cross.py`'s verdict yesterday, in a script I wrote *after*
+fixing that one.
+
+Added a contrast gate. **It is post-hoc**, declared as such in amendment 1; it can only withhold a
+conclusion, never create one, and it moves the result from "falsifying" to "uninformative", which is
+the conservative direction. My registered P2 caught a rollout that *collapses* and failed to
+anticipate one that is alive but flat.
+
+### Horizon sweep --- no horizon works
+
+Horizon 1 *is* the confounded one-step statistic; horizon 100 is noise. Amendment 2 swept between.
+
+| `T` | contrast (6 models) | readable (P4) | separates (P5) |
+|---|---|---|---|
+| 2 | all 1.00 | no | no |
+| 3 | 1.11--1.71 | no | no |
+| 5 | 1.48--2.09 | no | (true, but ungated --- grid saturation) |
+| **10** | **1.95--2.56** | **yes** | **no** |
+| 25 | 1.66--2.03 | no | no |
+| 50 | 1.33--1.64 | no | no |
+| 100 | 1.12--1.45 | no | no |
+
+Only `T = 10` passes the power gate, and there the families do not separate. P5 reads "true" at
+`T = 5` but P4 gates it, correctly: those argmins are `+3.00` three times over, i.e. saturation at
+the grid edge rather than a minimum.
+
+**The decisive diagnostic is not the gate.** Within a *single* model, the argmin across horizons is
+`-1.00, +0.25, +3.00, -0.50, +2.00, +2.00, +1.50` --- and **all six models have a spread of exactly
+4.00, the full width of the grid**. A genuine conserved quantity does not move from one end of the
+sweep to the other when the horizon changes. The argmin is noise at every horizon tested.
+
+P6, the confound check that would have had to accompany any readable horizon, was never reached.
+
+### Where this leaves the paper
+
+**Amendment 2's falsifier fires: the imagined-rollout approach cannot adjudicate F6 and E19.**
+
+Both available instruments are now known to be unusable for the model-side claim --- the one-step
+statistic is confounded by the evaluation data, and the imagined-rollout statistic has no power. That
+is **not** a finding that F6 and E19 are false. It is worse in one specific way and better in
+another: there is currently **no valid instrument** for the paper's headline claim, so it cannot be
+substantiated as written, but nothing has shown it to be wrong either.
+
+F6 and E19 remain **unresolved**, now with both obvious routes closed. Anything further needs a
+genuinely different measurement, not another variant of these two.
+
+`paper1.2/` untouched. `origin/main` unchanged at `20fa8b4`.
