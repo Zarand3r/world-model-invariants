@@ -133,8 +133,110 @@
     "rollout_finite": true,
     "pixel_std": 0.0701
    }
+  },
+  {
+   "ckpt": "runs/f7_verlet_s5_step6500.pt",
+   "dt": 0.05,
+   "c_star_predicted": 0.125,
+   "sweep": [
+    {
+     "r": -1.0,
+     "rho_obs": 0.04479701817035675
+    },
+    {
+     "r": -0.5,
+     "rho_obs": 0.02239944040775299
+    },
+    {
+     "r": -0.25,
+     "rho_obs": 0.013328650034964085
+    },
+    {
+     "r": 0.0,
+     "rho_obs": 0.00922858901321888
+    },
+    {
+     "r": 0.25,
+     "rho_obs": 0.013948953710496426
+    },
+    {
+     "r": 0.5,
+     "rho_obs": 0.023342140018939972
+    },
+    {
+     "r": 0.75,
+     "rho_obs": 0.034040313214063644
+    },
+    {
+     "r": 1.0,
+     "rho_obs": 0.04508836939930916
+    },
+    {
+     "r": 1.25,
+     "rho_obs": 0.056373290717601776
+    },
+    {
+     "r": 1.5,
+     "rho_obs": 0.0679120421409607
+    },
+    {
+     "r": 2.0,
+     "rho_obs": 0.09122955054044724
+    },
+    {
+     "r": 3.0,
+     "rho_obs": 0.13816754519939423
+    }
+   ],
+   "argmin_r": 0.0,
+   "c_recovered": 0.0,
+   "rho_obs_at_r1": 0.04508836939930916,
+   "rho_obs_at_rm1": 0.04479701817035675,
+   "rho_obs_at_r0": 0.00922858901321888,
+   "seed": 5,
+   "acceptance": {
+    "found": true,
+    "decode_ratio": 0.007,
+    "rollout_finite": true,
+    "pixel_std": 0.0696
+   }
   }
  ],
+ "summary": {
+  "verlet_argmin_r": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "semi_implicit_argmin_r": [
+   1.0,
+   1.0,
+   1.0
+  ],
+  "verlet_median_r": 0.0,
+  "semi_implicit_median_r": 1.0,
+  "P1_seeds_near_zero": 3,
+  "P1_pass": true,
+  "P2_median_gap": 1.0,
+  "P2_pass": true,
+  "P3_models_acceptable": false,
+  "P3_decode_ratio_ok": true,
+  "P3_rollout_finite_ok": true,
+  "P3_pixel_std_in_F6_range": [
+   true,
+   false,
+   true
+  ],
+  "P3_pixel_std": [
+   0.0694,
+   0.0701,
+   0.0696
+  ],
+  "F6_pixel_std_range": [
+   0.0694,
+   0.0699
+  ]
+ },
  "provenance": {
   "runs": [
    {
@@ -144,66 +246,8 @@
      "runs/f7_models.json"
     ],
     "cwd": "/home/rbao/world-model-invariants",
-    "utc": "2026-08-30T00:53:45+00:00",
-    "git": "d18f31c8c27f38119fc5942ca890bf0adbbda190",
-    "git_dirty": true,
-    "python": "3.13.13",
-    "inputs": {
-     "runs/f7_verlet_s3_step6500.pt": {
-      "sha256": null,
-      "mtime": null,
-      "bytes": null
-     },
-     "runs/f7_verlet_s4_step6500.pt": {
-      "sha256": null,
-      "mtime": null,
-      "bytes": null
-     },
-     "runs/f7_verlet_s5_step6500.pt": {
-      "sha256": null,
-      "mtime": null,
-      "bytes": null
-     }
-    }
-   },
-   {
-    "argv": [
-     "scripts/run_f7_analysis.py",
-     "--out",
-     "runs/f7_models.json"
-    ],
-    "cwd": "/home/rbao/world-model-invariants",
-    "utc": "2026-08-30T01:12:39+00:00",
-    "git": "04ae99d7ca9d558056ae2a71213bed13a375160d",
-    "git_dirty": true,
-    "python": "3.13.13",
-    "inputs": {
-     "runs/f7_verlet_s3_step6500.pt": {
-      "sha256": "f5833516a386887ac83b24ab02a6e11d57f3a9b08cc68bab2c0a40baa8bbec26",
-      "mtime": "2026-08-30T01:02:56+00:00",
-      "bytes": 53828741
-     },
-     "runs/f7_verlet_s4_step6500.pt": {
-      "sha256": null,
-      "mtime": null,
-      "bytes": null
-     },
-     "runs/f7_verlet_s5_step6500.pt": {
-      "sha256": null,
-      "mtime": null,
-      "bytes": null
-     }
-    }
-   },
-   {
-    "argv": [
-     "scripts/run_f7_analysis.py",
-     "--out",
-     "runs/f7_models.json"
-    ],
-    "cwd": "/home/rbao/world-model-invariants",
-    "utc": "2026-08-30T01:17:24+00:00",
-    "git": "e16e693566fe8474aa8e826708ec3a608099db1c",
+    "utc": "2026-08-30T01:34:21+00:00",
+    "git": "5c3213e1e461ca7350055ddf8d89359f9341ce84",
     "git_dirty": true,
     "python": "3.13.13",
     "inputs": {
@@ -218,9 +262,9 @@
       "bytes": 53828741
      },
      "runs/f7_verlet_s5_step6500.pt": {
-      "sha256": null,
-      "mtime": null,
-      "bytes": null
+      "sha256": "2a90a3d0a8d954e5602da153bd4a89a9f6fa1fc48a15cd33a0c73f1d81c8b8dc",
+      "mtime": "2026-08-30T01:25:29+00:00",
+      "bytes": 53828741
      }
     }
    }

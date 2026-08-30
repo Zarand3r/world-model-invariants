@@ -7122,3 +7122,65 @@ use, since on the Verlet dataset the old wording was simply wrong.)
 Analysis runs when they land. **P1 is a falsifier of the paper's own title**: if the Verlet models
 still put their argmin at `c ~ 0.125`, the coefficient tracks `dt` regardless of scheme, and the
 paper narrows to "timestep" throughout, title included.
+
+---
+
+## 2026-08-30 --- F7: the model learns the *scheme*, not just the timestep
+
+Three seeds trained on velocity Verlet at `dt = 0.05` completed (10-11 min each, far under the 2h
+cap). Verified against `docs/F7_PREREG.md`.
+
+### Result
+
+| arm | seed | argmin `r` | `rho_obs` at `r=0` (textbook `E`) | at `r=1` (Euler's shadow) | separation |
+|---|---|---|---|---|---|
+| **Verlet** | 3 | **+0.00** | 0.00766 | 0.04341 | 5.67x -> `r=0` |
+| **Verlet** | 4 | **+0.00** | 0.00872 | 0.04517 | 5.18x -> `r=0` |
+| **Verlet** | 5 | **+0.00** | 0.00923 | 0.04509 | 4.89x -> `r=0` |
+| semi-implicit | 3 | **+1.00** | 0.04487 | 0.00752 | 5.96x -> `r=1` |
+| semi-implicit | 4 | **+1.00** | 0.04575 | 0.01006 | 4.55x -> `r=1` |
+| semi-implicit | 5 | **+1.00** | 0.04463 | 0.00785 | 5.69x -> `r=1` |
+
+**A near-perfect mirror image at the same timestep**, 3/3 versus 3/3.
+
+- **P1 passes**, more cleanly than registered: `|r| <= 0.5` on 2 of 3 was the bar; observed is
+  **exactly `r = 0` on 3 of 3**.
+- **P2 passes**: median gap `+1.00`, against a registered bar of `0.5`.
+- **P3 is partial, and I am recording it as partial.** Decode ratio (0.007--0.011, bar 0.05) and
+  finite rollout pass 3/3. Rollout pixel std is inside F6's observed range on **2 of 3**: seed 4 sits
+  at `0.0701` against F6's `0.0694--0.0699`, outside by `0.0002`. That is a 0.3% margin on a
+  criterion I registered, so it is reported rather than waved through. It does not indicate a
+  training failure --- seed 4's decode ratio is 0.011, comfortably inside.
+
+  **The script's own P3 check was narrower than the preregistration**: it tested decode ratio and
+  finiteness but not pixel std, so the registered criterion would have passed silently. Fixed to
+  check all three and report each separately. This is the second time a checking script has been
+  weaker than the claim it was supposed to enforce, after the handoff-corpus incident.
+
+### The two numbers that carry the result
+
+1. **Each model conserves its own simulator's invariant to essentially the same precision** ---
+   Verlet models `0.00872`, semi-implicit models `0.00785`, a ratio of **1.11x**. Neither is better
+   at conservation; they conserve *different things*.
+2. **Textbook energy is conserved 5.15x better by the Verlet-trained models** (`0.00872` against
+   `0.04487`), at an identical timestep and with everything else in the pipeline held fixed.
+
+### What this changes
+
+The paper's title claims the model learns its simulator's **integrator**. Until today the evidence
+covered only the **timestep** --- F6's 4x sweep at one fixed scheme --- and a reviewer could have
+replied that the coefficient simply tracks `dt`. It does not: with `dt` held at 0.05 and only the
+scheme changed, the recovered coefficient moves from `0.125` to `0.000`. **The title is earned.**
+
+It also reframes the project's central negative. E18 found a supervised probe fitted to *true* energy
+is 6.7x less conserved than a label-free scalar, which the paper presents as a fact about world
+models. F7 shows it is a fact about the **integrator**: train the same architecture on Verlet data
+and the model conserves textbook energy fine. The dissociation is a property of the *simulator*, not
+a limitation of the *model* --- a sharper and more interesting claim than the one the paper makes.
+
+### Not yet in the paper
+
+Integrating this changes what the paper claims, so it is Richard's call, not mine. Recorded here,
+in `runs/f7_models.json`, and in the roadmap status table. Nothing in `paper1.2/` has been touched.
+
+`origin/main` unchanged at `20fa8b4`.

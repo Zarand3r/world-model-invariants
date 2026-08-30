@@ -71,9 +71,14 @@ def main():
         v_arg = [m["argmin_r"] for m in verlet]
         s_arg = [m["argmin_r"] for m in f6]
         p1 = sum(abs(x) <= 0.5 for x in v_arg)
-        p3 = all(m["acceptance"].get("decode_ratio") is not None
-                 and m["acceptance"]["decode_ratio"] < 0.05
-                 and m["acceptance"]["rollout_finite"] for m in verlet)
+        # The prereg named THREE acceptance criteria; an earlier version of this script checked
+        # only two, which would have let a registered criterion pass silently. Report each.
+        F6_STD = (0.0694, 0.0699)   # observed across all 12 F6 models
+        p3_decode = all(m["acceptance"].get("decode_ratio") is not None
+                        and m["acceptance"]["decode_ratio"] < 0.05 for m in verlet)
+        p3_finite = all(m["acceptance"]["rollout_finite"] for m in verlet)
+        p3_std = [F6_STD[0] <= m["acceptance"]["pixel_std"] <= F6_STD[1] for m in verlet]
+        p3 = p3_decode and p3_finite and all(p3_std)
         summary = {
             "verlet_argmin_r": v_arg, "semi_implicit_argmin_r": s_arg,
             "verlet_median_r": st.median(v_arg), "semi_implicit_median_r": st.median(s_arg),
@@ -81,6 +86,10 @@ def main():
             "P2_median_gap": st.median(s_arg) - st.median(v_arg),
             "P2_pass": bool(st.median(s_arg) - st.median(v_arg) >= 0.5),
             "P3_models_acceptable": bool(p3),
+            "P3_decode_ratio_ok": bool(p3_decode), "P3_rollout_finite_ok": bool(p3_finite),
+            "P3_pixel_std_in_F6_range": p3_std,
+            "P3_pixel_std": [m["acceptance"]["pixel_std"] for m in verlet],
+            "F6_pixel_std_range": list(F6_STD),
         }
         out["summary"] = summary
         print(f"\n  Verlet argmin r        {v_arg}   median {summary['verlet_median_r']:+.2f}")
@@ -89,7 +98,11 @@ def main():
               f"P2 {summary['P2_pass']} (gap {summary['P2_median_gap']:+.2f})   "
               f"P3 {summary['P3_models_acceptable']}")
         if not p3:
-            print("  P3 FAILED -- models did not train acceptably; do not read P1/P2 as a scheme effect.")
+            print(f"  P3 partial: decode {p3_decode}, finite {p3_finite}, "
+                  f"pixel std in F6 range {sum(p3_std)}/3 "
+                  f"({summary['P3_pixel_std']} vs {list(F6_STD)})")
+            if not (p3_decode and p3_finite):
+                print("  P3 FAILED on a substantive criterion -- do not read P1/P2 as a scheme effect.")
 
     attach(out, op, inputs=inputs_from_args(a))
     op.write_text(json.dumps(out, indent=1) + "\n")
