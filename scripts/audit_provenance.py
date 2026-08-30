@@ -21,13 +21,17 @@ RUNS = pathlib.Path(__file__).resolve().parent.parent / "runs"
 
 
 def main() -> int:
-    ok, empty, unstamped = [], [], []
+    ok, empty, unstamped, unstampable = [], [], [], []
     for p in sorted(RUNS.glob("*.json")):
         try:
             d = json.loads(p.read_text())
         except Exception:
             continue
         if not isinstance(d, dict):
+            # top-level lists (training histories, older outputs) cannot carry a provenance dict at
+            # all. Excluding them is legitimate; excluding them SILENTLY is not -- an earlier version
+            # dropped 49 files this way while printing the full glob count as the total.
+            unstampable.append(p.name)
             continue
         prov = d.get("provenance")
         if not prov or not prov.get("runs"):
@@ -38,8 +42,11 @@ def main() -> int:
             empty.append(p.name)
 
     total = len(ok) + len(empty) + len(unstamped)
-    print(f"  {total} artefacts: {len(ok)} record inputs, {len(empty)} stamped with EMPTY inputs, "
-          f"{len(unstamped)} unstamped (pre-M29, left alone deliberately)\n")
+    print(f"  {total} stampable artefacts: {len(ok)} record inputs, {len(empty)} stamped with EMPTY "
+          f"inputs, {len(unstamped)} unstamped (pre-M29, left alone deliberately)")
+    print(f"  {len(unstampable)} further files are top-level JSON lists (training histories and "
+          f"older outputs)\n  and cannot carry a provenance dict in this format -- excluded, and "
+          f"counted here so the\n  exclusion is visible rather than silent.\n")
     if empty:
         print("  stamped but recording no inputs -- check whether the script hardcodes its paths:")
         for n in empty:
