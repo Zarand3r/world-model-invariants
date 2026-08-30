@@ -7405,3 +7405,55 @@ gate that formally failed --- which is exactly why this was worth finding.
 | **F4b** | unaffected |
 
 `paper1.2/` untouched. `origin/main` unchanged at `20fa8b4`.
+
+---
+
+## 2026-08-30 --- A sweep for predictions that were registered but never evaluated
+
+### Why
+
+Three times this week a script evaluated **less** than its preregistration registered: F7's P3
+checked two of three acceptance criteria; F7b's P2 checked a two-arm gap where the prereg registered
+a three-arm ordering; F7 Gate 0's G2 recorded `pass` off an `inf` from a comparison that never ran.
+All three were found by accident. `scripts/audit_preregs.py` sweeps for the crudest version of this
+across every preregistration at once: a registered prediction with **no recorded verdict anywhere**.
+
+### Result --- and two false-positive rounds worth recording
+
+**First run flagged 10 predictions across 9 preregistrations.** Every one was wrong. `C1`--`C4` are
+the *paper's claim* identifiers ("Claim addressed: **C2 --- physical validity**"), not predictions.
+The letter cannot simply be dropped, because C-labels *are* used as controls elsewhere (`C1`--`C4` in
+`run_dreamer_mechanism_controls.py`), so the fix excludes by context.
+
+**Second run flagged 1**, also wrong: E2's prereg wraps the sentence, leaving "Claim addressed:" on
+one line and `**C3 --- failure mechanism.**` on the next, so a line-local context check missed it.
+Fixed with a one-line lookback.
+
+**Final: 0 of 36 labelled predictions across 8 preregistrations lack a recorded verdict.**
+
+### Why that is weak reassurance, and the tool now says so
+
+Two limits, both printed in the tool's own output rather than left in a docstring:
+
+1. **Coverage is 8 of 29 preregistrations.** The other 21 do not use the `**P1**` bold-label
+   convention and are *invisible* to this audit, not clean. Listing them by name in the output so the
+   gap cannot be mistaken for a pass.
+2. **It cannot see narrowness.** It matches labels textually, so it detects a prediction that was
+   never evaluated at all --- but not a verdict that is narrower than what was registered. **All
+   three defects that motivated it were of exactly that kind.**
+
+So the honest reading is: no experiment appears to have dropped a labelled prediction outright, and
+the failure mode that actually bit me three times remains undetected by anything except reading the
+prereg against the script. I would rather record that plainly than let "0 flags" read as a clean bill
+of health.
+
+### F7b closed in the record
+
+F7b's three reversed-scheme models finished training and remain **unanalysed by choice**: its
+registered analysis uses the measurement falsified by amendment 2, so running it would produce a
+number with no valid interpretation. The checkpoints and dataset stay in `runs/` for whenever a valid
+model-side measurement exists. Its ground-truth component --- reversed semi-implicit Euler puts the
+optimum at exactly `c = -0.125`, mirroring the forward scheme's `+0.125` --- was verified before
+training and stands, since it involves no model.
+
+`paper1.2/` untouched. `origin/main` unchanged at `20fa8b4`.
