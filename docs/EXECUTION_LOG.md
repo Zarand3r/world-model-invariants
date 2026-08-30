@@ -7263,3 +7263,78 @@ re-audit the paper --- including the published one, which shares this measuremen
 call, and it is the reason I am stopping here rather than continuing.
 
 `origin/main` unchanged at `20fa8b4`.
+
+---
+
+## 2026-08-30 --- Sizing the damage: F6's control is inconclusive, and the interventions are immune
+
+Follow-up to the falsification above. Two cheap diagnostics, no training, aimed at giving Richard
+the facts the re-audit decision needs rather than my guess about them.
+
+### 1. The same control applied to F6 --- INCONCLUSIVE
+
+Registered as amendment 3, crossing the `dt = 0.02` and `dt = 0.08` checkpoints against both
+datasets. In relative units the two hypotheses predict separable locations (`r = 0.25` and `r = 4.0`
+for "follows the model", `r = 1.0` for "follows the data").
+
+| checkpoint | eval data | argmin `r` (3 seeds) |
+|---|---|---|
+| `dt = 0.02` | `dt = 0.08` | `+2.00, +2.00, +3.00` |
+| `dt = 0.08` | `dt = 0.02` | `+3.00, -1.00, +3.00` |
+
+**Neither hypothesis holds. `0/6` follow the data; `5/6` are pinned at a grid edge.** The
+off-diagonal sweeps are degenerate.
+
+**Both of my registered predictions were wrong**, including the expectation I wrote down --- "I
+expect the falsifier to fire". It did not. P1 failed *and* the falsifier failed, because I did not
+anticipate degeneracy as a third outcome.
+
+**Why F7's control worked and this one cannot.** Velocity Verlet and semi-implicit Euler at the
+*same* timestep produce nearly identical data --- they differ at `O(dt^2)` --- so the crossed model
+stayed in distribution and performed *identically well* (`rho_obs` 0.00765 against the matched
+model's 0.00766). That is what made F7's cross-evaluation clean and damning. Changing the timestep
+changes the data distribution substantially, so the crossed model is genuinely out-of-distribution
+and the readout collapses.
+
+**So F6 is unresolved, not cleared.** The direct empirical test is not runnable on it: the only axis
+F6 varies is the one that breaks the readout when crossed. The *mechanism* --- a one-step prediction
+reproduces the next state of whatever trajectory it is shown --- is generic and does transfer to F6
+by argument. But an argument is not a measurement, and I am not recording one as the other.
+
+**A verdict line in my own script contradicted its own rows.** It hard-coded the else-branch to
+print "argmin follows the data" whenever P1 failed, and printed exactly that while `follows_data`
+read `0/3` and `0/3` directly above it. "Not following the model" is not "following the data" ---
+degeneracy is a third outcome. Fixed to report all three. This is the third checking artefact this
+week that was weaker or wronger than the claim it existed to test.
+
+### 2. Do the intervention results share the confound? --- No, structurally
+
+E1's intervention takes **one** initial latent from real data and then rolls the model forward
+freely: `h = hs[:, WARMUP].clone()`, then `for _ in range(horizon): preds.append(...); h =
+m.transition(h)`, applying the edit at each step and comparing against a magnitude-matched null.
+E12c has the same structure at 50 steps of imagination.
+
+There is **no evaluation trajectory being tracked**, so the F7 confound cannot arise: the data
+supplies only the initial condition and every subsequent state is the model's own. These are causal
+tests on the model's dynamics.
+
+One caveat stated rather than buried: the *direction* `C` is still identified using the one-step
+statistic on real frames, so its identification is data-informed. That does not affect the causal
+claim --- intervening along a direction and measuring the consequence in imagination against a
+matched null --- but it does mean "the model represents `C`" and "editing `C` changes the rollout"
+rest on different evidence, and only the second is immune here.
+
+### Where this leaves the scope
+
+| result | status after these controls |
+|---|---|
+| **F7** (scheme identification) | **falsified** --- argmin follows the evaluation data, 0/3 and 0/3 |
+| **F6, E19** (coefficient identification) | **unresolved** --- direct control not runnable; the mechanism argument transfers but is untested |
+| **E1, E4, E9, E12c** (interventions) | **immune by construction** --- measured on the model's own imagined rollout against a matched null |
+| **F4b** (architecture gap) | **unaffected** --- 767x on *identical* data cannot be a data effect |
+
+A valid test for F6 and E19 would measure conservation along the model's own imagined rollout, which
+is the same fix identified yesterday and still needs its own preregistration.
+
+F7b finished training (3/3 seeds). Still **not analysed** --- it uses the falsified measurement.
+`paper1.2/` untouched. `origin/main` unchanged at `20fa8b4`.

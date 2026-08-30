@@ -1,0 +1,176 @@
+{
+ "cells": [
+  {
+   "ckpt": "runs/f6_dt0.02_s3_step6500.pt",
+   "ckpt_dt": 0.02,
+   "eval_dt": 0.02,
+   "argmin_r": 0.75,
+   "predicted_r_if_model": 1.0,
+   "predicted_r_if_data": 1.0,
+   "follows_model": false,
+   "follows_data": false,
+   "diagonal": true
+  },
+  {
+   "ckpt": "runs/f6_dt0.02_s4_step6500.pt",
+   "ckpt_dt": 0.02,
+   "eval_dt": 0.02,
+   "argmin_r": 0.75,
+   "predicted_r_if_model": 1.0,
+   "predicted_r_if_data": 1.0,
+   "follows_model": false,
+   "follows_data": false,
+   "diagonal": true
+  },
+  {
+   "ckpt": "runs/f6_dt0.02_s5_step6500.pt",
+   "ckpt_dt": 0.02,
+   "eval_dt": 0.02,
+   "argmin_r": 1.0,
+   "predicted_r_if_model": 1.0,
+   "predicted_r_if_data": 1.0,
+   "follows_model": true,
+   "follows_data": true,
+   "diagonal": true
+  },
+  {
+   "ckpt": "runs/f6_dt0.02_s3_step6500.pt",
+   "ckpt_dt": 0.02,
+   "eval_dt": 0.08,
+   "argmin_r": 2.0,
+   "predicted_r_if_model": 0.25,
+   "predicted_r_if_data": 1.0,
+   "follows_model": false,
+   "follows_data": false,
+   "diagonal": false
+  },
+  {
+   "ckpt": "runs/f6_dt0.02_s4_step6500.pt",
+   "ckpt_dt": 0.02,
+   "eval_dt": 0.08,
+   "argmin_r": 2.0,
+   "predicted_r_if_model": 0.25,
+   "predicted_r_if_data": 1.0,
+   "follows_model": false,
+   "follows_data": false,
+   "diagonal": false
+  },
+  {
+   "ckpt": "runs/f6_dt0.02_s5_step6500.pt",
+   "ckpt_dt": 0.02,
+   "eval_dt": 0.08,
+   "argmin_r": 3.0,
+   "predicted_r_if_model": 0.25,
+   "predicted_r_if_data": 1.0,
+   "follows_model": false,
+   "follows_data": false,
+   "diagonal": false
+  },
+  {
+   "ckpt": "runs/f6_dt0.08_s3_step6500.pt",
+   "ckpt_dt": 0.08,
+   "eval_dt": 0.02,
+   "argmin_r": 3.0,
+   "predicted_r_if_model": 4.0,
+   "predicted_r_if_data": 1.0,
+   "follows_model": true,
+   "follows_data": false,
+   "diagonal": false
+  },
+  {
+   "ckpt": "runs/f6_dt0.08_s4_step6500.pt",
+   "ckpt_dt": 0.08,
+   "eval_dt": 0.02,
+   "argmin_r": -1.0,
+   "predicted_r_if_model": 4.0,
+   "predicted_r_if_data": 1.0,
+   "follows_model": false,
+   "follows_data": false,
+   "diagonal": false
+  },
+  {
+   "ckpt": "runs/f6_dt0.08_s5_step6500.pt",
+   "ckpt_dt": 0.08,
+   "eval_dt": 0.02,
+   "argmin_r": 3.0,
+   "predicted_r_if_model": 4.0,
+   "predicted_r_if_data": 1.0,
+   "follows_model": true,
+   "follows_data": false,
+   "diagonal": false
+  },
+  {
+   "ckpt": "runs/f6_dt0.08_s3_step6500.pt",
+   "ckpt_dt": 0.08,
+   "eval_dt": 0.08,
+   "argmin_r": 1.0,
+   "predicted_r_if_model": 1.0,
+   "predicted_r_if_data": 1.0,
+   "follows_model": true,
+   "follows_data": true,
+   "diagonal": true
+  },
+  {
+   "ckpt": "runs/f6_dt0.08_s4_step6500.pt",
+   "ckpt_dt": 0.08,
+   "eval_dt": 0.08,
+   "argmin_r": 1.0,
+   "predicted_r_if_model": 1.0,
+   "predicted_r_if_data": 1.0,
+   "follows_model": true,
+   "follows_data": true,
+   "diagonal": true
+  },
+  {
+   "ckpt": "runs/f6_dt0.08_s5_step6500.pt",
+   "ckpt_dt": 0.08,
+   "eval_dt": 0.08,
+   "argmin_r": 1.0,
+   "predicted_r_if_model": 1.0,
+   "predicted_r_if_data": 1.0,
+   "follows_model": true,
+   "follows_data": true,
+   "diagonal": true
+  }
+ ],
+ "verdict": {
+  "dt0.02_follows_model": "0/3",
+  "dt0.02_follows_data": "0/3",
+  "dt0.08_follows_model": "2/3",
+  "dt0.08_follows_data": "0/3",
+  "P1_pass": false,
+  "off_diagonal_following_data": "0/6",
+  "off_diagonal_pinned_at_grid_edge": "5/6",
+  "outcome": "neither -- degenerate"
+ },
+ "provenance": {
+  "runs": [
+   {
+    "argv": [
+     "scripts/run_f6_cross.py",
+     "--out",
+     "runs/f6_cross.json"
+    ],
+    "cwd": "/home/rbao/world-model-invariants",
+    "utc": "2026-08-30T02:44:28+00:00",
+    "git": "ea575975942c171daeef4d7478230f4e8266dda7",
+    "git_dirty": true,
+    "python": "3.13.13",
+    "inputs": {}
+   },
+   {
+    "argv": [
+     "scripts/run_f6_cross.py",
+     "--out",
+     "runs/f6_cross.json"
+    ],
+    "cwd": "/home/rbao/world-model-invariants",
+    "utc": "2026-08-30T02:45:13+00:00",
+    "git": "ea575975942c171daeef4d7478230f4e8266dda7",
+    "git_dirty": true,
+    "python": "3.13.13",
+    "inputs": {}
+   }
+  ]
+ }
+}

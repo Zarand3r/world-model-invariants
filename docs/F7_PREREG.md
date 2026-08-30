@@ -238,3 +238,35 @@ The control separates them by crossing checkpoint against evaluation data:
 Off-diagonal cells are mildly out-of-distribution for the encoder (same initial conditions and
 similar images, different integration), so a degradation in absolute `rho_obs` is expected and is not
 itself a failure. Only the **argmin location** is registered.
+
+## Amendment 3 --- the same control applied to F6, to size the damage
+
+**Registered 2026-08-30, before running. No training --- existing F6 checkpoints only.**
+
+Amendment 2 falsified F7. F6 uses the same measurement and every F6 model was only ever evaluated on
+data from its own timestep, so the confound was invisible there by construction. This control asks
+directly whether F6's model arm is affected, because that fact --- not my guess about it --- is what
+the decision about re-auditing the paper should rest on.
+
+Cross the `dt = 0.02` and `dt = 0.08` checkpoints (4x apart, F6's widest separation) against both
+datasets. The sweep is in relative units `r = c / c*(dt_eval)`, so the two hypotheses predict
+different, separable locations:
+
+| checkpoint | eval data | if argmin follows the **model** | if it follows the **data** |
+|---|---|---|---|
+| `dt = 0.02` | `dt = 0.08` | `r = 0.05/0.20 = 0.25` | `r = 1.0` |
+| `dt = 0.08` | `dt = 0.02` | `r = 0.20/0.05 = 4.0` | `r = 1.0` |
+
+`r = 0.25` is on F6's grid. `r = 4.0` is **off** it (the grid stops at 3.0), so in that cell
+"follows the model" is registered as **argmin at the grid edge, `r >= 2.0`**, and "follows the data"
+as `r = 1.0`. Stated now so the reading is not chosen after seeing the numbers.
+
+- **P1 (registered).** If F6's model arm is sound, the off-diagonal argmins follow the **checkpoint**
+  on at least 2 of 3 seeds per cell.
+- **Falsifier.** If they follow the evaluation data --- `r = 1.0` in both off-diagonal cells --- then
+  F6's model arm is confounded in exactly the way F7's was, and F6's headline claim that *a model
+  trained only on pixels recovers a coefficient tracking `(dt/2) mg(l/2)`* is re-deriving its own
+  physics arm rather than measuring the model.
+
+I expect the falsifier to fire, given amendment 2. Registering the expectation so that confirming it
+counts for nothing extra and refuting it counts fully.
