@@ -1,9 +1,13 @@
 """Where the bench finds models and data, and what it is willing to say about them.
 
 The released checkpoints land in `runs/` via `scripts/fetch_assets.py`. A training-step ladder
-(`dreamer_ref_s3_step*.pt`) exists on the machine this study was run on but is not part of the
+(`dreamer_ref_s*_step*.pt`) exists on the machine this study was run on but is not part of the
 release, so it is picked up from `$WMI_EXTRA_CKPT_DIR` when present and simply absent otherwise —
 the bench must degrade to the three released seeds on any other machine rather than fail.
+
+That default is a sibling checkout on one machine and nothing anywhere else. It is a convenience,
+not a dependency: when the directory was renamed the ladder silently dropped out of the model list,
+which is the intended failure — eighteen models fewer, nothing broken.
 
 Every model carries the dataset it was trained on. Pointing a damped model at conservative frames
 produces a plausible-looking latent and a meaningless invariant, which is the single easiest way to
@@ -20,7 +24,8 @@ import torch
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 RUNS = ROOT / "runs"
-EXTRA = pathlib.Path(os.environ.get("WMI_EXTRA_CKPT_DIR", "/home/rbao/world-model-invariants/runs"))
+EXTRA = pathlib.Path(os.environ.get(
+    "WMI_EXTRA_CKPT_DIR", str(ROOT.parent / "world-model-invariants-extension" / "runs")))
 
 CONSERVATIVE_DATA = "pendulum_pixels.npz"
 DAMPED_DATA = "pendulum_pixels_damped.npz"
