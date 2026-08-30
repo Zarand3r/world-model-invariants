@@ -7849,3 +7849,72 @@ The check that would have caught it costs three lines and no GPU, and I have now
 first thing any future scheme-comparison must pass.
 
 `paper1.2/` untouched. `origin/main` unchanged at `20fa8b4`.
+
+---
+
+## 2026-08-30 --- F11: the timestep axis is unreadable too, and a pre-committed gate stopped a false positive
+
+Having withdrawn the scheme experiments, F11 ran the same forced choice on the **timestep**, the axis
+that genuinely exists in the observations (`dt` enters the position recurrence as `a(th) dt^2`, now
+pinned by `tests/test_observable_difference.py`).
+
+### Result --- NOT READABLE
+
+| model `dt` | data `dt` | hit rate for own `dt` | separation | prediction error | readable |
+|---|---|---|---|---|---|
+| 0.02 | 0.02 | -- | 0.0000 | 0.0064--0.0073 | diagonal, degenerate by construction |
+| 0.02 | 0.08 | 0.512, 0.502, 0.511 | 0.0697 | **0.58--0.62** | **no** |
+| 0.08 | 0.02 | **0.844, 0.852, 0.849** | 0.0699 | **0.60--0.63** | **no** |
+| 0.08 | 0.08 | -- | 0.0000 | 0.0065--0.0084 | diagonal, degenerate by construction |
+
+G2 fires on every crossed cell: prediction error is roughly **9x the separation** between the two
+candidates. A model trained at one timestep is hopelessly out of distribution on another's data ---
+its one-step error rises from `~0.007` rad on its own data to `~0.6` rad, a factor of nearly 90.
+
+### The gate stopped the most convincing false positive of the week
+
+Without G2, the `dt = 0.08` models would have read as **0.844 / 0.852 / 0.849, three of three,
+`p < 1e-100`** --- "the model applies its own timestep, not the data's". Signed, consistent across
+seeds, overwhelmingly significant, and **entirely an artefact**: at 0.6 rad of error the prediction
+is nowhere near either candidate, and the rate only records which direction the error leans (a model
+trained on large per-frame motion over-predicts motion on slow data, landing nearer the larger-`dt`
+candidate every time).
+
+The mirrored cells give the game away: the same comparison run the other way sits at chance
+(0.512 / 0.502 / 0.511). A real effect would have been symmetric.
+
+This is the counterpoint to the week's other entries. Four experiments failed because I did not
+register the gate that mattered; here I registered G1 and G2 **before running**, precisely because
+F8 and F10 had taught me that lesson, and they withheld a result I would otherwise have reported as a
+triumph.
+
+### Where F6 now stands
+
+Cross-evaluation cannot settle F6, and the reason is structural rather than incidental: attributing
+the recovered coefficient to the **model** rather than the **data** requires varying them
+independently, and every model is only in distribution on its own timestep's data. F7 amendment 3
+hit this wall with the `rho_obs` sweep; F11 hits the same wall with a cleaner statistic and a
+quantified margin (`9x`), which at least explains *why* rather than just reporting degeneracy.
+
+So the honest position on F6, which is neither the withdrawal I wrongly recommended nor the positive
+I originally reported:
+
+> Models trained at timestep `dt` recover a coefficient matching `c*(dt)`. Whether that reflects the
+> **model** or the **data it was measured on** is untested, and is **not testable by
+> cross-evaluation with these assets**. Separating them needs a model that is in distribution on more
+> than one timestep --- trained on mixed timesteps, or conditioned on `dt`.
+
+That is a limitation to state in the paper, not a falsification.
+
+**What is already separated**, and worth keeping in view: F4b varies the *model* while holding the
+data fixed --- conv-GRU against RSSM on identical trajectories, a `767x` gap. That is a valid
+model-versus-data separation and it supports the *level* claim (this model conserves something; that
+one does not). It says nothing about the coefficient.
+
+### Not started
+
+Training a mixed-timestep or `dt`-conditioned model is the route that would settle this. It is new
+training compute on a question where I have already spent a week on a mis-specified axis, so I am
+flagging it for Richard rather than launching it.
+
+`paper1.2/` untouched. `origin/main` unchanged at `20fa8b4`.
