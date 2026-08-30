@@ -7014,3 +7014,61 @@ results and conclusion, and a guard has to survive all of them being wrong at on
 
 Anchored coverage 10 -> 16 of 70. **29 checks remain presence-only** and stay labelled as such.
 `verify_paper_numbers.py` 70/70; 56 tests pass; `origin/main` unchanged at `20fa8b4`.
+
+---
+
+## 2026-08-29 --- F7 Gate 0: `c*` is a fingerprint of the *scheme*, not just the timestep
+
+### Why this ran
+
+Auditing the paper's claim calibration, I found a gap between the title and the evidence. The paper
+is called *World models learn their simulator's integrator* and says "integrator" **17 times**, but
+F6 varied only the **timestep**, at one fixed scheme. No sentence anywhere in the paper stated that
+limitation. A reviewer asks this first, so I preregistered `docs/F7_PREREG.md` and ran the cheap
+ground-truth gate that could falsify the title before spending any training compute on it.
+
+The gate question: **at a fixed `dt`, do different integrators want different `c*`?** If not, `c*`
+identifies `dt` alone and the paper narrows to "timestep" throughout, title included.
+
+### Result --- gate passes, more sharply than registered
+
+| `dt` | SI argmin `c` | VV argmin `c` | SI ratio | VV ratio | explicit Euler |
+|---|---|---|---|---|---|
+| 0.02 | 0.0500 | **0.0000** | 1.36e-06 | 2.22e-06 | 3.7e5x worse |
+| 0.035 | 0.0875 | **0.0000** | 1.29e-05 | 2.08e-05 | diverged |
+| 0.05 | **0.1250** | **0.0000** | 5.33e-05 | 8.63e-05 | diverged |
+| 0.08 | 0.2000 | **0.0000** | 3.51e-04 | 5.64e-04 | diverged |
+
+- **G0 (positive control) passes.** Semi-implicit Euler's argmin sits at `r = 1` at all four
+  timesteps, re-deriving F6's physics arm exactly (`c = 0.125` at `dt = 0.05`).
+- **G1 passes, at the boundary value.** Velocity Verlet's argmin is **exactly `c = 0`** at every
+  timestep --- registered as `|c_VV| <= 0.25 c_SI`, observed as zero. Verlet has no `O(dt)` term in
+  this direction, and the sweep finds none.
+- **G2 passes, but by a different mechanism than registered.** I registered "EE's best ratio is
+  `>=5x` SI's at `dt = 0.05`". At `dt = 0.05` explicit Euler does not survive 200 steps at all ---
+  every trajectory hits the velocity clip, so the ratio is undefined rather than large. The finite
+  number comes from `dt = 0.02`, the one timestep where it survives: **3.7e5x** worse. Recording the
+  mechanism because "diverged" and "5x worse" are different evidence, and the prereg asked for the
+  second.
+
+### What this does and does not license
+
+The sharp part: **the two symplectic schemes conserve comparably well (5.3e-5 vs 8.6e-5 at
+`dt = 0.05`) but conserve *different quantities*.** The separation is in *which* invariant, not in
+*how well*. So at a fixed timestep, `c*` distinguishes semi-implicit Euler (0.125) from velocity
+Verlet (0.000) from explicit Euler (no answer). The measurement F6 used is scheme-discriminating.
+
+The limit: this is **ground truth only**. It shows the *instrument* can tell schemes apart. It says
+nothing about whether a model trained on **pixels** tracks the scheme it was trained under --- that
+is F7 proper, and it needs training. What the gate buys is that F7 is now a well-posed experiment
+with a parameter-free, sharply discriminating prediction: a model trained on Verlet data at
+`dt = 0.05` should recover argmin `~0`, not `0.125`. Because the timestep is **held fixed**, "the
+model merely learned `dt`" cannot explain a difference.
+
+### Consequence for the paper regardless of whether F7 proper runs
+
+The paper is currently missing a limitation sentence it should always have had: one scheme was
+tested. That is a claim-calibration fix, not a new result, and it is the author's call whether the
+title narrows --- flagged for Richard rather than changed unilaterally.
+
+`runs/f7_gate0.json` written with provenance. No model was trained.
