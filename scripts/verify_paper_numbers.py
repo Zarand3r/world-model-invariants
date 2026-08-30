@@ -68,8 +68,10 @@ def check(label, value, *, fmt="{:.1f}", must_appear=None, near=None):
         CHECKS.append((label, s, bool(re.search(pat, CORPUS, re.S | re.I))))
 
 # --- E18 ---
-check("E18 label-free rho_obs median (6.9e-3)", st.median(r["rho_obs"] for r in lf) * 1e3, fmt="{:.1f}")
-check("E18 supervised rho_obs median (4.58e-2)", st.median(r["rho_obs"] for r in sup) * 1e2, fmt="{:.2f}")
+check("E18 label-free rho_obs median (6.9e-3)", st.median(r["rho_obs"] for r in lf) * 1e3,
+      fmt="{:.1f}", near=r"against[\s\S]{0,15}VALUE\\times10\^\{-3\}")
+check("E18 supervised rho_obs median (4.58e-2)", st.median(r["rho_obs"] for r in sup) * 1e2,
+      fmt="{:.2f}", near=r"median[\s\S]{0,40}VALUE\\times10\^\{-2\}")
 check("E18 label-free effect median", st.median(r["effect_pct"] for r in lf), fmt="{:.1f}",
       near=r"median\s*\$?-?VALUE")
 check("E18 supervised effect median", st.median(r["effect_pct"] for r in sup), fmt="{:.1f}",
@@ -88,8 +90,10 @@ wrong = [at(m, -CS)["rho_obs"] / at(m, CS)["rho_obs"] for m in e19["models"]]
 check("E19 wrong-sign control (median, NOT best seed)", st.median(wrong), fmt="{:.0f}",
       near=r"VALUE\\times[^.]{0,60}worse")
 red = sorted(at(m, 0.0)["rho_obs"] / at(m, CS)["rho_obs"] for m in e19["models"])
-check("E19 P3 reduction range low", red[0], fmt="{:.1f}")
-check("E19 P3 reduction range high", red[-1], fmt="{:.1f}")
+check("E19 P3 reduction range low", red[0], fmt="{:.1f}",
+      near=r"falling[^\n]{0,6}VALUE")
+check("E19 P3 reduction range high", red[-1], fmt="{:.1f}",
+      near=r"4\.9\$?-\$?VALUE\\times[^\n]{0,25}c=0")
 check("E19 residual to label-free",
       st.median(at(m, CS)["rho_obs"] for m in e19["models"]) / st.median(r["rho_obs"] for r in lf),
       fmt="{:.2f}", near=r"VALUE\\times[^.]{0,40}(remaining )?gap|gap of[^.]{0,20}VALUE")
@@ -115,7 +119,9 @@ def _spear(a, b):
 for _sig in ("acc_drift", "latent_disp"):
     for _m in f2["models"]:
         _s = _spear(_m["signals"][_sig], _m["target_energy_error"])
-        check(f"F2 {_sig} {_m['ckpt'][-16:-3]}", _s, fmt="{:+.2f}")
+        check(f"F2 {_sig} {_m['ckpt'][-16:-3]}", _s, fmt="{:+.2f}",
+              near=(r"Spearman[^\n]{0,60}VALUE" if _sig == "acc_drift"
+                    else r"against[\s\S]{0,50}VALUE"))
 # Guard the RISK (claiming it is untested), not a phrasing. An earlier version required the
 # literal "was tested" and failed on a legitimate rewrite during compression, which is a guard
 # training you to ignore it. The numbers themselves are checked above.
@@ -185,14 +191,18 @@ CHECKS.append(("F3: no released-checkpoint result claimed", "-",
 # --- F1 actuation axis (the paper's fifth dissociation axis) ---
 for _m in f1b["models"]:
     _s = _m["ckpt"][-9:-3]
-    check(f"F1 rho(C,E) {_s}", _m["rho_C_energy"], fmt="{:.2f}")
-    check(f"F1 Spearman(power,dC) {_s}", _m["spearman_pred_obs"], fmt="{:.3f}")
+    check(f"F1 rho(C,E) {_s}", _m["rho_C_energy"], fmt="{:.2f}",
+          near=r"\\rho\|?_E[^\n]{0,20}=?[^\n]{0,30}VALUE")
+    check(f"F1 Spearman(power,dC) {_s}", _m["spearman_pred_obs"], fmt="{:.3f}",
+          near=r"predicted source term is[\s\S]{0,40}VALUE")
 _var = 100 * float(np.mean([m["pearson_pred_obs"] ** 2 for m in f1b["models"]]))
 check("F1 variance of dC explained by power (%)", _var, fmt="{:.2f}",
       near=r"VALUE\\%[^.]{0,80}variance")
 _scale = [m["scale_obs_over_pred"] for m in f1b["models"]]
-check("F1 obs/pred scale low", min(_scale), fmt="{:.1f}")
-check("F1 obs/pred scale high", max(_scale), fmt="{:.1f}")
+check("F1 obs/pred scale low", min(_scale), fmt="{:.1f}",
+      near=r"VALUE\$?-\$?5\.4")
+check("F1 obs/pred scale high", max(_scale), fmt="{:.1f}",
+      near=r"4\.5\$?-\$?VALUE")
 # The paper quotes the RANGE, not per-seed values, so check the endpoints. Checking each seed
 # fails on a value that is inside the stated range but never written down -- which it did.
 _fin = [m["ratio_true_over_shuffled"] for m in f1a["models"] if not re.search(r"step\d+", m["ckpt"])]

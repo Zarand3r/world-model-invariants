@@ -52,6 +52,13 @@ CASES = [
     ("0.032", "9.999", "F3 rho(G,Gtrue) high"),
     ("0.740", "9.999", "F1 action-use range low"),
     ("+0.57", "+9.99", "E10b Spearman _s1_step30000"),
+    # one per anchor SHAPE introduced in the final batch, so each pattern style is proven:
+    ("4.58",  "9.999", "E18 supervised rho_obs median"),   # superscript-bounded
+    ("0.72",  "9.999", "F1 rho(C,E) act_s3"),              # symbol-bounded
+    ("0.041", "9.999", "F1 Spearman(power,dC) act_s3"),    # phrase-bounded, crosses newline
+    ("-0.24", "-9.99", "F2 acc_drift f_s5_step6500"),      # newline-bounded triple
+    ("+0.31", "+9.99", "F2 latent_disp f_s5_step6500"),    # cross-newline triple
+    ("4.9",   "9.9",   "E19 P3 reduction range low"),      # range endpoint
 ]
 
 
