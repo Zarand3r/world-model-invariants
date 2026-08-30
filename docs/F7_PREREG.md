@@ -59,3 +59,63 @@ minimise the same `invariance_ratio` F6's physics arm uses, so the numbers are d
 Even a clean pass shows only that the *measurement* can tell schemes apart on ground truth. It says
 nothing about whether a **model trained on pixels** tracks the scheme it was trained under. That is
 F7 proper and needs training. This gate decides only whether that experiment is worth running.
+
+---
+
+# F7 proper --- train on a second integrator at the *same* timestep
+
+**Registered 2026-08-29, after Gate 0 passed and before generating any data or training anything.**
+
+Gate 0 passed: at `dt = 0.05`, semi-implicit Euler wants `c = 0.125` and velocity Verlet wants
+`c = 0.000`, with explicit Euler diverging. So the instrument discriminates schemes on ground truth.
+This is the model-side test.
+
+## Design
+
+Everything is held identical to F6's `dt = 0.05` arm except the integrator: same renderer, same
+initial-condition ranges, same 256 x 120 trajectories, same clip rejection, same seeds (3, 4, 5),
+same 6,500 training steps, same checkpoint, same analysis. Only the state update changes, from
+gymnasium's semi-implicit Euler to velocity Verlet.
+
+**The timestep is held fixed at 0.05.** That is the whole point: "the model merely learned `dt`"
+cannot explain any difference, because `dt` does not differ.
+
+## Power (computed on ground truth before registering, from `runs/f7_gate0.json`)
+
+At `dt = 0.05` the two schemes give near mirror-image sweeps:
+
+| data from | ratio at `r = 0` | ratio at `r = 1` | separation |
+|---|---|---|---|
+| semi-implicit Euler | 3.36e-02 | 5.33e-05 | **631x** favouring `r = 1` |
+| velocity Verlet | 8.63e-05 | 3.32e-02 | **384x** favouring `r = 0` |
+
+So the ground-truth contrast is two-to-three orders of magnitude in *both* directions. Whether the
+**model** resolves it is the open question --- F6's semi-implicit models showed a 5.7x separation at
+this timestep, well short of the 631x available, so the model tracks a fraction of the signal, not
+all of it.
+
+## Registered predictions
+
+- **P1 (primary).** Verlet-trained models put their argmin closer to `0` than to `1`:
+  `|r_argmin| <= 0.5` on at least **2 of 3** seeds.
+- **P2 (contrast).** Median argmin `r` across the three Verlet models is at least **0.5 below** the
+  median across F6's three semi-implicit models at the same timestep (which was `1.0`).
+- **P3 (model-quality control).** The Verlet models pass the same acceptance checks F6's did ---
+  1-step decode MSE ratio below 0.05, finite rollout, rollout pixel std in F6's observed range. A
+  model that failed to train is uninformative and must not be read as a scheme effect.
+
+## Falsifier --- and what it costs
+
+If the Verlet-trained models put argmin at `r ~ 1` (that is, `c ~ 0.125`) on 2 of 3 seeds, then the
+recovered coefficient tracks the **timestep regardless of the scheme**. The word *integrator* would
+then be unearned, and the paper narrows to *discretisation timestep* throughout --- **including the
+title**. That is recorded as the outcome whatever it costs the paper.
+
+This is the experiment most likely to kill the paper's headline framing, which is why it runs.
+
+## Interpretation if P1 passes
+
+Verlet's shadow in this family is plain energy, so a Verlet-trained model recovering `r ~ 0` means it
+conserves **textbook energy** --- the very quantity the semi-implicit models were shown *not* to
+conserve. The claim becomes: *the model conserves what its simulator conserves*, and the paper's
+central dissociation is a property of the **scheme**, not a fixed fact about world models.

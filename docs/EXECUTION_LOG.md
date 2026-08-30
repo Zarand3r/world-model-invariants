@@ -7072,3 +7072,53 @@ tested. That is a claim-calibration fix, not a new result, and it is the author'
 title narrows --- flagged for Richard rather than changed unilaterally.
 
 `runs/f7_gate0.json` written with provenance. No model was trained.
+
+---
+
+## 2026-08-29 --- F7 proper launched: a second integrator at the *same* timestep
+
+Gate 0 passed, so the model-side test is well-posed and is now running. Registered in
+`docs/F7_PREREG.md` before any data was generated.
+
+### Why this is the experiment worth running
+
+Every result in the paper so far comes from **one** integrator. F6 varied the timestep across a 4x
+range and found the coefficient tracking `(dt/2) mg(l/2)`, which is why the paper says the model
+learns its simulator's *integrator*. But varying `dt` cannot separate "learned the timestep" from
+"learned the scheme". Training on velocity Verlet **at `dt = 0.05`** does, because the timestep is
+held fixed and only the scheme moves.
+
+Ground-truth power, computed before registering: the two schemes give near mirror-image sweeps ---
+semi-implicit data favours `r = 1` by **631x**, Verlet data favours `r = 0` by **384x**. Two to three
+orders of magnitude in both directions.
+
+### Implementation, and the two things checked before spending compute
+
+`make_pendulum_pixels.py` gained `--scheme {semi-implicit, verlet}`, mirroring the existing
+`damped_step` precedent. Renderer, initial conditions, horizon, seeds and clip rejection are
+untouched --- only the state update differs.
+
+1. **The stepper reproduces the gate.** Run standalone, the patched `verlet_step` puts the argmin at
+   `r = +0.00` with a 381x separation, against the gate's independent 384x. Checked *before*
+   rendering anything.
+2. **The default path is bit-exact.** Regenerating 8 trajectories with the patched script gives
+   `states IDENTICAL, frames IDENTICAL` against `runs/pend_dt0.05.npz`. The new branch is an `elif`
+   that consumes no RNG, so the `data_sha256` provenance chain the existing checkpoints record (M29)
+   stays valid. This mattered enough to verify rather than argue.
+
+### A confirmation that fell out of the generator itself
+
+The dataset's own diagnostic reports **textbook-E relative oscillation 0.006** for Verlet against
+**0.186** for semi-implicit Euler at the same timestep --- a **31x** difference. Velocity Verlet
+conserves textbook energy far better, exactly as its missing `O(dt)` term predicts. The generator
+printed this without being asked, and it is the whole experiment in one number.
+
+(The diagnostic's text had been hard-coded to say "symplectic Euler"; it now names the scheme in
+use, since on the Verlet dataset the old wording was simply wrong.)
+
+### Status
+
+3 seeds (3, 4, 5) training on `runs/pend_verlet_dt0.05.npz`, 6,500 steps, same checkpoint as F6.
+Analysis runs when they land. **P1 is a falsifier of the paper's own title**: if the Verlet models
+still put their argmin at `c ~ 0.125`, the coefficient tracks `dt` regardless of scheme, and the
+paper narrows to "timestep" throughout, title included.

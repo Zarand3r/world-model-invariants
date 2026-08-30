@@ -69,9 +69,30 @@ def damped_step(state, zeta: float, dt: float = 0.05, g: float = 10.0, l: float 
     return np.array([th + thd * dt, thd])
 
 
+def verlet_step(state, dt: float = 0.05, g: float = 10.0, l: float = 1.0):
+    """Velocity Verlet -- F7 (docs/F7_PREREG.md).
+
+    Gymnasium's own step is semi-implicit Euler, whose shadow Hamiltonian carries an O(dt) term
+    `(dt/2) mg(l/2) thdot sin(th)`. Velocity Verlet is also symplectic but its leading error is
+    O(dt^2), so that term is absent and its shadow is plain energy. Ground truth confirms it:
+    at dt=0.05 the sweep bottoms out at c=0.000 rather than c=0.125 (runs/f7_gate0.json).
+
+    Everything else about the dataset -- renderer, initial conditions, horizon, clip rejection --
+    is untouched, so the ONLY difference from the F6 dt=0.05 arm is the integrator. This consumes
+    no RNG, so the default semi-implicit path stays bit-exact and the data_sha256 provenance chain
+    the existing checkpoints record (M29) remains valid.
+    """
+    th, thd = float(state[0]), float(state[1])
+    acc = lambda x: (3 * g / (2 * l)) * np.sin(x)
+    a = acc(th)
+    th_new = th + thd * dt + 0.5 * a * dt ** 2
+    return np.array([th_new, thd + 0.5 * (a + acc(th_new)) * dt])
+
+
 def main(n_traj: int, n_steps: int, seed: int, out: str, zeta: float = 0.0,
          th_lo: float = 0.0, th_hi: float = TH_MAX,
-         thd_lo: float = 0.0, thd_hi: float = THD_MAX, dt=None):
+         thd_lo: float = 0.0, thd_hi: float = THD_MAX, dt=None,
+         scheme: str = "semi-implicit"):
     env = gym.make("Pendulum-v1", render_mode="rgb_array")
     u = env.unwrapped
     if dt is not None:
@@ -109,6 +130,8 @@ def main(n_traj: int, n_steps: int, seed: int, out: str, zeta: float = 0.0,
             fr.append(downsample(env.render()))
             if zeta > 0:
                 u.state = damped_step(u.state, zeta)
+            elif scheme == "verlet":
+                u.state = verlet_step(u.state, dt=u.dt)
             else:
                 env.step(zero)
             if abs(u.state[1]) >= u.max_speed - 1e-6:
@@ -131,7 +154,7 @@ def main(n_traj: int, n_steps: int, seed: int, out: str, zeta: float = 0.0,
         print(f"  DAMPED (zeta={zeta}): median energy change over the horizon {decay:+.3f}")
     else:
         print(f"  textbook-E relative oscillation: median {np.median(rel):.3f}  "
-              f"(shadow-Hamiltonian artifact of symplectic Euler, not secular drift)")
+              f"(shadow-Hamiltonian artifact of the {scheme} integrator, not secular drift)")
     print(f"  frames {frames.shape} {frames.dtype}  ~{frames.nbytes/1e9:.2f} GB")
 
     p = pathlib.Path(out)
@@ -152,9 +175,11 @@ if __name__ == "__main__":
     a.add_argument("--out", default="runs/pendulum_pixels.npz")
     a.add_argument("--dt", type=float, default=None,
                    help="override the simulator timestep (F6). Default keeps gymnasium's 0.05.")
+    a.add_argument("--scheme", choices=["semi-implicit", "verlet"], default="semi-implicit",
+                   help="integrator (F7). Default is gymnasium's own semi-implicit Euler.")
     a.add_argument("--zeta", type=float, default=0.0,
                    help="linear damping; 0 is the conservative dataset, 0.15 the GRU control value")
     a = a.parse_args()
     print("Building a PIXEL dataset from gymnasium Pendulum-v1 (real third-party simulator).")
-    main(a.n_traj, a.n_steps, a.seed, a.out, zeta=a.zeta, dt=a.dt,
+    main(a.n_traj, a.n_steps, a.seed, a.out, zeta=a.zeta, dt=a.dt, scheme=a.scheme,
          th_lo=a.th_lo, th_hi=a.th_hi, thd_lo=a.thd_lo, thd_hi=a.thd_hi)
