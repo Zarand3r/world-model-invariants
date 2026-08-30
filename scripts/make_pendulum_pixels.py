@@ -69,6 +69,23 @@ def damped_step(state, zeta: float, dt: float = 0.05, g: float = 10.0, l: float 
     return np.array([th + thd * dt, thd])
 
 
+def reversed_semi_implicit_step(state, dt: float = 0.05, g: float = 10.0, l: float = 1.0):
+    """Semi-implicit Euler with the two update lines SWAPPED -- F7b (docs/F7_PREREG.md).
+
+    Gymnasium updates velocity first, then position from the NEW velocity. Doing it the other way
+    round is still symplectic and still first order, but its shadow Hamiltonian carries the same
+    O(dt) term with the OPPOSITE sign: ground truth puts the optimum at c = -0.125 at dt=0.05,
+    against +0.125 for the forward order, with the same separation to one part in a thousand.
+
+    That equality is the point. The Verlet dataset (F7) is smoother than the semi-implicit one, so a
+    reviewer can attribute F7 to data difficulty. This dataset is exactly as rough as the forward
+    one and predicts the opposite sign, which no difficulty argument can produce.
+    """
+    th, thd = float(state[0]), float(state[1])
+    th_new = th + thd * dt
+    return np.array([th_new, thd + (3 * g / (2 * l)) * np.sin(th_new) * dt])
+
+
 def verlet_step(state, dt: float = 0.05, g: float = 10.0, l: float = 1.0):
     """Velocity Verlet -- F7 (docs/F7_PREREG.md).
 
@@ -132,6 +149,8 @@ def main(n_traj: int, n_steps: int, seed: int, out: str, zeta: float = 0.0,
                 u.state = damped_step(u.state, zeta)
             elif scheme == "verlet":
                 u.state = verlet_step(u.state, dt=u.dt)
+            elif scheme == "reversed":
+                u.state = reversed_semi_implicit_step(u.state, dt=u.dt)
             else:
                 env.step(zero)
             if abs(u.state[1]) >= u.max_speed - 1e-6:
@@ -175,7 +194,7 @@ if __name__ == "__main__":
     a.add_argument("--out", default="runs/pendulum_pixels.npz")
     a.add_argument("--dt", type=float, default=None,
                    help="override the simulator timestep (F6). Default keeps gymnasium's 0.05.")
-    a.add_argument("--scheme", choices=["semi-implicit", "verlet"], default="semi-implicit",
+    a.add_argument("--scheme", choices=["semi-implicit", "verlet", "reversed"], default="semi-implicit",
                    help="integrator (F7). Default is gymnasium's own semi-implicit Euler.")
     a.add_argument("--zeta", type=float, default=0.0,
                    help="linear damping; 0 is the conservative dataset, 0.15 the GRU control value")

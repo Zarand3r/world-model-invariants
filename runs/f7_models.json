@@ -203,7 +203,9 @@
   }
  ],
  "summary": {
-  "verlet_argmin_r": [
+  "arm": "verlet",
+  "target_r": 0.0,
+  "arm_argmin_r": [
    0.0,
    0.0,
    0.0
@@ -213,9 +215,9 @@
    1.0,
    1.0
   ],
-  "verlet_median_r": 0.0,
+  "arm_median_r": 0.0,
   "semi_implicit_median_r": 1.0,
-  "P1_seeds_near_zero": 3,
+  "P1_seeds_near_target": 3,
   "P1_pass": true,
   "P2_median_gap": 1.0,
   "P2_pass": true,
@@ -248,6 +250,93 @@
     "cwd": "/home/rbao/world-model-invariants",
     "utc": "2026-08-30T01:34:21+00:00",
     "git": "5c3213e1e461ca7350055ddf8d89359f9341ce84",
+    "git_dirty": true,
+    "python": "3.13.13",
+    "inputs": {
+     "runs/f7_verlet_s3_step6500.pt": {
+      "sha256": "f5833516a386887ac83b24ab02a6e11d57f3a9b08cc68bab2c0a40baa8bbec26",
+      "mtime": "2026-08-30T01:02:56+00:00",
+      "bytes": 53828741
+     },
+     "runs/f7_verlet_s4_step6500.pt": {
+      "sha256": "badcd172f9861271240f48c1c6ef30f18ee3192c2cbbe2a0deed357109111cad",
+      "mtime": "2026-08-30T01:14:08+00:00",
+      "bytes": 53828741
+     },
+     "runs/f7_verlet_s5_step6500.pt": {
+      "sha256": "2a90a3d0a8d954e5602da153bd4a89a9f6fa1fc48a15cd33a0c73f1d81c8b8dc",
+      "mtime": "2026-08-30T01:25:29+00:00",
+      "bytes": 53828741
+     }
+    }
+   },
+   {
+    "argv": [
+     "scripts/run_f7_analysis.py",
+     "--arm",
+     "verlet"
+    ],
+    "cwd": "/home/rbao/world-model-invariants",
+    "utc": "2026-08-30T01:45:07+00:00",
+    "git": "7b373e5f59623f7aa99dd53a378dfd03e219d6b2",
+    "git_dirty": true,
+    "python": "3.13.13",
+    "inputs": {
+     "runs/f7_verlet_s3_step6500.pt": {
+      "sha256": "f5833516a386887ac83b24ab02a6e11d57f3a9b08cc68bab2c0a40baa8bbec26",
+      "mtime": "2026-08-30T01:02:56+00:00",
+      "bytes": 53828741
+     },
+     "runs/f7_verlet_s4_step6500.pt": {
+      "sha256": "badcd172f9861271240f48c1c6ef30f18ee3192c2cbbe2a0deed357109111cad",
+      "mtime": "2026-08-30T01:14:08+00:00",
+      "bytes": 53828741
+     },
+     "runs/f7_verlet_s5_step6500.pt": {
+      "sha256": "2a90a3d0a8d954e5602da153bd4a89a9f6fa1fc48a15cd33a0c73f1d81c8b8dc",
+      "mtime": "2026-08-30T01:25:29+00:00",
+      "bytes": 53828741
+     }
+    }
+   },
+   {
+    "argv": [
+     "scripts/run_f7_analysis.py",
+     "--arm",
+     "verlet"
+    ],
+    "cwd": "/home/rbao/world-model-invariants",
+    "utc": "2026-08-30T01:45:23+00:00",
+    "git": "7b373e5f59623f7aa99dd53a378dfd03e219d6b2",
+    "git_dirty": true,
+    "python": "3.13.13",
+    "inputs": {
+     "runs/f7_verlet_s3_step6500.pt": {
+      "sha256": "f5833516a386887ac83b24ab02a6e11d57f3a9b08cc68bab2c0a40baa8bbec26",
+      "mtime": "2026-08-30T01:02:56+00:00",
+      "bytes": 53828741
+     },
+     "runs/f7_verlet_s4_step6500.pt": {
+      "sha256": "badcd172f9861271240f48c1c6ef30f18ee3192c2cbbe2a0deed357109111cad",
+      "mtime": "2026-08-30T01:14:08+00:00",
+      "bytes": 53828741
+     },
+     "runs/f7_verlet_s5_step6500.pt": {
+      "sha256": "2a90a3d0a8d954e5602da153bd4a89a9f6fa1fc48a15cd33a0c73f1d81c8b8dc",
+      "mtime": "2026-08-30T01:25:29+00:00",
+      "bytes": 53828741
+     }
+    }
+   },
+   {
+    "argv": [
+     "scripts/run_f7_analysis.py",
+     "--arm",
+     "verlet"
+    ],
+    "cwd": "/home/rbao/world-model-invariants",
+    "utc": "2026-08-30T01:45:40+00:00",
+    "git": "7b373e5f59623f7aa99dd53a378dfd03e219d6b2",
     "git_dirty": true,
     "python": "3.13.13",
     "inputs": {

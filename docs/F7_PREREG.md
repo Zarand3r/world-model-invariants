@@ -119,3 +119,94 @@ Verlet's shadow in this family is plain energy, so a Verlet-trained model recove
 conserves **textbook energy** --- the very quantity the semi-implicit models were shown *not* to
 conserve. The claim becomes: *the model conserves what its simulator conserves*, and the paper's
 central dissociation is a property of the **scheme**, not a fixed fact about world models.
+
+---
+
+# F7b --- the sign flip: a third scheme, equally rough, predicting `-c*`
+
+**Registered 2026-08-30, after F7 landed and before generating any data or training anything.**
+
+## The objection this answers
+
+F7 showed Verlet-trained models recover `c = 0` where semi-implicit models recover `c = 0.125`. The
+obvious reviewer objection: **the Verlet dataset is smoother.** Its textbook-energy oscillation is
+0.006 against semi-implicit's 0.186, so perhaps the model simply latches onto whatever varies least,
+and "tracks the integrator" is a story told over a data-difficulty artefact.
+
+That objection cannot be answered by any scheme whose data is smoother. It needs a scheme that is
+**exactly as rough** and predicts a **different** coefficient.
+
+## The scheme
+
+Gymnasium's semi-implicit Euler updates velocity first, then position from the *new* velocity.
+Reversing the two lines --- position first, then velocity from the *new* position --- is still
+symplectic, still first order, and its shadow Hamiltonian carries the same `O(dt)` term with the
+**opposite sign**. Verified on ground truth at `dt = 0.05` before registering:
+
+| scheme | argmin `c` | best ratio | separation from `c = 0` |
+|---|---|---|---|
+| semi-implicit (velocity first) | `+0.1250` | 5.329e-05 | **630.9x** |
+| **reversed (position first)** | **`-0.1250`** | 5.333e-05 | **630.1x** |
+| velocity Verlet | `0.0000` | 8.635e-05 | 1.0x |
+
+The forward and reversed schemes are **equally difficult by every measure available** --- same best
+ratio to three digits, same separation to one part in a thousand. The only difference is the sign,
+and it is caused by swapping two lines of simulator code.
+
+## Registered predictions
+
+Three seeds (3, 4, 5) on reversed semi-implicit Euler at `dt = 0.05`; everything else identical to
+F6's `dt = 0.05` arm and F7's Verlet arm.
+
+- **P1 (primary).** Reversed-scheme models put their argmin at `r = -1`: `|r_argmin + 1| <= 0.5` on
+  at least **2 of 3** seeds.
+- **P2 (ordering).** The three arms' median argmin `r` are strictly ordered
+  `reversed < Verlet < semi-implicit`, with `reversed <= -0.5` and `semi-implicit >= +0.5`.
+- **P3 (model quality).** All **three** registered acceptance criteria, checked and reported
+  individually: decode ratio below 0.05, finite rollout, and pixel std inside F6's observed
+  `0.0694--0.0699`. (F7's script checked only the first two; that is fixed and this arm uses the
+  corrected check.)
+
+## Falsifier
+
+If the reversed-scheme models land at `r ~ +1` --- the same place as the forward scheme --- then the
+recovered sign is a property of the **model or the training**, not of the simulator. F7's Verlet
+result would then have to be reinterpreted as a data-smoothness effect, and the paper's "learns the
+integrator" claim would weaken back to "learns something that co-varies with the integrator".
+
+This is the experiment that can most cheaply destroy F7's interpretation, which is why it runs next.
+
+## What a pass would establish
+
+That the recovered coefficient tracks a **sign flip produced by reordering two lines of the
+simulator**, on data that is by every available measure exactly as hard. At that point three schemes
+at one timestep predict `+0.125`, `0.000`, `-0.125` and the model reproduces all three, with `dt`
+held fixed throughout.
+
+## F7b amendment 1 --- correcting the "equally rough" claim, before any result
+
+**Written 2026-08-30, after generating the dataset and before analysing any model.**
+
+I registered above that the forward and reversed schemes are "exactly as difficult by every measure
+available". Generating the dataset shows that is **too strong**, and the record should say so before
+results exist rather than after.
+
+| measure | forward (semi-implicit) | reversed | Verlet |
+|---|---|---|---|
+| ground-truth invariance ratio at its own optimum | 5.329e-05 | 5.333e-05 | 8.635e-05 |
+| ground-truth separation from `c = 0` | 630.9x | 630.1x | 1.0x |
+| **dataset textbook-`E` relative oscillation** | **0.186** | **0.115** | **0.006** |
+
+On the invariance-ratio measure the experiment actually uses, the two are equal to within 0.1%. On
+relative oscillation they are **not**: the reversed dataset is about **1.6x smoother**. My claim of
+equality across "every measure available" was wrong.
+
+**Does this damage the design? No, and it is worth being precise about why.** A data-difficulty
+confound can explain a change in *magnitude* --- an easier dataset letting the model sit closer to
+textbook energy. It cannot explain a change in **sign**. Smoothness has no direction. The registered
+prediction is that the coefficient moves to `-0.125`, on the far side of `c = 0` from the forward
+scheme, and no amount of "this data is easier" produces that.
+
+So the correct statement of the control is the weaker, sufficient one: the reversed dataset is
+**1.6x** from the forward scheme on the roughness measure where Verlet is **31x** away, and it
+predicts an outcome that difficulty cannot produce at all. P1 and its falsifier are unchanged.
