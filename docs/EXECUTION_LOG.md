@@ -7918,3 +7918,50 @@ training compute on a question where I have already spent a week on a mis-specif
 flagging it for Richard rather than launching it.
 
 `paper1.2/` untouched. `origin/main` unchanged at `20fa8b4`.
+
+---
+
+## 2026-08-30 --- The reviewer handoff was actively misleading; corrected
+
+`docs/REVIEWER_HANDOFF.md` last changed on 2026-08-29, before any of this week's findings. It is the
+document whose whole purpose is to give a reviewer an accurate picture, and it had drifted into
+saying the opposite of what is now known:
+
+- its title and §1 asserted the integrator claim as established;
+- §2.1 was headed "The headline (F6) --- the model tracks the simulator's timestep";
+- §6 recommended, as the **top-ranked, "strongest and cheapest"** extension, "F7 --- does it track
+  the *scheme*?", the experiment I ran and withdrew as invalid;
+- §7 gave main-track probabilities driven by F6.
+
+A stale summary is one thing; one that recommends an experiment already known to be impossible is
+another. Corrected as a derived summary, with no raw rows touched.
+
+### What changed
+
+- **New §0**, at the top and referenced from a banner under the title, stating plainly that the title
+  is not currently supported: the four withdrawn experiments and the position-recurrence identity
+  behind them, the recommendation I made and retracted the same day, what F6 can and cannot claim,
+  and F11's quantified wall (`0.007 -> 0.6` rad, nine times the needed separation).
+- **§0.4 records the gate that worked**, as a deliberate counterweight: F11's pre-committed
+  readability gate withheld `0.844 / 0.852 / 0.849`, `p < 1e-100`, which is pure artefact.
+- **§2.1 and §2.2** now carry the attribution caveat rather than reading as settled results. The
+  numbers themselves are unchanged and still reproduce --- what changed is what they license.
+- **§4 "what to distrust"** gains this week at the top: a week spent on an axis that does not exist
+  in the data, a recommendation retracted the same day, four checking scripts weaker than the claims
+  they enforced, and the silent M29 provenance degradation.
+- **§6** leads by showing the recommendation it previously made and why it was wrong, rather than
+  quietly deleting it, and promotes mixed-timestep training to the only route to the headline. The
+  RK4 suggestion now carries an explicit instruction to run the observable-difference test **first**,
+  since that is exactly what sank F7.
+- **§7 withdraws the probability estimates outright** rather than replacing them. Over two days I
+  called F7 the cleanest result in the project, recommended withdrawing F6 and E19, and retracted
+  that --- all on one evidence base. A fresh point estimate would not be worth more than the last
+  one; the calibration failure is itself the finding.
+
+### Verification
+
+70/70 number checks still pass, including the four handoff-specific ones (`2.484`, `0.058`, `6.7`,
+`0.31`) --- those values were never wrong, only their interpretation was. 58 tests pass. The
+how-to-check block now also lists the mutation harness and the two new audits.
+
+`paper1.2/` untouched. `origin/main` unchanged at `20fa8b4`.

@@ -1,12 +1,70 @@
 # Review handoff — *World models learn their simulator's integrator, not the physics it approximates*
 
+> **The title above is not currently supported.** Read §0 before anything else. The paper's headline
+> claim is **unresolved**, four experiments built to test it were **withdrawn as invalid**, and one
+> recommendation I made on 2026-08-30 was **retracted the same day**. The negatives, the
+> dissociation, the architecture gap and the causal interventions are unaffected, and the
+> interventions are now measured immune rather than argued immune.
+
 For a co-author, an internal reviewer, or a future maintainer. What the paper claims, what the
 evidence is, what failed, what to distrust, and how to check any of it yourself.
 
 **Status:** ICLR 2025 submission format, **9-page main text** (16 with appendix and references),
-double-blind anonymised. **66/66** mechanical number checks and **56** tests pass. `origin/main`
+double-blind anonymised. **70/70** mechanical number checks (all now anchored to the claim they
+support, with a mutation harness proving 26/26 catch their claim being falsified) and **58** tests
+pass. `origin/main`
 remains pinned at the last published state (`20fa8b4`, 2026-08-24); all work is local on
 `roadmap/stage1` behind a `pre-push` hook.
+
+---
+
+## 0. What changed on 2026-08-29/30, and what it costs
+
+**The short version: the paper's headline claim is untested, not refuted, and I spent a week testing
+it on an axis where the difference does not exist in the data.**
+
+### 0.1 Four experiments withdrawn as invalid design
+
+F7, F7b, F9 and F10 compared **semi-implicit Euler** against **velocity Verlet**. Eliminating
+velocity, both reduce to the *identical* three-term position recurrence
+
+    th_{t+1} = 2 th_t - th_{t-1} + a(th_t) dt^2
+
+verified to `8.9e-16` synthetically and `~1e-15` on both datasets. They differ only in the first step
+and in **which finite difference is called the velocity**: the semi-implicit dataset's recorded
+`thetadot` equals the backward difference exactly, the Verlet dataset's equals the central difference
+exactly (both to `0.00000`).
+
+The models see **pixels, which show position**. Velocity is never rendered. So the entire contrast
+lived in a bookkeeping label the model cannot observe, and those four experiments could not have
+worked. `tests/test_observable_difference.py` now pins this, and pins that `dt` — unlike the scheme —
+*is* observable.
+
+### 0.2 A recommendation made and retracted the same day
+
+On the strength of F10 I recommended **withdrawing F6 and E19**. That was wrong: F10's control
+assumed the two schemes are distinguishable in the observations. F6 and E19 revert to **unresolved**.
+
+### 0.3 What F6 can and cannot claim today
+
+Models trained at timestep `dt` recover a coefficient matching `c*(dt)`. **Whether that reflects the
+model or the data it was measured on is untested**, and is **not testable by cross-evaluation with
+these assets**: every model is only in distribution on its own timestep. F11 quantified the wall — a
+model's one-step error rises from `~0.007` rad on its own data to `~0.6` rad on another timestep's,
+nine times the separation the test needs to resolve. This is a **limitation to state**, not a
+falsification.
+
+What *is* properly separated is F4b: it varies the **model** with the data held fixed (conv-GRU
+against RSSM on identical trajectories, `767x`). That supports the **level** claim — this model
+conserves something, that one does not — and says nothing about the coefficient.
+
+### 0.4 A gate that worked, for contrast
+
+F11 registered its readability gates *before* running. Without them the `dt = 0.08` models read as
+**0.844 / 0.852 / 0.849, 3 of 3, `p < 1e-100`** — and it is pure artefact: at `0.6` rad the
+prediction is near neither candidate, and the mirrored cells sit at chance (`0.512 / 0.502 / 0.511`),
+which a real effect would not do. Four experiments failed this week because I had not registered the
+gate that mattered; this one did not.
 
 ---
 
@@ -29,7 +87,10 @@ wrong with the probe.
 
 ## 2. Evidence
 
-### 2.1 The headline (F6) — the model tracks the simulator's timestep
+### 2.1 The headline (F6) — the recovered coefficient matches the simulator's timestep
+
+**Read §0.3 first.** The measurement below is reproducible and the numbers stand. What is *not*
+established is that it reflects the **model** rather than the **data it was measured on**.
 
 | dt | predicted `c*` | argmin `r` per seed | `rho_obs` r=0 / r=1 | separation |
 |---|---|---|---|---|
@@ -47,7 +108,7 @@ two-parameter intercept is `-0.0072 ± 0.0057`, excluding zero, from a real ~12%
 smallest timestep where the whole separation is 1.03x. A post-hoc fine grid there gives argmin
 `0.875` on 3/3, so it is genuine, not grid coarseness.
 
-### 2.2 The mechanism (E19)
+### 2.2 The mechanism (E19) — same attribution caveat as §2.1
 
 Sweeping `T_c = E + c*thetadot*sin(theta)` over a family containing both signs and wrong magnitudes,
 `rho_obs` is minimised at exactly `c* = 0.125` on 3/3 seeds, **12x** better than the wrong-sign
@@ -87,6 +148,25 @@ Load-bearing, not embarrassments — each bounds the claim with a number.
 
 Read this section first if you are reviewing adversarially.
 
+- **I spent a week testing the headline on an axis that does not exist in the data**, and four
+  preregistrations, six training runs and five measurement designs sat on that gap before I checked
+  it. The check costs three lines and no GPU (§0.1). Every gate I had written asked whether the
+  *instrument* could see a difference; none asked whether the difference was *there*.
+- **I recommended withdrawing F6 and E19, then retracted it the same day** (§0.2). Treat my
+  confidence statements in this document accordingly — see §7.
+- **Four checking scripts were weaker or wronger than the claims they enforced**, all found this
+  week: `run_f6_cross.py` printed "argmin follows the data" while its own rows read `0/3`;
+  `run_f7_gate0.py` recorded `G2_pass: true` off an `inf` from a comparison that never ran (F7's
+  Gate 0 had therefore **not** passed as registered); F7's `P3` checked two of three registered
+  criteria; F7b's `P2` checked a two-arm gap where the prereg registered a three-arm ordering. The
+  first version of the provenance audit reported `0/153` off a schema misread, and the first version
+  of the prereg audit reported ten false positives.
+- **M29 provenance had silently degraded across every script written that week.**
+  `inputs_from_args` only sees paths reaching the argparse Namespace, and those scripts hardcoded
+  their checkpoints and datasets, so artefacts recorded `inputs: {}` while looking stamped. Repaired
+  without recomputing (rows verified unchanged); the limitation is now documented in
+  `provenance.py` and swept by `scripts/audit_provenance.py`. **70 pre-M29 artefacts are deliberately
+  left unstamped** — asserting a provenance nobody can verify would be worse than an honest gap.
 - **The published `paper/` version has a defect.** Its random-constraint null is described as
   norm-matched, but the projection is scale-invariant in `C`, so random draws took steps **29x
   larger**. Corrected in `paper1.2` with a magnitude-matched null — which *strengthens* the result
@@ -110,8 +190,11 @@ Read this section first if you are reviewing adversarially.
 ## 5. How to check any of it
 
 ```bash
-uv run python scripts/verify_paper_numbers.py   # 66 checks: recompute from runs/, grep the sources
-uv run python -m pytest tests/ -q               # 56 tests, incl. a pinned coefficient-convention test
+uv run python scripts/verify_paper_numbers.py   # 70 checks, ALL anchored to their claim
+uv run python scripts/mutate_guards.py          # breaks each claim; 26/26 guards must catch it
+uv run python scripts/audit_preregs.py          # registered predictions with no recorded verdict
+uv run python scripts/audit_provenance.py       # artefacts with no record of their inputs
+uv run python -m pytest tests/ -q               # 58 tests, incl. the observable-difference guard
 uv run python scripts/make_results_summary.py   # regenerates docs/RESULTS.md byte-identically
 ./scripts/make_arxiv_archive.sh paper1.2        # archive; extract anywhere and it compiles standalone
 ```
@@ -126,40 +209,55 @@ claim it backs.
 
 ## 6. Extensions, ranked
 
-1. **F7 — does it track the *scheme*, not just the timestep?** Train on explicit vs semi-implicit
-   Euler at the same `dt`. Explicit Euler is not symplectic and has **no** conserved shadow, so the
-   prediction is sharp. Upgrades "learns the timestep" to "learns the integrator". ~3 GPU-hours,
-   infrastructure exists. *Strongest and cheapest.*
-2. **F9 — does inherited discretisation predict transfer failure?** Train at one `dt`, evaluate on
-   another, test whether error tracks the mismatch in `c*`. F2 and F5 both failed for the same
-   effect-size reason; this targets a regime where the effect is large by construction. *Best route
-   to the downstream consequence the paper lacks.*
-3. **F8 — higher-order integrators.** RK4's shadow correction is `O(dt^4)`, so predicted `c*` ~ 0.
-   A clean null-prediction test extending the claim to integrator *order*.
-4. **F10 — mixed-timestep training.** One shadow, an average, or neither?
-5. **F11 — real video.** No integrator exists; what is learned then? Highest impact, hardest, and the
-   direct sim-to-real question.
+**The previous version of this list led with "F7 — does it track the *scheme*, not just the
+timestep?", called it the strongest and cheapest, and estimated three GPU-hours. It was run, and it
+was invalid by construction (§0.1).** Kept visible here rather than quietly deleted, because the
+error was in the reasoning that produced the recommendation, not in the execution.
+
+1. **Mixed-timestep or `dt`-conditioned training.** *Now the only route to the paper's headline.*
+   Attributing the recovered coefficient to the model rather than the data needs one model that is
+   in distribution on more than one timestep; F11 showed cross-evaluation cannot do it (§0.3). Ask
+   whether such a model recovers one shadow, an average, or neither. Needs new training compute.
+2. **Real video.** No integrator exists, so what is learned then? Highest impact, hardest, and the
+   direct sim-to-real question. Unaffected by anything in §0.
+3. **Higher-order integrators (RK4).** Predicted `c* ~ 0` from an `O(dt^4)` correction. **Check
+   first** whether RK4 differs from the current schemes *in the position sequence* — the test in
+   `tests/test_observable_difference.py` — since that is exactly what sank F7.
+4. **Does inherited discretisation predict transfer failure?** F11 already shows the transfer
+   penalty is enormous (one-step error `0.007 -> 0.6` rad across a 4x timestep change). Attributing
+   that to `c*` mismatch rather than to generic distribution shift runs into the same confound, so
+   this needs a design that separates them before it is worth running.
 
 **Not recommended:** more toy systems, more seeds, another intervention variant, or a sixth
-dissociation axis. Effect sizes are small, interventions do not transfer, and the marginal claim is
-already well supported.
+dissociation axis.
 
 ---
 
 ## 7. Honest assessment
 
-The contribution is a **positive, general, parameter-free result** (F6) with a **mechanism** (E19)
-explaining a **methodological correction** (probing over-reports), bounded by **four measured
-negatives**. The evidence is unusually well controlled for this area.
+**The estimates that stood here are withdrawn.** They read *ICLR 55--65%, NeurIPS 40--50%, ICML
+35--45%*, and were driven by F6 — the claim now known to be unattributed. Replacing them with new
+numbers would repeat the mistake: over two days I called F7 "the cleanest result in the project",
+recommended withdrawing F6 and E19, and retracted that recommendation, all on the same evidence base.
+The calibration failure is the finding; a fresh point estimate would not be worth more than the last.
 
-The weaknesses are real and stated in the paper: two smooth Hamiltonian toy systems, 13.5M
-parameters, no released checkpoint, and **no downstream benefit** — the two practical uses we tested
-both fail, for one measured reason.
+What can be said without a forecast:
 
-Estimated main-track probability: **ICLR 55--65%**, **NeurIPS 40--50%**, **ICML 35--45%**. F6 is what
-moved these; before it the paper was diagnostic-only and I would have said 40--50 / 25--30 / 20--25.
-The largest remaining risk is presentation rather than evidence — and a reviewer who wants scale will
-not find it here.
+**What the evidence supports today.** A methodological correction with a mechanism — a probe fitted
+to true energy reaches `|rho| = 0.9999` yet is **6.7x** less preserved by the model's own transition
+than a label-free scalar, and enforcing it makes the model's physics worse. A five-axis dissociation.
+A `767x` architecture gap that *is* properly model-versus-data separated. Four preregistered
+negatives, each with a measured cause. Causal interventions that are immune to the confound by
+construction **and were measured immune**: repair survives 3/3 with `C` fitted on a different
+dataset entirely.
+
+**What it does not support.** That the model learns its simulator's integrator, or its timestep. The
+measurement reproduces; the attribution to the model is untested and needs §6.1.
+
+**The honest framing of the paper as it stands** is a probing-methodology result with an unusually
+well-controlled negative section — not the positive general result the current title claims. Whether
+that is worth a main-track submission as-is, or whether to run §6.1 first, is a judgement call for
+Richard, and it is the open decision this document exists to inform.
 
 ---
 
