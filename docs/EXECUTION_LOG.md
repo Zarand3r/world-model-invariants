@@ -7184,3 +7184,82 @@ Integrating this changes what the paper claims, so it is Richard's call, not min
 in `runs/f7_models.json`, and in the roadmap status table. Nothing in `paper1.2/` has been touched.
 
 `origin/main` unchanged at `20fa8b4`.
+
+---
+
+## 2026-08-30 --- The cross-evaluation control FALSIFIES F7, and puts F6 and E19 in question
+
+**This retracts what I reported earlier today.** I told Richard that F7 was "the cleanest result in
+the project" and that the title's word *integrator* was "earned". A control I registered afterwards
+shows the measurement those claims rest on does not measure the model.
+
+### The control
+
+Registered as F7 amendment 2 before running: cross checkpoint against evaluation dataset. If the
+recovered argmin follows the **checkpoint**, the sweep measures the model's learned dynamics; if it
+follows the **evaluation data**, it measures the readout construction and F7's interpretation
+collapses. No training; existing checkpoints only.
+
+| checkpoint trained on | evaluated on | argmin `r` | follows model? |
+|---|---|---|---|
+| semi-implicit | semi-implicit | `+1.00` (3/3) | -- diagonal |
+| semi-implicit | **Verlet** | **`+0.00` (3/3)** | **no** |
+| Verlet | **semi-implicit** | **`+1.00` (3/3)** | **no** |
+| Verlet | Verlet | `+0.00` (3/3) | -- diagonal |
+
+**`0/3` and `0/3` on the two off-diagonals.** Across all 12 cells the argmin is a pure function of
+the evaluation dataset --- `+1.0` in all six semi-implicit-eval cells and `0.0` in all six
+Verlet-eval cells --- and does not depend on which checkpoint is used.
+
+The depth of the minimum does not rescue it either. A semi-implicit-trained model on Verlet data
+scores `rho_obs = 0.00765` at the optimum; the Verlet-trained model on the same data scores
+`0.00766`. The two are indistinguishable.
+
+**The control script is sound**: its Verlet/Verlet diagonal cells reproduce `runs/f7_models.json`'s
+numbers to the last digit, so this is not a harness artefact.
+
+### Why it happens
+
+`run()` computes `nxt = m.transition(H)` --- a **one-step** prediction from encoded **real** frames.
+A model that predicts well reproduces the next state of whatever trajectory it is shown, so
+`C(next) - C(now)` approximates the true change of the target along the *evaluation* trajectory. The
+minimising `r` is then the evaluation data's own shadow, whichever model produced the step. The
+measurement asks "is this target conserved along these trajectories?", not "has this model learned
+this scheme?"
+
+### Scope --- what this does and does not damage
+
+**Falsified.** F7's claim that the model recovers its own simulator's coefficient. Dead as stated.
+
+**In question, and not yet audited.** F6 and E19 use this same measurement, and in both, *every model
+was only ever evaluated on data from its own simulator*. Model and data were never separated, so the
+confound was invisible by construction. F6's model arm may be re-deriving its own physics arm. I am
+not asserting that --- I am saying the experiment as run cannot distinguish the two, which is exactly
+what the cross-evaluation was built to detect.
+
+**Probably unaffected, stated as a hypothesis rather than a finding.** F4b compares a conv-GRU
+(`rho_obs` 4.83--5.55) against the RSSM (`~0.0075`) on *identical* data, so its 767x gap cannot be a
+data effect. That establishes the measurement is model-sensitive in *level* while this control shows
+it is data-determined in *argmin location* --- these are consistent, and the distinction matters. The
+intervention results (E1, E4, E9, E12c) edit latents and roll forward, which is a different
+measurement; they need checking, not assuming.
+
+### What a valid model-side measurement would look like
+
+Conservation along the model's **own imagined rollout** from an initial latent, so the data supplies
+only the initial condition and every subsequent step is the model's. The E12c interchange machinery
+already rolls 50 steps into imagination, so the infrastructure exists. That is a new experiment
+needing its own preregistration, not a patch.
+
+### Status and what I did not do
+
+F7b (reversed-scheme training, 3 seeds) was launched before this control returned and is finishing.
+Its registered analysis uses the same measurement, so it cannot answer its question either; I have
+**not** analysed it or claimed anything from it.
+
+I have **not** touched `paper1.2/`, have **not** started the imagined-rollout experiment, and have
+**not** revised F6's or E19's recorded status beyond marking them as in question. Deciding how far to
+re-audit the paper --- including the published one, which shares this measurement --- is Richard's
+call, and it is the reason I am stopping here rather than continuing.
+
+`origin/main` unchanged at `20fa8b4`.

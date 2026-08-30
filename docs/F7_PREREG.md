@@ -210,3 +210,31 @@ scheme, and no amount of "this data is easier" produces that.
 So the correct statement of the control is the weaker, sufficient one: the reversed dataset is
 **1.6x** from the forward scheme on the roughness measure where Verlet is **31x** away, and it
 predicts an outcome that difficulty cannot produce at all. P1 and its falsifier are unchanged.
+
+## F7 amendment 2 --- cross-evaluation control: does the argmin follow the model or the data?
+
+**Registered 2026-08-30, before running it. No training required --- existing checkpoints only.**
+
+The measurement evaluates `rho_obs` under **the model's own learned transition**
+(`m.transition`), not under the simulator, so the argmin is a property of the model. But the
+**evaluation dataset** still does real work: it supplies the frames that are encoded, the PCA
+subspace, and the regression that defines the candidate direction in latent space. A sceptic can
+therefore ask whether F7's contrast lives in the readout construction rather than in the model.
+
+The control separates them by crossing checkpoint against evaluation data:
+
+| checkpoint trained on | evaluated on | if argmin follows the **model** | if it follows the **data** |
+|---|---|---|---|
+| semi-implicit | Verlet data | `r = +1` | `r = 0` |
+| Verlet | semi-implicit data | `r = 0` | `r = +1` |
+
+- **P1 (registered).** The argmin follows the **checkpoint** in both off-diagonal cells: the
+  semi-implicit models stay at `r = +1` on Verlet data, and the Verlet models stay at `r = 0` on
+  semi-implicit data, each on at least **2 of 3** seeds.
+- **Falsifier.** If either off-diagonal cell flips to match its evaluation data, the sweep is reading
+  the trajectories used to build the readout rather than the model's dynamics, and **F7's
+  interpretation collapses** --- the result would be a property of the analysis, not of the model.
+
+Off-diagonal cells are mildly out-of-distribution for the encoder (same initial conditions and
+similar images, different integration), so a degradation in absolute `rho_obs` is expected and is not
+itself a failure. Only the **argmin location** is registered.
