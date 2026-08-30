@@ -93,15 +93,18 @@ check("E19 P3 reduction range high", red[-1], fmt="{:.1f}")
 check("E19 residual to label-free",
       st.median(at(m, CS)["rho_obs"] for m in e19["models"]) / st.median(r["rho_obs"] for r in lf),
       fmt="{:.2f}", near=r"VALUE\\times[^.]{0,40}(remaining )?gap|gap of[^.]{0,20}VALUE")
-check("E19 rho_E at c*", st.median(at(m, CS)["rho_E"] for m in e19["models"]), fmt="{:.3f}")
+check("E19 rho_E at c*", st.median(at(m, CS)["rho_E"] for m in e19["models"]), fmt="{:.3f}",
+      near=r"VALUE\$?[^\n]{0,20}against[^\n]{0,12}0\.9999")
 for m in e19["models"]:
     s = m["ckpt"].split("_s")[1][0]
-    check(f"E19 effect at c*, seed {s}", at(m, CS)["effect_pct"], fmt="{:.1f}")
+    check(f"E19 effect at c*, seed {s}", at(m, CS)["effect_pct"], fmt="{:.1f}",
+          near=r"VALUE[^\n]{0,90}repair on all three")
 
 # --- F4b ---
 term = [m["recovered"]["rho_obs"] for m in f4b["models"] if m["ckpt"].endswith("step60000.pt")]
 check("F4b degradation vs RSSM",
-      st.median(term) / st.median(r["rho_obs"] for r in lf), fmt="{:.0f}")
+      st.median(term) / st.median(r["rho_obs"] for r in lf), fmt="{:.0f}",
+      near=r"VALUE[^\n]{0,15}gap|conservation VALUEx worse")
 
 # --- F2 (registered NEGATIVE: drift is not a useful trust signal) ---
 def _rank_np(x):
@@ -172,7 +175,8 @@ CHECKS.append(("F6 registered P3 failure is stated", "-",
 _r = sorted(m["rho_G_Gtrue"] for m in f3["models"])
 check("F3 rho(G,Gtrue) low", _r[0], fmt="{:.3f}",
       near=r"correlates[^.]{0,80}VALUE")
-check("F3 rho(G,Gtrue) high", _r[-1], fmt="{:.3f}")
+check("F3 rho(G,Gtrue) high", _r[-1], fmt="{:.3f}",
+      near=r"0\.004\$?-\$?VALUE")
 CHECKS.append((f"F3 A1 failed on all {len(f3['models'])} models (gate fired)", "-",
                not any(m["A1_pass"] for m in f3["models"])))
 CHECKS.append(("F3: no released-checkpoint result claimed", "-",
@@ -192,8 +196,10 @@ check("F1 obs/pred scale high", max(_scale), fmt="{:.1f}")
 # The paper quotes the RANGE, not per-seed values, so check the endpoints. Checking each seed
 # fails on a value that is inside the stated range but never written down -- which it did.
 _fin = [m["ratio_true_over_shuffled"] for m in f1a["models"] if not re.search(r"step\d+", m["ckpt"])]
-check("F1 action-use range low", min(_fin), fmt="{:.3f}")
-check("F1 action-use range high", max(_fin), fmt="{:.3f}")
+check("F1 action-use range low", min(_fin), fmt="{:.3f}",
+      near=r"VALUE\$?-\$?0\.761")
+check("F1 action-use range high", max(_fin), fmt="{:.3f}",
+      near=r"0\.740\$?-\$?VALUE")
 
 # --- F5 (registered NEGATIVE: no control benefit) ---
 _arms = ("none", "conserve", "balance", "probe", "random")
@@ -222,7 +228,8 @@ def _ci(r, n):
     z = math.atanh(r); se = 1 / math.sqrt(n - 3)
     return math.tanh(z - 1.96 * se), math.tanh(z + 1.96 * se)
 for m in e10b["models"]:
-    check(f"E10b Spearman {m['ckpt'][-16:-3]}", m["spearman_ratio_repair"], fmt="{:+.2f}")
+    check(f"E10b Spearman {m['ckpt'][-16:-3]}", m["spearman_ratio_repair"], fmt="{:+.2f}",
+          near=r"VALUE[^\n]{0,60}(across seeds|at n = 3)")
 n_excl = sum(1 for m in e10b["models"]
              if (lambda t: t[0] * t[1] > 0)(_ci(m["spearman_ratio_repair"], len(m["rows"]))))
 CHECKS.append((f"E10b CI excludes zero on {n_excl} of 3 (paper must say 'one of')",

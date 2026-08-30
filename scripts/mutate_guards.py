@@ -46,6 +46,12 @@ CASES = [
     ("1.65",  "9.99",  "F5 Gate 0 paired margin"),
     ("2.24",  "9.99",  "F6 separation dt=0.035"),
     ("5.72",  "9.99",  "F6 separation dt=0.05"),
+    ("0.977", "0.999", "E19 rho_E at c*"),
+    ("-49.5", "-99.9", "E19 effect at c*, seed 3"),
+    ("767",   "999",   "F4b degradation vs RSSM"),
+    ("0.032", "9.999", "F3 rho(G,Gtrue) high"),
+    ("0.740", "9.999", "F1 action-use range low"),
+    ("+0.57", "+9.99", "E10b Spearman _s1_step30000"),
 ]
 
 

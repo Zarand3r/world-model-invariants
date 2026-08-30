@@ -1,5 +1,73 @@
 {
- "models": [],
+ "models": [
+  {
+   "ckpt": "runs/f7_verlet_s3_step6500.pt",
+   "dt": 0.05,
+   "c_star_predicted": 0.125,
+   "sweep": [
+    {
+     "r": -1.0,
+     "rho_obs": 0.04793033376336098
+    },
+    {
+     "r": -0.5,
+     "rho_obs": 0.02470901980996132
+    },
+    {
+     "r": -0.25,
+     "rho_obs": 0.01424336526542902
+    },
+    {
+     "r": 0.0,
+     "rho_obs": 0.00766135286539793
+    },
+    {
+     "r": 0.25,
+     "rho_obs": 0.01177254132926464
+    },
+    {
+     "r": 0.5,
+     "rho_obs": 0.021268419921398163
+    },
+    {
+     "r": 0.75,
+     "rho_obs": 0.03219504654407501
+    },
+    {
+     "r": 1.0,
+     "rho_obs": 0.0434093251824379
+    },
+    {
+     "r": 1.25,
+     "rho_obs": 0.05469590052962303
+    },
+    {
+     "r": 1.5,
+     "rho_obs": 0.06634777039289474
+    },
+    {
+     "r": 2.0,
+     "rho_obs": 0.09010691940784454
+    },
+    {
+     "r": 3.0,
+     "rho_obs": 0.13721293210983276
+    }
+   ],
+   "argmin_r": 0.0,
+   "c_recovered": 0.0,
+   "rho_obs_at_r1": 0.0434093251824379,
+   "rho_obs_at_rm1": 0.04793033376336098,
+   "rho_obs_at_r0": 0.00766135286539793,
+   "seed": 3,
+   "acceptance": {
+    "found": true,
+    "decode_ratio": 0.008,
+    "rollout_finite": true,
+    "pixel_std": 0.0694
+   }
+  }
+ ],
  "provenance": {
   "runs": [
    {
@@ -18,6 +86,35 @@
       "sha256": null,
       "mtime": null,
       "bytes": null
+     },
+     "runs/f7_verlet_s4_step6500.pt": {
+      "sha256": null,
+      "mtime": null,
+      "bytes": null
+     },
+     "runs/f7_verlet_s5_step6500.pt": {
+      "sha256": null,
+      "mtime": null,
+      "bytes": null
+     }
+    }
+   },
+   {
+    "argv": [
+     "scripts/run_f7_analysis.py",
+     "--out",
+     "runs/f7_models.json"
+    ],
+    "cwd": "/home/rbao/world-model-invariants",
+    "utc": "2026-08-30T01:12:39+00:00",
+    "git": "04ae99d7ca9d558056ae2a71213bed13a375160d",
+    "git_dirty": true,
+    "python": "3.13.13",
+    "inputs": {
+     "runs/f7_verlet_s3_step6500.pt": {
+      "sha256": "f5833516a386887ac83b24ab02a6e11d57f3a9b08cc68bab2c0a40baa8bbec26",
+      "mtime": "2026-08-30T01:02:56+00:00",
+      "bytes": 53828741
      },
      "runs/f7_verlet_s4_step6500.pt": {
       "sha256": null,
