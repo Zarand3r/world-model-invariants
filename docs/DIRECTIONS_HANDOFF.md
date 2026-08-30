@@ -6,6 +6,33 @@ next, ranked by how much it shifts a main-track decision.
 
 Rendered version: <https://claude.ai/code/artifact/998f0b86-4325-4847-90fc-3fa2ee30cf69>
 
+## 0. Correction, 2026-08-30 — the reframe is an EXTENSION, not a new paper
+
+The version of this document published earlier recommended reframing around *"decodability does not
+imply dynamical preservation"* and quoted odds for it as a fresh submission. **That was wrong, and
+the error was not checking novelty against the already-published preprint.**
+
+The arXiv abstract's own closing sentence reads: *"These results distinguish a dynamically meaningful
+invariant from a merely decodable correlate."* That **is** the reframe's thesis. And
+`paper1.2/CLAIMS.md` says as much: paper 1.0's claim *"survives, but it is now the **second** claim
+rather than the first, because a stronger and more transferable one sits above it"* --- that stronger
+one being the integrator result. Remove it, and paper 1.2 collapses onto paper 1.0 with better
+evidence.
+
+**Consequence for the odds below:** the "reframed, as-is" row is a well-evidenced **v2 of a published
+preprint**, worth roughly **15--20% at ICLR**, not the 25--30% quoted. The honest answer to "what is
+new?" --- E18's supervised control, the four load-bearing negatives, the 2-DoF replication, the
+corrected null --- is real but incremental.
+
+**Consequence for the ranking:** directions 2 and 3 are now load-bearing for **novelty**, not merely
+for odds. The paper needs at least one of {integrator settled, downstream tool, benchmark scale} to
+be a new contribution rather than a revision. Direction 3 in particular is not "restores the
+headline" --- it is the difference between a new paper and a v2, because the shadow-Hamiltonian
+result *explains why probing over-reports* rather than measuring the same dissociation more
+carefully.
+
+---
+
 ## 1. The odds
 
 Main-track acceptance, single submission, no resubmission cycle.
@@ -98,10 +125,18 @@ direction 1 if that lands somewhere with non-physical structure.
 
 ## 5. If you only do one thing
 
-**Direction 2.** No training, existing checkpoints, and it fills the hole two previous experiments
-failed to fill --- the hole a reviewer names right after "this is a pendulum".
+**Superseded by §0.** The earlier advice --- "reframe now, keep the training open" --- treated the
+reframe as a viable standalone submission. It is a v2 of your own preprint, so it is not.
 
-If you can afford two, add **direction 1** and write the reframe while it runs. The reframe rests
-only on already-separated evidence, so it is robust to however 1 and 3 turn out --- and if 3 later
-succeeds, the integrator result returns to the headline of a paper that was already sound, rather
-than propping up one that was not.
+**Do direction 2 first.** No training, existing checkpoints, and it is now the cheapest route to a
+contribution the preprint does not already contain: a diagnostic becomes a selection method.
+
+**Then direction 3, with its precondition.** It is the only thing that makes the *mechanism* claim ---
+why probing over-reports, rather than that it does --- and that mechanism is what a genuinely new
+paper would be built on.
+
+**Direction 1 amplifies whichever of those lands** but does not by itself answer "what is new relative
+to your arXiv paper", since "same claim, larger system" is still a revision.
+
+Write the reframe as the paper's *second* claim, as `paper1.2` already had it --- not as its
+first.
