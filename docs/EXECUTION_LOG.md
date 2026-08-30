@@ -7338,3 +7338,70 @@ is the same fix identified yesterday and still needs its own preregistration.
 
 F7b finished training (3/3 seeds). Still **not analysed** --- it uses the falsified measurement.
 `paper1.2/` untouched. `origin/main` unchanged at `20fa8b4`.
+
+---
+
+## 2026-08-30 --- E1's repair survives fitting `C` on the wrong integrator; and a gate that had not passed
+
+### 1. Testing my own caveat (amendment 4)
+
+Yesterday I claimed E1 and E12c are "immune by construction" to the F7 confound, and flagged one hole
+I had not tested: the direction `C` is still identified using the falsified one-step statistic. After
+three checking artefacts this week weaker than the claims they existed to test, leaving that untested
+was not acceptable.
+
+Two arms on the same semi-implicit checkpoints and the same rollout initial conditions --- only the
+data used to *identify* `C` differs. Arm X fits `C` on **velocity Verlet** data.
+
+| seed | arm | best `eps` | energy drift | pixel MSE | tangent null | random null |
+|---|---|---|---|---|---|---|
+| 3 | M | 0.02 | **-28.4%** | -0.5% | +14.6% | +35.4% |
+| 3 | **X** | 0.02 | **-38.3%** | +3.1% | +2.1% | +13.7% |
+| 4 | M | 0.02 | **-45.3%** | -13.6% | -0.9% | +10.5% |
+| 4 | **X** | 0.02 | **-48.0%** | -12.1% | -0.9% | +11.2% |
+| 5 | M | 0.01 | **-38.8%** | -9.5% | +9.6% | -4.1% |
+| 5 | **X** | 0.02 | **-23.8%** | -7.9% | +13.1% | +12.6% |
+
+**Repair 3/3 in both arms. Median effect -38.8% matched against -38.3% mismatched --- indistinguishable.**
+P1 passes 3/3 against a registered bar of 2/3.
+
+So the intervention result does **not** depend on `C` being identified from data matched to the
+model's own integrator. The "immune by construction" claim now has evidence behind it rather than a
+code-reading, and the caveat I flagged is closed.
+
+**Two things I am not claiming.** This says nothing about whether `C` is scheme-specific --- that is
+the falsified claim and stays falsified. And the nulls are not uniformly harmful: **9 of 12**
+increased drift (median +10.9%), with three cells slightly negative. Reported as 9/12, not as "the
+nulls never repair".
+
+Worth noting the direction of the E1 hard gate. It guards against pixel MSE improving while decoded
+energy does not. Here energy improved in **all six** cells, and in seed 3 arm X energy improved
+`-38.3%` while pixel MSE got **worse** (`+3.1%`) --- the opposite of the artefact the gate exists to
+catch, and stronger evidence than a cell where both move together.
+
+### 2. F7's Gate 0 had not actually passed as registered
+
+Auditing the other scripts for the verdict-doesn't-follow-from-the-measurement pattern found one in
+my own gate. `run_f7_gate0.py` set the G2 ratio to `inf` when explicit Euler diverged, so
+`G2_pass` came out **true** off a comparison that never happened. I described the divergence honestly
+in prose at the time, but the artefact on disk said "pass".
+
+Fixed to separate `G2_pass` from `G2_evaluable`. Re-running gives **`G2_pass: false`,
+`gate_pass: false`**: explicit Euler diverges at `dt = 0.05`, so the registered 5x comparison is not
+evaluable there. G0 and G1 stand on their own (semi-implicit wants `0.125`, Verlet wants `0.000`),
+and the finite `3.7e5x` figure is now recorded against `dt = 0.02`, the timestep where it can be
+computed.
+
+F7 is falsified anyway so no conclusion moves. But had it not been, I would have been leaning on a
+gate that formally failed --- which is exactly why this was worth finding.
+
+### Scope, updated
+
+| result | status |
+|---|---|
+| **F7** | falsified |
+| **F6, E19** | unresolved --- direct control not runnable |
+| **E1, E4, E9, E12c** | **immune, now measured** --- repair survives `C` fitted on the wrong integrator, 3/3 |
+| **F4b** | unaffected |
+
+`paper1.2/` untouched. `origin/main` unchanged at `20fa8b4`.

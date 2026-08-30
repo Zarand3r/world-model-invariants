@@ -108,13 +108,30 @@ def main():
         g1[str(dt)] = bool(vv and vv.get("kept") and
                            abs(vv["argmin_c"]) <= 0.25 * abs(si["argmin_c"]))
     ee5, si5 = res["0.05"].get("EE"), res["0.05"]["SI"]
-    g2_ratio = (ee5["best_ratio"] / si5["best_ratio"]) if (ee5 and ee5.get("kept")) else float("inf")
+    # "Diverged, so the ratio is undefined" is NOT the same evidence as "the ratio exceeds 5".
+    # An earlier version set this to inf on divergence, which recorded G2_pass=true off a
+    # measurement that never happened. Report the two outcomes separately.
+    g2_evaluable = bool(ee5 and ee5.get("kept"))
+    g2_ratio = (ee5["best_ratio"] / si5["best_ratio"]) if g2_evaluable else None
     verdict = {
         "G0_SI_argmin_at_r1": g0, "G0_pass": all(g0.values()),
         "G1_VV_separated": g1, "G1_pass": all(g1.values()),
-        "G2_EE_over_SI_at_dt0.05": g2_ratio, "G2_pass": bool(g2_ratio >= 5.0),
+        "G2_EE_over_SI_at_dt0.05": g2_ratio,
+        "G2_evaluable_at_dt0.05": g2_evaluable,
+        "G2_pass": bool(g2_evaluable and g2_ratio >= 5.0),
+        "G2_note": (None if g2_evaluable else
+                    "explicit Euler diverged at dt=0.05 (every trajectory clipped), so the "
+                    "registered 5x comparison could not be evaluated at this timestep"),
     }
+    # The finite comparison exists only where explicit Euler survives.
+    for _dt, _per in res.items():
+        if _per.get("EE", {}).get("kept"):
+            verdict["G2_finite_ratio_at_smallest_surviving_dt"] = {
+                "dt": _dt, "ratio": _per["EE"]["best_ratio"] / _per["SI"]["best_ratio"]}
+            break
     verdict["gate_pass"] = bool(verdict["G0_pass"] and verdict["G1_pass"] and verdict["G2_pass"])
+    if not g2_evaluable:
+        print("  G2 NOT EVALUABLE at dt=0.05: " + verdict["G2_note"])
     print("\n  " + json.dumps({k: v for k, v in verdict.items() if k.endswith("pass")}))
     if not verdict["G0_pass"]:
         print("  G0 FAILED -- positive control broken, do not read G1/G2")

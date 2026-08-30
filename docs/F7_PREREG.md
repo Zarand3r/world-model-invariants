@@ -270,3 +270,40 @@ as `r = 1.0`. Stated now so the reading is not chosen after seeing the numbers.
 
 I expect the falsifier to fire, given amendment 2. Registering the expectation so that confirming it
 counts for nothing extra and refuting it counts fully.
+
+## Amendment 4 --- does E1's repair survive fitting `C` on the wrong integrator?
+
+**Registered 2026-08-30, before running. No training --- existing checkpoints only.**
+
+Yesterday I recorded that E1 and E12c are "immune by construction" to the F7 confound, because they
+roll the model forward freely and the data supplies only the initial condition. I also flagged, and
+did not test, the one hole in that claim: **the direction `C` is still identified using the falsified
+one-step statistic on real frames.** After three checking artefacts this week that were weaker than
+the claims they existed to test, leaving my own caveat untested is not acceptable.
+
+E1 already supports the needed separation via `--eval-data` (built for E9): `C`, `h_mean`, `U` and
+`R` are frozen from `--data`, and the rollout starts from `--eval-data`'s latents.
+
+Two arms, same semi-implicit-trained checkpoint, same rollout initial conditions:
+
+| arm | `C` fitted on | rollout from |
+|---|---|---|
+| **M (matched)** | semi-implicit `dt = 0.05` | semi-implicit `dt = 0.05` |
+| **X (mismatched)** | **velocity Verlet `dt = 0.05`** | semi-implicit `dt = 0.05` |
+
+Only the data used to *identify* `C` differs. This is a fair test rather than a distribution-shift
+artefact for the reason F7's control was clean and F6's was not: at a fixed timestep the two schemes
+differ at `O(dt^2)`, and a crossed model scores `rho_obs` 0.00765 against a matched model's 0.00766.
+
+- **P1 (registered).** In arm X the recovered direction still repairs: median `|D_sec|` at its best
+  `eps` is below its value at `eps = 0` by at least **half** the relative improvement arm M shows, on
+  at least **2 of 3** seeds.
+- **Falsifier.** If repair vanishes in arm X, or is indistinguishable from the tangent control there,
+  then `C`'s identification carries the effect, the intervention results inherit the F7 confound, and
+  **my "immune by construction" claim was wrong** and must be retracted alongside F7.
+
+**E1's hard gate applies unchanged**: improvement in `pixel_mse` without improvement in decoded
+physical energy is not repair, and is to be read as a failure rather than a partial success.
+
+I am not stating an expected direction. Last time I registered an expectation ("I expect the
+falsifier to fire") I was wrong, and in a way I had not imagined.

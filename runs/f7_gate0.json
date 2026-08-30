@@ -3414,9 +3414,15 @@
       "0.08": true
     },
     "G1_pass": true,
-    "G2_EE_over_SI_at_dt0.05": Infinity,
-    "G2_pass": true,
-    "gate_pass": true
+    "G2_EE_over_SI_at_dt0.05": null,
+    "G2_evaluable_at_dt0.05": false,
+    "G2_pass": false,
+    "G2_note": "explicit Euler diverged at dt=0.05 (every trajectory clipped), so the registered 5x comparison could not be evaluated at this timestep",
+    "G2_finite_ratio_at_smallest_surviving_dt": {
+      "dt": "0.02",
+      "ratio": 365568.9339957801
+    },
+    "gate_pass": false
   },
   "provenance": {
     "runs": [
@@ -3427,8 +3433,8 @@
           "runs/f7_gate0.json"
         ],
         "cwd": "/home/rbao/world-model-invariants",
-        "utc": "2026-08-30T00:46:34+00:00",
-        "git": "e0f5ddc752f6a0386f5b85784b50856091a0b6a5",
+        "utc": "2026-08-30T02:48:10+00:00",
+        "git": "3e6d1da40e85c99c87ff5286eca8a53c835eaed2",
         "git_dirty": true,
         "python": "3.13.13",
         "inputs": {}
