@@ -7648,3 +7648,69 @@ Withdrawing a claim and rewriting a paper around what remains is an authorial de
 `paper1.2/` is still untouched. The evidence for it is now complete rather than pending.
 
 `origin/main` unchanged at `20fa8b4`.
+
+---
+
+## 2026-08-30 --- Does the PUBLISHED paper need a correction? Assessed: no.
+
+F10 withdrew F6/E19's model-side claims. I had been repeating that `paper1.2/` is untouched without
+ever checking what the **published** paper on arXiv actually claims. If it made the claim F10
+falsifies, that would be a correction obligation, not a drafting decision. Checked.
+
+### The published paper does not make the claim
+
+`shadow`, `integrator`, `semi-implicit` and `symplectic` appear in exactly one file, `setup.tex`, in
+one paragraph, as **background about the simulator**:
+
+> Gymnasium uses a semi-implicit integrator, so it conserves a nearby shadow Hamiltonian
+> `H~ = H + O(dt)` rather than `E` itself. In our trajectories this produces about 12% relative
+> oscillation in `E` without secular drift, **which we treat as a noise floor.**
+
+The shadow is a *nuisance term* there, used to justify a noise floor. The published paper never
+claims the model learns the integrator, the scheme or the timestep. **F10 falsifies nothing in it.**
+
+That claim was introduced only in `paper1.2/`, which is unpublished and untouched.
+
+### Its punchline is the part that is immune
+
+The abstract's central result --- "projecting the latent state back toward its initial level set
+reduces rollout error in all three conservative models, whereas matched random constraints usually
+increase it" --- is an intervention measured on the model's own imagined rollout against matched
+controls. That is immune by construction, and this week it was **measured** immune rather than
+assumed: repair survives 3/3 with `C` fitted on a different integrator's data (E1 amendment 4).
+
+### The one claim with genuine exposure --- and why it survives
+
+The abstract also says "a label-free search recovers the same energy-like invariant across
+independently trained conservative models, while the same procedure finds no comparable invariant in
+matched damped models."
+
+That search selects what is conserved under the model's one-step transition on real trajectories, so
+it is exposed to a weaker form of the confound: if the transition tracks the data, the search finds
+what the *data* conserves. **The damped control does not separate the two** --- damped data has no
+conserved quantity either, so finding nothing there is consistent with both readings. Recording that
+plainly, because the paper leans on that control.
+
+What does separate them is **F4b**: a conv-GRU trained and analysed on the **same dataset**
+(`runs/pendulum_pixels.npz` for both the reference RSSM and the GRU) scores `rho_obs` 4.83--5.55
+against the RSSM's `~7e-3`, a **767x** gap. If the search read only the data, both architectures
+would score alike. They do not, so the recovery is model-dependent.
+
+So the strongest threat to the published paper's recovery claim is answered by work done **after**
+publication. No correction is required on the evidence available.
+
+### One provenance gap found while checking
+
+`runs/f4b_recovery.json` records no `data` path per model and its provenance `inputs` are empty, so
+the same-data claim above rests on both scripts sharing a default rather than on the artefact. That
+is exactly what M29 provenance stamping exists to prevent. The conclusion is not in doubt --- both
+analyses default to the same file --- but the record should not have required me to infer it.
+
+### Status
+
+| paper | affected by F10 |
+|---|---|
+| **published (`paper/`, arXiv)** | **no** --- makes no integrator claim; punchline immune and measured; recovery claim defended by F4b |
+| `paper1.2/` (unpublished) | **yes** --- title and headline claim should be withdrawn |
+
+`origin/main` unchanged at `20fa8b4`.
