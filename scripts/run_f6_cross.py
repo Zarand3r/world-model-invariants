@@ -80,7 +80,8 @@ def main():
                                         "(pinned at grid edges), matching neither hypothesis. "
                                         "Cross-timestep evaluation is out-of-distribution, so this "
                                         "control cannot adjudicate F6.")}[v["outcome"]])
-    attach(out, op, inputs=inputs_from_args(a))
+    attach(out, op, inputs=sorted({f'runs/f6_dt{d}_s{s}_step6500.pt' for d in DTS for s in SEEDS}
+                              | {f'runs/pend_dt{d}.npz' for d in DTS}))
     op.write_text(json.dumps(out, indent=1) + "\n")
     print(f"  wrote {op}")
 

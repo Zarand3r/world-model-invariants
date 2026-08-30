@@ -61,7 +61,7 @@ def main():
         print("\n  " + json.dumps(verdict))
         print("  argmin follows the MODEL" if verdict["P1_pass"]
               else "  argmin follows the DATA -- F7's interpretation does not survive")
-    attach(out, op, inputs=inputs_from_args(a))
+    attach(out, op, inputs=sorted({c for v in CKPT.values() for c in v} | set(DATA.values())))
     op.write_text(json.dumps(out, indent=1) + "\n")
     print(f"  wrote {op}")
 

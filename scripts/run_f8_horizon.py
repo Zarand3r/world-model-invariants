@@ -111,7 +111,7 @@ def main():
         print(f"\n  readable horizons (P4): {readable or 'NONE'}")
         if not readable:
             print("  -> the imagined-rollout approach cannot adjudicate F6/E19 at any horizon tested.")
-    attach(out, op, inputs=inputs_from_args(a))
+    attach(out, op, inputs=sorted({c for v in FAMILIES.values() for c in v} | {'runs/pend_dt0.05.npz'}))
     op.write_text(json.dumps(out, indent=1) + "\n")
     print(f"  wrote {op}")
 

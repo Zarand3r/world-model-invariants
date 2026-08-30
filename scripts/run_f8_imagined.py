@@ -144,7 +144,7 @@ def main():
                   f"(semi-implicit {n_si}/3 >= 0.5, verlet {n_vv}/3 <= 0.5)")
             print("  -> the model carries the integrator" if summ["P1_pass"]
                   else "  -> the families do NOT separate: F6/E19 model-side claims fail as F7's did")
-    attach(out, op, inputs=inputs_from_args(a))
+    attach(out, op, inputs=sorted({c for v in FAMILIES.values() for c in v} | {DATA}))
     op.write_text(json.dumps(out, indent=1) + "\n")
     print(f"  wrote {op}")
 

@@ -105,7 +105,7 @@ def main():
         print(f"  verdict: {summ['verdict']}")
         if floor_blind >= 2:
             print("  -> the READOUT cannot see the scheme gap, so this says nothing about the model.")
-    attach(out, op, inputs=inputs_from_args(a))
+    attach(out, op, inputs=sorted(set(CKPTS) | {DATA}))
     op.write_text(json.dumps(out, indent=1) + "\n")
     print(f"  wrote {op}")
 

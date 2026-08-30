@@ -93,6 +93,12 @@ def inputs_from_args(ns) -> list[str]:
     Scripts here name their inputs inconsistently -- `--ckpt` or `--ckpts`, `--data`, `--eval-data`,
     `--ood-data` -- so this selects by extension rather than by argument name, and therefore keeps
     working when a script grows a new input flag.
+
+    LIMITATION, found 2026-08-30 by auditing every artefact in runs/: this can only see paths that
+    reach the argparse Namespace. A script that hardcodes its checkpoints or datasets as module
+    constants -- which every experiment script written that week did -- records `inputs: {}` and
+    looks stamped while carrying no input record at all. M29 did not break; the inputs stopped being
+    where it looks. Such scripts must pass `inputs=[...]` to `attach()` explicitly.
     """
     out: list[str] = []
     for v in vars(ns).values():

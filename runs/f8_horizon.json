@@ -2475,6 +2475,55 @@
     "git_dirty": true,
     "python": "3.13.13",
     "inputs": {}
+   },
+   {
+    "argv": [
+     "scripts/run_f8_horizon.py",
+     "--out",
+     "runs/f8_horizon.json"
+    ],
+    "cwd": "/home/rbao/world-model-invariants",
+    "utc": "2026-08-30T05:42:30+00:00",
+    "git": "1db578ad00fbe75ab899fc3a8dda5945e18d8b34",
+    "git_dirty": true,
+    "python": "3.13.13",
+    "inputs": {
+     "runs/f6_dt0.05_s3_step6500.pt": {
+      "sha256": "7716c91b0dfebfcab0d1a7505deefe70e0e92408777b2cbc2d2a12bd545327ec",
+      "mtime": "2026-08-29T08:16:16+00:00",
+      "bytes": 53828677
+     },
+     "runs/f6_dt0.05_s4_step6500.pt": {
+      "sha256": "b296a804d3d3586f9e97414f058d3a9ce9bd6b79709165e6ab714f388a1ea48a",
+      "mtime": "2026-08-29T08:34:00+00:00",
+      "bytes": 53828677
+     },
+     "runs/f6_dt0.05_s5_step6500.pt": {
+      "sha256": "1f100cf84ef1997ce61e3f8ba7c6809807a788a8f8ef79472afc005716b6dd3a",
+      "mtime": "2026-08-29T08:52:13+00:00",
+      "bytes": 53828677
+     },
+     "runs/f7_verlet_s3_step6500.pt": {
+      "sha256": "f5833516a386887ac83b24ab02a6e11d57f3a9b08cc68bab2c0a40baa8bbec26",
+      "mtime": "2026-08-30T01:02:56+00:00",
+      "bytes": 53828741
+     },
+     "runs/f7_verlet_s4_step6500.pt": {
+      "sha256": "badcd172f9861271240f48c1c6ef30f18ee3192c2cbbe2a0deed357109111cad",
+      "mtime": "2026-08-30T01:14:08+00:00",
+      "bytes": 53828741
+     },
+     "runs/f7_verlet_s5_step6500.pt": {
+      "sha256": "2a90a3d0a8d954e5602da153bd4a89a9f6fa1fc48a15cd33a0c73f1d81c8b8dc",
+      "mtime": "2026-08-30T01:25:29+00:00",
+      "bytes": 53828741
+     },
+     "runs/pend_dt0.05.npz": {
+      "sha256": "9eed2d0776a177961113f711b4ba4bd69d3db1a1c0f6f9c5519364824d910e8b",
+      "mtime": "2026-08-29T06:39:18+00:00",
+      "bytes": 6799505
+     }
+    }
    }
   ]
  }

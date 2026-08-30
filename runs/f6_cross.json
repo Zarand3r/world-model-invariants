@@ -170,6 +170,60 @@
     "git_dirty": true,
     "python": "3.13.13",
     "inputs": {}
+   },
+   {
+    "argv": [
+     "scripts/run_f6_cross.py",
+     "--out",
+     "runs/f6_cross.json"
+    ],
+    "cwd": "/home/rbao/world-model-invariants",
+    "utc": "2026-08-30T05:42:28+00:00",
+    "git": "1db578ad00fbe75ab899fc3a8dda5945e18d8b34",
+    "git_dirty": true,
+    "python": "3.13.13",
+    "inputs": {
+     "runs/f6_dt0.02_s3_step6500.pt": {
+      "sha256": "4b5e54122040c385b5d7569ba5a6b9fe1669c97647082c61280c4bfc6415bc79",
+      "mtime": "2026-08-29T06:53:06+00:00",
+      "bytes": 53828677
+     },
+     "runs/f6_dt0.02_s4_step6500.pt": {
+      "sha256": "d7d17a195245fda03b81bd189f279589205b4084c92d395afdd570060cfdbb0c",
+      "mtime": "2026-08-29T07:03:46+00:00",
+      "bytes": 53828677
+     },
+     "runs/f6_dt0.02_s5_step6500.pt": {
+      "sha256": "73101479f47565323c79a21d677406e899e54d6035c34895316d5e6f4ec428e4",
+      "mtime": "2026-08-29T07:14:26+00:00",
+      "bytes": 53828677
+     },
+     "runs/f6_dt0.08_s3_step6500.pt": {
+      "sha256": "0d0544a94618ffa4cc8a340d8964e6348498ff7e08f4f91eff8fa742113f08b9",
+      "mtime": "2026-08-29T09:03:35+00:00",
+      "bytes": 53828677
+     },
+     "runs/f6_dt0.08_s4_step6500.pt": {
+      "sha256": "db997f0f61b7330e3ed264b08d44d427a1e609095fbc603c91cd2b8203228255",
+      "mtime": "2026-08-29T09:14:04+00:00",
+      "bytes": 53828677
+     },
+     "runs/f6_dt0.08_s5_step6500.pt": {
+      "sha256": "7c9136b9c8f9ffa0f29f0297cc32e20f9461c46edba5559b10b21409b463f8ed",
+      "mtime": "2026-08-29T09:24:39+00:00",
+      "bytes": 53828677
+     },
+     "runs/pend_dt0.02.npz": {
+      "sha256": "14c04b7347adaf4e7bec8ee456222650791d30df81ceb04512134339db5e832c",
+      "mtime": "2026-08-29T06:35:24+00:00",
+      "bytes": 6600362
+     },
+     "runs/pend_dt0.08.npz": {
+      "sha256": "aa95321c02adaccdf5683d635d4a38d2fd3f1017a0b7520e55b9e77c55ceaae6",
+      "mtime": "2026-08-29T06:41:22+00:00",
+      "bytes": 6901882
+     }
+    }
    }
   ]
  }

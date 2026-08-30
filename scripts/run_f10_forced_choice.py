@@ -128,7 +128,7 @@ def main():
               f"P3 symmetry {summ['P3_symmetry_pass']}")
         if not summ["all_readable"]:
             print("  -> at least one cell is degenerate; its rate is not to be read.")
-    attach(out, op, inputs=inputs_from_args(a))
+    attach(out, op, inputs=sorted({c for v in FAMILIES.values() for c in v} | set(DATASETS.values())))
     op.write_text(json.dumps(out, indent=1) + "\n")
     print(f"  wrote {op}")
 

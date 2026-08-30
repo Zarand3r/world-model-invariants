@@ -7714,3 +7714,58 @@ analyses default to the same file --- but the record should not have required me
 | `paper1.2/` (unpublished) | **yes** --- title and headline claim should be withdrawn |
 
 `origin/main` unchanged at `20fa8b4`.
+
+---
+
+## 2026-08-30 --- M29 provenance had silently degraded across every script I wrote this week
+
+Yesterday's check of the published paper needed one load-bearing fact --- that F4b's conv-GRU and the
+reference RSSM were analysed on the **same** dataset --- and I could only establish it from two
+scripts sharing an argparse default, because `runs/f4b_recovery.json` records no input paths. M29
+provenance stamping exists precisely so that inference is never necessary. Swept all 153 artefacts.
+
+### My first audit was wrong, in this week's usual way
+
+It read `provenance["inputs"]` and reported **0 of 153** artefacts as fully stamped. The real schema
+nests inputs per run entry, `provenance["runs"][i]["inputs"]`. Checked the schema before believing
+the number, which is the only reason it did not become a finding.
+
+### The real picture
+
+| | count |
+|---|---|
+| record their inputs | 19 |
+| **stamped but `inputs: {}`** | **15** |
+| unstamped (pre-M29) | 70 |
+
+The 15 empty ones are almost entirely **scripts I wrote this week**: `f6_cross`, `f7_cross`,
+`f8_imagined`, `f8_horizon`, `f9_resolution`, `f10_forced_choice`, plus `f4b_recovery`.
+
+### Cause
+
+`inputs_from_args` selects path-like strings **out of the argparse Namespace**. Every experiment
+script I wrote this week hardcodes its checkpoints and datasets as module constants (`CKPTS`, `DATA`,
+`FAMILIES`, `DATASETS`), so nothing path-like reaches the Namespace and `inputs` comes out empty.
+
+**M29 did not break. I stopped putting inputs where it looks**, and the artefacts went on looking
+stamped the whole time. A provenance mechanism that degrades to silence is worse than one that fails
+loudly, so the limitation is now documented in `provenance.py` itself rather than in this log.
+
+### Fix
+
+Six scripts now pass their real inputs explicitly. Re-running each **re-stamps without recomputing**,
+because every one skips cells already present --- so the raw rows are untouched (verified: 12->12,
+12->12, 6->6, 6->6, 3->3, 12->12) and each artefact now carries a stamp listing 4--8 input files. The
+stamp history reads `[0, 8]`, which is the honest record: an empty stamp followed by a repaired one,
+rather than a rewritten past.
+
+`scripts/audit_provenance.py` makes the sweep repeatable.
+
+### What I deliberately did not do
+
+The 70 unstamped artefacts predate M29 and are **left alone**. Stamping them now would assert a
+provenance nobody can verify --- an honest gap is better than a fabricated record. Two of the
+remaining empty-input artefacts (`f7_gate0`, `f6_physics`) are pure simulations with no file inputs,
+where empty is correct; the audit says so rather than flagging them as defects.
+
+`paper1.2/` untouched. `origin/main` unchanged at `20fa8b4`.
