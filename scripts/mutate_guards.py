@@ -40,6 +40,12 @@ CASES = [
     ("0.31",  "9.99",  "F1 variance of dC"),
     ("0.0014", "0.9999", "F5 largest arm effect"),
     ("0.575", "9.999", "F5 across-episode return SD"),
+    ("0.125", "0.999", "E19 shadow coefficient"),
+    ("1.10",  "9.99",  "E19 residual to label-free"),
+    ("0.058", "0.999", "F6 origin-forced slope CI"),
+    ("1.65",  "9.99",  "F5 Gate 0 paired margin"),
+    ("2.24",  "9.99",  "F6 separation dt=0.035"),
+    ("5.72",  "9.99",  "F6 separation dt=0.05"),
 ]
 
 

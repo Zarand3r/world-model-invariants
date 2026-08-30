@@ -82,7 +82,8 @@ check("E18 rho_obs ratio sup/lf",
 phys = e19["physics_P1"]
 check("E19 physics improvement at c*", phys["improvement_x"], fmt="{:.0f}",
       near=r"VALUE\\times[^.]{0,60}better conserved")
-check("E19 shadow coefficient", CS, fmt="{:.3f}")
+check("E19 shadow coefficient", CS, fmt="{:.3f}",
+      near=r"c\^\\star[^.]{0,80}VALUE")
 wrong = [at(m, -CS)["rho_obs"] / at(m, CS)["rho_obs"] for m in e19["models"]]
 check("E19 wrong-sign control (median, NOT best seed)", st.median(wrong), fmt="{:.0f}",
       near=r"VALUE\\times[^.]{0,60}worse")
@@ -91,7 +92,7 @@ check("E19 P3 reduction range low", red[0], fmt="{:.1f}")
 check("E19 P3 reduction range high", red[-1], fmt="{:.1f}")
 check("E19 residual to label-free",
       st.median(at(m, CS)["rho_obs"] for m in e19["models"]) / st.median(r["rho_obs"] for r in lf),
-      fmt="{:.2f}")
+      fmt="{:.2f}", near=r"VALUE\\times[^.]{0,40}(remaining )?gap|gap of[^.]{0,20}VALUE")
 check("E19 rho_E at c*", st.median(at(m, CS)["rho_E"] for m in e19["models"]), fmt="{:.3f}")
 for m in e19["models"]:
     s = m["ckpt"].split("_s")[1][0]
@@ -145,14 +146,20 @@ for _dt in sorted(_by):
     _r0 = float(np.median([z["rho_obs_at_r0"] for z in _by[_dt]]))
     _r1 = float(np.median([z["rho_obs_at_r1"] for z in _by[_dt]]))
     # the paper quotes these to the precision it uses: 2 dp for the small ones, 1 dp for 13.5
-    check(f"F6 separation dt={_dt}", _r0 / _r1, fmt=("{:.1f}" if _r0 / _r1 >= 10 else "{:.2f}"))
+    # Anchored to its own row of the timestep table -- bounded by newline, since rows are single
+    # lines. An earlier version bounded by "no backslash", which broke on rows whose argmin
+    # cell contains \times.
+    check(f"F6 separation dt={_dt}", _r0 / _r1,
+          fmt=("{:.1f}" if _r0 / _r1 >= 10 else "{:.2f}"),
+          near=rf"{re.escape(str(_dt))}\s*&[^\n]{{0,160}}VALUE")
 _x = np.array([m["dt"] for m in f6["models"]]); _y = np.array([m["c_recovered"] for m in f6["models"]])
 _slope0 = float((_x @ _y) / (_x @ _x))
 _res = _y - _slope0 * _x
 _se0 = float(np.sqrt(((_res ** 2).sum() / (len(_x) - 1)) / (_x @ _x)))
 check("F6 origin-forced slope", _slope0, fmt="{:.3f}",
       near=r"slope[^.]{0,60}VALUE")
-check("F6 origin-forced slope CI", 1.96 * _se0, fmt="{:.3f}")
+check("F6 origin-forced slope CI", 1.96 * _se0, fmt="{:.3f}",
+      near=r"2\.484\s*\\pm\s*VALUE")
 _exact = sum(1 for m in f6["models"] if abs(m["argmin_r"] - 1.0) < 1e-9)
 CHECKS.append((f"F6 argmin exactly at r=1 on {_exact} of {len(f6['models'])} models", "-",
                f"{_exact} of {len(f6['models'])}" in CORPUS or f"{_exact} of\n12" in CORPUS))
@@ -201,7 +208,8 @@ check("F5 across-episode return SD", _base.std(), fmt="{:.3f}",
 _g = f5g["models"][0]["arms"]
 _d = (np.array([r["return"] for r in _g["none"]["rows"]])
       - np.array([r["return"] for r in _g["__random_policy__"]["rows"]]))
-check("F5 Gate 0 paired margin", _d.mean(), fmt="{:.2f}")
+check("F5 Gate 0 paired margin", _d.mean(), fmt="{:.2f}",
+      near=r"random[^.]{0,60}\+VALUE|\+VALUE[^.]{0,40}95\\%")
 CHECKS.append(("F5 not described as untested", "-",
                not re.search(r"helps a planner is untested|planner[^.]{0,40}untested", CORPUS, re.I)))
 CHECKS.append(("F5: no arm claimed to beat no-correction", "-",

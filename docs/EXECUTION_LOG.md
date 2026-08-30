@@ -6966,3 +6966,51 @@ effect and return SD), taking anchored coverage from 4 to 10.
 labelled as such; they should gain anchors as the claims they guard are next touched.
 
 `verify_paper_numbers.py` 70/70; 56 tests pass.
+
+---
+
+## 2026-08-29 --- Anchor the headline numbers; a bad row-bound caught by the guards themselves
+
+Continuing the previous entry: 37 checks were presence-only, meaning they asserted digits appeared
+*somewhere* in the paper rather than next to the claim they support. I enumerated them and anchored
+the eight with the most consequence --- the ones backing the mechanism, the headline table and the
+one positive downstream result:
+
+| Check | Anchored to |
+|---|---|
+| E19 shadow coefficient `0.125` | the phrase defining $c^\star$ |
+| E19 residual to label-free `1.10` | the sentence describing the remaining gap |
+| F6 origin-forced slope CI `0.058` | the `2.484 \pm` it qualifies |
+| F5 Gate 0 paired margin `1.65` | the comparison against random actions |
+| F6 separations `1.03 / 2.24 / 5.72 / 13.5` | **their own row** of the timestep table |
+
+The table rows matter most. Presence-only, a separation could be right in aggregate while sitting in
+the wrong row --- exactly the error that would invert the paper's claim about which timestep is
+best-conserved, and exactly the error a reader cannot catch without the run records.
+
+### The row anchor was wrong on first attempt, and the checks said so
+
+I bounded each row with "match the dt, then up to 120 non-backslash characters, then the value" ---
+using *no backslash* as a proxy for *stay inside this row*. Three of the four failed immediately.
+The rows for $\Delta t \ge 0.035$ have an argmin cell reading `$+1.00\times3$`, so the bound could
+not reach past `\times` to the separation column. Bounding by newline instead is both correct and
+simpler, since a table row is one line.
+
+Worth recording because the failure mode was benign in the best way: **an over-strict anchor fails
+loudly, an under-strict one passes silently.** A guard that is wrong in the strict direction costs
+ten minutes; one that is wrong in the loose direction is why these checks needed a mutation harness
+in the first place.
+
+### Result
+
+`mutate_guards.py` extended from 8 to 14 cases. Every one is caught:
+
+    14/14 guards caught their mutation
+
+The F6 separations each broke exactly **one** occurrence --- they appear only in the table, so
+nothing else in the paper restates them. The E19 coefficient broke four and the slope CI five, which
+is the usual pattern: a number that carries the argument gets repeated in the abstract, intro,
+results and conclusion, and a guard has to survive all of them being wrong at once.
+
+Anchored coverage 10 -> 16 of 70. **29 checks remain presence-only** and stay labelled as such.
+`verify_paper_numbers.py` 70/70; 56 tests pass; `origin/main` unchanged at `20fa8b4`.
