@@ -70,15 +70,18 @@ def check(label, value, *, fmt="{:.1f}", must_appear=None, near=None):
 # --- E18 ---
 check("E18 label-free rho_obs median (6.9e-3)", st.median(r["rho_obs"] for r in lf) * 1e3, fmt="{:.1f}")
 check("E18 supervised rho_obs median (4.58e-2)", st.median(r["rho_obs"] for r in sup) * 1e2, fmt="{:.2f}")
-check("E18 label-free effect median", st.median(r["effect_pct"] for r in lf), fmt="{:.1f}")
-check("E18 supervised effect median", st.median(r["effect_pct"] for r in sup), fmt="{:.1f}")
+check("E18 label-free effect median", st.median(r["effect_pct"] for r in lf), fmt="{:.1f}",
+      near=r"median\s*\$?-?VALUE")
+check("E18 supervised effect median", st.median(r["effect_pct"] for r in sup), fmt="{:.1f}",
+      near=r"\+VALUE\\%[^.]{0,60}(two models|33\.4)")
 check("E18 rho_obs ratio sup/lf",
       st.median(r["rho_obs"] for r in sup) / st.median(r["rho_obs"] for r in lf), fmt="{:.1f}",
       near=r"VALUE\\times[^.]{0,40}less\s+preserved")
 
 # --- E19 ---
 phys = e19["physics_P1"]
-check("E19 physics improvement at c*", phys["improvement_x"], fmt="{:.0f}")
+check("E19 physics improvement at c*", phys["improvement_x"], fmt="{:.0f}",
+      near=r"VALUE\\times[^.]{0,60}better conserved")
 check("E19 shadow coefficient", CS, fmt="{:.3f}")
 wrong = [at(m, -CS)["rho_obs"] / at(m, CS)["rho_obs"] for m in e19["models"]]
 check("E19 wrong-sign control (median, NOT best seed)", st.median(wrong), fmt="{:.0f}",
@@ -174,7 +177,8 @@ for _m in f1b["models"]:
     check(f"F1 rho(C,E) {_s}", _m["rho_C_energy"], fmt="{:.2f}")
     check(f"F1 Spearman(power,dC) {_s}", _m["spearman_pred_obs"], fmt="{:.3f}")
 _var = 100 * float(np.mean([m["pearson_pred_obs"] ** 2 for m in f1b["models"]]))
-check("F1 variance of dC explained by power (%)", _var, fmt="{:.2f}")
+check("F1 variance of dC explained by power (%)", _var, fmt="{:.2f}",
+      near=r"VALUE\\%[^.]{0,80}variance")
 _scale = [m["scale_obs_over_pred"] for m in f1b["models"]]
 check("F1 obs/pred scale low", min(_scale), fmt="{:.1f}")
 check("F1 obs/pred scale high", max(_scale), fmt="{:.1f}")
@@ -190,8 +194,10 @@ _ret = {a: np.concatenate([[r["return"] for r in m["arms"][a]["rows"]] for m in 
         for a in _arms}
 _base = _ret["none"]
 _largest = max(abs(_ret[a].mean() - _base.mean()) for a in _arms[1:])
-check("F5 largest arm effect", _largest, fmt="{:.4f}")
-check("F5 across-episode return SD", _base.std(), fmt="{:.3f}")
+check("F5 largest arm effect", _largest, fmt="{:.4f}",
+      near=r"largest[^.]{0,60}VALUE")
+check("F5 across-episode return SD", _base.std(), fmt="{:.3f}",
+      near=r"(standard\s+deviation|SD)[^.]{0,40}VALUE")
 _g = f5g["models"][0]["arms"]
 _d = (np.array([r["return"] for r in _g["none"]["rows"]])
       - np.array([r["return"] for r in _g["__random_policy__"]["rows"]]))

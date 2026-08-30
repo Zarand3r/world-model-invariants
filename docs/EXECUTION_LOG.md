@@ -6939,3 +6939,30 @@ I have repeatedly cited "N/N checks pass" as evidence the paper's numbers are ve
 anchored checks that is true. For the presence-only majority it means only that the digits occur
 somewhere in the corpus --- weaker than I implied. The labels now say so, and the remaining anchors
 should be added as the claims they guard are touched.
+
+### A mutation harness, because I kept getting this wrong by hand
+
+`scripts/mutate_guards.py` breaks each guarded claim in the paper and checks that the guard notices.
+Written because I got the same thing wrong **three times in one day**, always the way
+`cppgpt/tools/mutate.sh` warns about: a mutation that does not apply everywhere the claim appears
+"survives", and the guard looks broken when the test is.
+
+- 1st: mutated `6.7\times` in `dissociation.tex` only --- it also lives in the abstract and intro.
+- 2nd: mutated `"slope of $2.484"`, missing the conclusion's `"slope 2.484"` without the *of*.
+- 3rd: the harness itself mutated only `sections/*.tex` --- but `CLAIMS.md` is **also** in the corpus
+  `verify_paper_numbers.py` reads, so the E18 label-free guard slept through a partial mutation.
+
+The third one is the interesting one: **the harness reported `MISSED` and I believed it, then found
+the harness was at fault, not the guard.** A tool that says a guard is broken has to be as trustworthy
+as the guard. It now mutates the whole corpus and asserts the mutation applied before drawing any
+conclusion, and it exits non-zero if any anchored guard sleeps.
+
+### Result
+
+Six more high-consequence checks anchored (E18 effects, E19 physics improvement, F1 variance, F5
+effect and return SD), taking anchored coverage from 4 to 10.
+
+**8/8 anchored guards now catch their claim being falsified.** 37 checks remain presence-only and are
+labelled as such; they should gain anchors as the claims they guard are next touched.
+
+`verify_paper_numbers.py` 70/70; 56 tests pass.
