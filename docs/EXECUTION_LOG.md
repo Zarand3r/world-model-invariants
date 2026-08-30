@@ -8056,3 +8056,56 @@ Earlier the same session, the provenance audit's schema misread produced a false
 about as often as the things they check**, so a tool's output gets the same scrutiny as a result.
 
 `paper1.2/` prose untouched. `origin/main` unchanged at `20fa8b4`.
+
+---
+
+## 2026-08-30 --- A concrete reframe proposal, so the open decision can actually be made
+
+The decision that has been pending for several cycles is: run mixed-timestep training to settle the
+attribution behind the headline, or reframe the paper around what the evidence already supports. The
+second option is hard to weigh in the abstract, so `docs/REFRAME_PROPOSAL.md` sets out concretely what
+that paper would claim. **Nothing in `paper1.2/` was changed** --- rewriting the manuscript is
+Richard's decision, and this exists to inform it, not to pre-empt it.
+
+### The proposed claim
+
+> **Decodability does not imply dynamical preservation.** A world model can carry a quantity a linear
+> probe recovers almost perfectly while its own learned transition does not preserve it --- and a
+> label-free search against the transition finds a direction that *is* preserved and that causally
+> repairs imagination.
+
+### Why this survives when the integrator claim does not
+
+The proposal grades the evidence by **how well it is separated**, which is the axis the week's
+failures turned on:
+
+- **Properly separated, model versus data:** F4b (conv-GRU against RSSM on *identical* trajectories,
+  `767x`) and the causal interventions (measured on the model's own imagined rollout against matched
+  nulls, and *measured* immune this week rather than argued immune).
+- **Same model, same data, so not exposed to the confound at all:** E18 and E14b.
+- **Load-bearing negatives with measured causes:** F5, F2, F1, F3.
+
+The proposal states E18's limit rather than burying it: the label-free scalar is fitted *to be*
+conserved, so winning on conservation is partly by construction. The non-trivial half is the other
+direction --- a nearly perfectly **decodable** quantity is not **dynamically preserved**, which no
+probe diagnostic detects because nothing is wrong with the probe.
+
+### Numbers cross-checked
+
+Every figure quoted was recomputed from the run records rather than copied from earlier prose:
+E18 `6.7x`, F4b `767x` and its `4.83--5.55` range, and the E1 `C`-identification control's
+`-38.8%` / `-38.3%`. All four reproduce exactly. My first attempt used the wrong JSON keys and
+raised; I fixed the reader rather than quoting unverified numbers.
+
+### The recommendation, and its honest cost
+
+**Reframe now, keep mixed-timestep training open.** The reframe rests only on already-separated
+evidence, so it is robust to whatever that training later shows, and if it succeeds the integrator
+result can be restored to the headline on top of a paper that was already sound --- a better position
+than submitting on it now and meeting the attribution question in review.
+
+Stated plainly in the proposal: this is a **weaker paper** than the one drafted, and I decline to
+quantify how much weaker. My forecasts moved in both directions within two days this week, and a
+fifth number would not be worth more than the previous four.
+
+`paper1.2/` untouched. `origin/main` unchanged at `20fa8b4`.
