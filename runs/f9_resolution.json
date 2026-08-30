@@ -1,0 +1,61 @@
+{
+ "models": [
+  {
+   "ckpt": "runs/f6_dt0.05_s3_step6500.pt",
+   "D_model": 0.006587189666929073,
+   "D_decoder": 0.004947768169435529,
+   "D_scheme": 0.014407318306087102,
+   "model_over_scheme": 0.4572113648760006,
+   "decoder_over_scheme": 0.3434204800865053
+  },
+  {
+   "ckpt": "runs/f6_dt0.05_s4_step6500.pt",
+   "D_model": 0.007487853244505615,
+   "D_decoder": 0.0055758146008320075,
+   "D_scheme": 0.014407318306087102,
+   "model_over_scheme": 0.5197256758977825,
+   "decoder_over_scheme": 0.38701266136920304
+  },
+  {
+   "ckpt": "runs/f6_dt0.05_s5_step6500.pt",
+   "D_model": 0.006435420406868409,
+   "D_decoder": 0.0050229150072414915,
+   "D_scheme": 0.014407318306087102,
+   "model_over_scheme": 0.4466771865621542,
+   "decoder_over_scheme": 0.3486363596977868
+  }
+ ],
+ "summary": {
+  "model_over_scheme": [
+   0.457,
+   0.52,
+   0.447
+  ],
+  "decoder_over_scheme": [
+   0.343,
+   0.387,
+   0.349
+  ],
+  "P1_cannot_resolve": "0/3",
+  "P2_can_resolve": "0/3",
+  "P3_decoder_blind": "0/3",
+  "verdict": "marginal"
+ },
+ "provenance": {
+  "runs": [
+   {
+    "argv": [
+     "scripts/run_f9_resolution.py",
+     "--out",
+     "runs/f9_resolution.json"
+    ],
+    "cwd": "/home/rbao/world-model-invariants",
+    "utc": "2026-08-30T04:19:20+00:00",
+    "git": "b546ac0865633abbc9e56c25f84d746d8ac8e87c",
+    "git_dirty": true,
+    "python": "3.13.13",
+    "inputs": {}
+   }
+  ]
+ }
+}

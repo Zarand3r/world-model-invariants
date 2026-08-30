@@ -7531,3 +7531,50 @@ F6 and E19 remain **unresolved**, now with both obvious routes closed. Anything 
 genuinely different measurement, not another variant of these two.
 
 `paper1.2/` untouched. `origin/main` unchanged at `20fa8b4`.
+
+---
+
+## 2026-08-30 --- F9: the models CAN marginally resolve the scheme difference. The claim is not dead.
+
+Both instruments being closed left F6 and E19 "unresolved", which is an uncomfortable place to leave a
+headline claim. F9 asks a prior question that needs no new instrument: **is the difference between the
+two integrators even large enough for these models to represent?**
+
+Analytically the schemes differ in one step by `0.5 a(theta) dt^2 = 0.01875 sin(theta)` rad --- about
+a degree. If a model's own one-step error exceeded that, no statistic could recover the scheme, and
+the claim would be unsupportable *in principle*.
+
+### Result --- marginal, reported as marginal
+
+| model | `D_model` | `D_decoder` (floor) | `D_scheme` | model/scheme | decoder/scheme |
+|---|---|---|---|---|---|
+| s3 | 0.00659 | 0.00495 | 0.01441 | **0.46** | 0.34 |
+| s4 | 0.00749 | 0.00558 | 0.01441 | **0.52** | 0.39 |
+| s5 | 0.00644 | 0.00502 | 0.01441 | **0.45** | 0.35 |
+
+P1 (cannot resolve, `>= 1.0`) fails 0/3. P2 (can resolve, `<= 0.3`) fails 0/3. Registered verdict:
+**marginal**, and recorded as marginal rather than rounded toward either conclusion.
+
+**The floor control passes**, which is what makes the number readable: `D_decoder/D_scheme` is
+0.34--0.39, so the readout *can* see the gap and this is a statement about the model rather than
+about the decoder. I registered P3 for exactly this after F8 taught me an instrument can be alive and
+still blind.
+
+**Most of the model's error is readout noise.** Subtracting the decoder floor in quadrature leaves
+roughly `0.0043` rad of genuinely dynamical error --- about **0.30** of the scheme gap.
+
+### What this changes
+
+**F6 and E19's model-side claims are not dead in principle.** The models carry roughly `2x`
+resolution on the distinction, and about three quarters of the measured error is the pixel readout,
+not the dynamics.
+
+That thin margin also explains both instrument failures at once, which is the first account this week
+that covers them together: at one step the scheme signal is a factor of two above the model's own
+error and is swamped by the data-tracking effect; over a rollout it is swamped by accumulation.
+Neither statistic was ever going to work, and the reason is quantitative, not conceptual.
+
+It also says where the SNR is being lost --- in decoding to pixels. A measurement that stays in
+latent space should recover most of the factor of three currently spent on readout noise.
+
+`paper1.2/` untouched. `origin/main` unchanged at `20fa8b4`.
