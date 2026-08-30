@@ -1,0 +1,217 @@
+{
+ "cells": [
+  {
+   "ckpt": "runs/f6_dt0.05_s3_step6500.pt",
+   "data": "runs/pend_dt0.05.npz",
+   "n": 5668,
+   "hits_for_SI": 3868,
+   "rate_SI": 0.6824276640790402,
+   "z": 27.4685423463079,
+   "p_two_sided": 4.172696010125168e-166,
+   "D_model": 0.004527074281624799,
+   "D_scheme": 0.014407318306087102,
+   "readable": true,
+   "family": "semi-implicit",
+   "eval_data": "semi-implicit"
+  },
+  {
+   "ckpt": "runs/f6_dt0.05_s4_step6500.pt",
+   "data": "runs/pend_dt0.05.npz",
+   "n": 5668,
+   "hits_for_SI": 4427,
+   "rate_SI": 0.7810515172900494,
+   "z": 42.318557019021746,
+   "p_two_sided": 0.0,
+   "D_model": 0.005774181359063246,
+   "D_scheme": 0.014407318306087102,
+   "readable": true,
+   "family": "semi-implicit",
+   "eval_data": "semi-implicit"
+  },
+  {
+   "ckpt": "runs/f6_dt0.05_s5_step6500.pt",
+   "data": "runs/pend_dt0.05.npz",
+   "n": 5668,
+   "hits_for_SI": 4223,
+   "rate_SI": 0.745059985885674,
+   "z": 36.899231449730834,
+   "p_two_sided": 4.754073049334887e-298,
+   "D_model": 0.004832777192812521,
+   "D_scheme": 0.014407318306087102,
+   "readable": true,
+   "family": "semi-implicit",
+   "eval_data": "semi-implicit"
+  },
+  {
+   "ckpt": "runs/f7_verlet_s3_step6500.pt",
+   "data": "runs/pend_dt0.05.npz",
+   "n": 5668,
+   "hits_for_SI": 4429,
+   "rate_SI": 0.7814043754410727,
+   "z": 42.371687661857926,
+   "p_two_sided": 0.0,
+   "D_model": 0.005763703275010168,
+   "D_scheme": 0.014407318306087102,
+   "readable": true,
+   "family": "verlet",
+   "eval_data": "semi-implicit"
+  },
+  {
+   "ckpt": "runs/f7_verlet_s4_step6500.pt",
+   "data": "runs/pend_dt0.05.npz",
+   "n": 5668,
+   "hits_for_SI": 3713,
+   "rate_SI": 0.6550811573747354,
+   "z": 23.35091752650353,
+   "p_two_sided": 1.3488916133395492e-120,
+   "D_model": 0.004689448410737729,
+   "D_scheme": 0.014407318306087102,
+   "readable": true,
+   "family": "verlet",
+   "eval_data": "semi-implicit"
+  },
+  {
+   "ckpt": "runs/f7_verlet_s5_step6500.pt",
+   "data": "runs/pend_dt0.05.npz",
+   "n": 5668,
+   "hits_for_SI": 4134,
+   "rate_SI": 0.7293577981651376,
+   "z": 34.53491784352057,
+   "p_two_sided": 2.4008793224808202e-261,
+   "D_model": 0.004479169152840967,
+   "D_scheme": 0.014407318306087102,
+   "readable": true,
+   "family": "verlet",
+   "eval_data": "semi-implicit"
+  },
+  {
+   "ckpt": "runs/f6_dt0.05_s3_step6500.pt",
+   "data": "runs/pend_verlet_dt0.05.npz",
+   "n": 5668,
+   "hits_for_SI": 1086,
+   "rate_SI": 0.19160197600564574,
+   "z": -46.436181838826116,
+   "p_two_sided": 0.0,
+   "D_model": 0.005162186868278242,
+   "D_scheme": 0.014313321345093888,
+   "readable": true,
+   "family": "semi-implicit",
+   "eval_data": "verlet"
+  },
+  {
+   "ckpt": "runs/f6_dt0.05_s4_step6500.pt",
+   "data": "runs/pend_verlet_dt0.05.npz",
+   "n": 5668,
+   "hits_for_SI": 1917,
+   "rate_SI": 0.33821453775582216,
+   "z": -24.36039974039105,
+   "p_two_sided": 4.4982172012140564e-131,
+   "D_model": 0.004649882436162244,
+   "D_scheme": 0.014313321345093888,
+   "readable": true,
+   "family": "semi-implicit",
+   "eval_data": "verlet"
+  },
+  {
+   "ckpt": "runs/f6_dt0.05_s5_step6500.pt",
+   "data": "runs/pend_verlet_dt0.05.npz",
+   "n": 5668,
+   "hits_for_SI": 1423,
+   "rate_SI": 0.25105857445306984,
+   "z": -37.48366852092887,
+   "p_two_sided": 1.6998049380555143e-307,
+   "D_model": 0.004858977647453565,
+   "D_scheme": 0.014313321345093888,
+   "readable": true,
+   "family": "semi-implicit",
+   "eval_data": "verlet"
+  },
+  {
+   "ckpt": "runs/f7_verlet_s3_step6500.pt",
+   "data": "runs/pend_verlet_dt0.05.npz",
+   "n": 5668,
+   "hits_for_SI": 1930,
+   "rate_SI": 0.3405081157374735,
+   "z": -24.015050561955846,
+   "p_two_sided": 1.936304941435918e-127,
+   "D_model": 0.004953154813100448,
+   "D_scheme": 0.014313321345093888,
+   "readable": true,
+   "family": "verlet",
+   "eval_data": "verlet"
+  },
+  {
+   "ckpt": "runs/f7_verlet_s4_step6500.pt",
+   "data": "runs/pend_verlet_dt0.05.npz",
+   "n": 5668,
+   "hits_for_SI": 1220,
+   "rate_SI": 0.21524347212420608,
+   "z": -42.876428768801695,
+   "p_two_sided": 0.0,
+   "D_model": 0.005690870019858374,
+   "D_scheme": 0.014313321345093888,
+   "readable": true,
+   "family": "verlet",
+   "eval_data": "verlet"
+  },
+  {
+   "ckpt": "runs/f7_verlet_s5_step6500.pt",
+   "data": "runs/pend_verlet_dt0.05.npz",
+   "n": 5668,
+   "hits_for_SI": 1157,
+   "rate_SI": 0.20412844036697247,
+   "z": -44.55004401814154,
+   "p_two_sided": 0.0,
+   "D_model": 0.0048289028316559224,
+   "D_scheme": 0.014313321345093888,
+   "readable": true,
+   "family": "verlet",
+   "eval_data": "verlet"
+  }
+ ],
+ "summary": {
+  "rate_SI_semi_implicit_models_on_semi_implicit_data": [
+   0.682,
+   0.781,
+   0.745
+  ],
+  "rate_SI_verlet_models_on_semi_implicit_data": [
+   0.781,
+   0.655,
+   0.729
+  ],
+  "rate_SI_semi_implicit_models_on_verlet_data": [
+   0.192,
+   0.338,
+   0.251
+  ],
+  "rate_SI_verlet_models_on_verlet_data": [
+   0.341,
+   0.215,
+   0.204
+  ],
+  "all_readable": true,
+  "P1_pass": true,
+  "P1": "3/3",
+  "P2_pass": false,
+  "P2": "0/3 below 0.5, families ordered False",
+  "P3_symmetry_pass": false
+ },
+ "provenance": {
+  "runs": [
+   {
+    "argv": [
+     "scripts/run_f10_forced_choice.py",
+     "--out",
+     "runs/f10_forced_choice.json"
+    ],
+    "cwd": "/home/rbao/world-model-invariants",
+    "utc": "2026-08-30T04:50:16+00:00",
+    "git": "5ab6162efecf2ab217aedf33708ae97ea7f2df84",
+    "git_dirty": true,
+    "python": "3.13.13",
+    "inputs": {}
+   }
+  ]
+ }
+}

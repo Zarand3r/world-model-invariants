@@ -53,3 +53,41 @@ model's prediction is to either, the comparison is degenerate and P1 must not be
 ## Direction
 
 None stated.
+
+---
+
+## Amendment 1 --- the comparison moves to `theta`, and why (registered before running)
+
+Implementing the latent version exposed a defect in the design above. `encode` is a teacher-forced
+sequence pass whose indexing is `state k has consumed obs[:k]`, so a latent is defined by its
+*history*, not by a frame in isolation. "Encode the counterfactual frame and compare" therefore has
+no well-defined meaning: the counterfactual latent would carry a posterior update at the wrong
+index, and a mistake there would corrupt the test **silently**, which is precisely the class of
+error that has cost me four experiments this week.
+
+The forced choice is well-defined in `theta`, and needs no rendering and no counterfactual encoding:
+
+    hit  <=>  |theta_pred - theta_SI|  <  |theta_pred - theta_VV|
+
+where `theta_pred` is decoded from `m.transition(h_t)` and the two counterfactual angles are computed
+analytically from the same true `(theta_t, thetadot_t)`. Every quantity already exists in F9.
+
+**What this costs.** The latent version was chosen so that encoder error would be common-mode. In
+`theta` it is not: `theta_pred` carries readout noise while the two targets are exact. So the test is
+noisier than the design above intended.
+
+**Why it still has power, computed before running.** F9 measured total one-step error `0.0066` rad
+against a scheme separation of `0.0144` rad. A model sitting on its own scheme's next state is
+misclassified only when noise exceeds half the separation, so the expected hit rate is roughly
+`Phi(0.0072 / 0.0066) ~ 0.86` --- far from the 50% null. If the model instead learned the continuous
+flow, it sits *between* the two schemes and the rate goes to ~50%.
+
+**The control gains a sharper, signed prediction.** A Verlet-trained model run on semi-implicit data
+should prefer `theta_VV`, so its hit rate for `theta_SI` should fall **below 50%**, not merely below
+the semi-implicit models' rate. P2 is tightened accordingly: Verlet models score below 50% on at
+least 2 of 3, and strictly below the semi-implicit models.
+
+**Degeneracy guard, restated in these terms.** The comparison is degenerate if the separation is not
+resolvable against the readout noise. F9 already establishes it is (`D_model/D_scheme = 0.46`), and
+the guard is re-checked here per model: **if `D_model >= D_scheme` for a model, its hit rate is not
+to be read.**

@@ -7578,3 +7578,73 @@ It also says where the SNR is being lost --- in decoding to pixels. A measuremen
 latent space should recover most of the factor of three currently spent on readout noise.
 
 `paper1.2/` untouched. `origin/main` unchanged at `20fa8b4`.
+
+---
+
+## 2026-08-30 --- F10: the forced choice fires its control. F6 and E19 should be WITHDRAWN.
+
+F9 showed the models have roughly `2x` resolution on the scheme difference, so the question was
+answerable in principle and the failures had been instrument failures. F10 built the instrument F9
+pointed at: a two-alternative forced choice with an **exact 50% null** and a **signed control**.
+
+For each state, compute what each scheme would give as the next angle, decode the model's predicted
+next angle, and score a hit when it lands nearer semi-implicit's answer.
+
+### Result
+
+Hit rate for **semi-implicit's** answer, by model family and evaluation data:
+
+| model family | on semi-implicit data | on Verlet data |
+|---|---|---|
+| semi-implicit-trained | 0.682, 0.781, 0.745 | 0.192, 0.338, 0.251 |
+| **Verlet-trained** | **0.781, 0.655, 0.729** | 0.341, 0.215, 0.204 |
+
+Every cell is readable (`D_model < D_scheme` throughout), so nothing here is a degenerate comparison.
+
+- **P1 passes 3/3.** Semi-implicit models prefer semi-implicit's answer on their own data, far above
+  the 50% null.
+- **P2 --- the control that makes P1 mean anything --- FAILS.** Verlet-trained models, run on the
+  same semi-implicit data, prefer semi-implicit's answer **just as strongly** (0.781 / 0.655 / 0.729
+  against 0.682 / 0.781 / 0.745; the families overlap and the Verlet models' best cell *ties* the
+  semi-implicit models' best).
+- **P3 symmetry fails the same way**: on Verlet data, *both* families prefer Verlet's answer.
+
+The preference is a function of the **evaluation data alone**. Training scheme does nothing.
+
+### The registered consequence
+
+F10's falsifier reads: *"if P2 shows Verlet-trained models preferring the semi-implicit answer just as
+strongly, the model does not carry its integrator and F6/E19's model-side claims should be
+withdrawn."* That is what happened, so that is the conclusion.
+
+**This is no longer "unresolved for want of an instrument."** Three independent measurements now
+agree: the one-step `rho_obs` sweep (F7 amendment 2), the imagined rollout (F8), and this forced
+choice. The first was confounded and the second had no power, but this one has an exact null, a
+signed control, and a readability check that all pass --- and it says the model's one-step behaviour
+is determined by the trajectory it is shown, not by the integrator it was trained on.
+
+**P1 alone would have read as a clean positive.** Without P2 I would have reported "semi-implicit
+models recover semi-implicit's step, 3/3, p < 1e-10" --- which is true, and meaningless. Registering
+P2 as load-bearing before running is the only reason that did not happen.
+
+### What the models are actually doing
+
+If a model had learned a scheme-agnostic approximation of the *continuous flow*, its prediction would
+sit between the two schemes and the rate would be ~50%. It does not; it tracks whichever scheme
+generated the data in front of it. Combined with F9's finding that the resolution exists, the reading
+is that the teacher-forced state `h_t` carries enough recent history for the transition to *continue
+the observed trajectory*, rather than applying a fixed learned integrator. That is a substantive
+claim about what these world models represent, and it is the opposite of the paper's.
+
+### Consequence for the paper
+
+**F6 and E19's model-side claims should be withdrawn**, and with them the title's assertion that the
+model learns its simulator's integrator. What survives is unaffected by any of this: F4b's `767x`
+architecture gap (identical data), the decodability-versus-conservation dissociation, the four
+negatives, and the intervention results, which are immune by construction and were measured to be so
+(E1 amendment 4, repair 3/3 with `C` fitted on the wrong integrator).
+
+Withdrawing a claim and rewriting a paper around what remains is an authorial decision, so
+`paper1.2/` is still untouched. The evidence for it is now complete rather than pending.
+
+`origin/main` unchanged at `20fa8b4`.
