@@ -8185,3 +8185,27 @@ rather than my own reading --- which is the argument for having written it. Reco
 rather than repaired, because repairing it means running a measurement on a withdrawn axis.
 
 `paper1.2/` untouched. `origin/main` unchanged at `20fa8b4`.
+
+---
+
+## 2026-08-30 --- Keeping the prereg audit readable, so the next real flag is not lost
+
+Verification-only firing: no jobs, no new artefacts, everything green (70/70 checks, 58 tests, 50/50
+manifest hashes, `origin/main` at `20fa8b4`). The single outstanding item was F8's P6, recorded and
+accepted in the previous entry.
+
+One change, small but worth making. The audit flagged that same known deviation on every run, and a
+check that is permanently red is a check nobody reads --- which is exactly how the *next* real flag
+gets missed. It now separates **accepted deviations** from **new** ones: the headline count reads
+`0 with no recorded verdict`, P6 is still printed in full with the reason it was accepted, and a
+genuinely new gap would appear as `FLAG` and move that count off zero.
+
+The waiver list requires a log entry justifying each entry, so it cannot become a quiet
+suppression mechanism. It currently holds exactly one item.
+
+The audit continues to report its own blind spots on every run: coverage is **12 of 33**
+preregistrations (the rest do not use the bold-label convention and are *invisible, not clean*, and
+are named), and it cannot detect a verdict that is **narrower** than what was registered --- the
+failure mode that actually produced three defects this week.
+
+`paper1.2/` untouched.

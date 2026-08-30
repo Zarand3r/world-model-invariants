@@ -22,6 +22,18 @@ from __future__ import annotations
 import argparse, json, pathlib, re, sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+
+# Deviations that are known, recorded in docs/EXECUTION_LOG.md, and deliberately not repaired.
+# They stay VISIBLE in the output -- the point is only that a NEW flag is not lost among them.
+# A permanently-red check is a check nobody reads, which is how the next real one gets missed.
+# Adding an entry here requires a log entry saying why it was accepted rather than fixed.
+KNOWN = {
+    ("F8_PREREG.md", "P6"): (
+        "registered mandatory before reading P5; T=10 passed the power gate so it was owed, and was "
+        "not run. P5 came out NEGATIVE and P6 guards against reading a confounded POSITIVE, and the "
+        "whole axis was withdrawn hours later, so running it now would interrogate a contrast that "
+        "does not exist. Logged 2026-08-30."),
+}
 DOCS, RUNS = ROOT / "docs", ROOT / "runs"
 
 # A registered prediction is introduced in bold: **P1**, **P1 (primary).**, **G0 (control).**, **A1**
@@ -75,8 +87,10 @@ def main() -> int:
             key = re.compile(rf'"[A-Za-z0-9_]*{lab}[_"]')
             if not any(key.search(b) for b in blobs.values()):
                 missing.append(lab)
-        checked_total += len(labs); missing_total += len(missing)
-        rows.append((pre.name, labs, missing))
+        known = [l for l in missing if (pre.name, l) in KNOWN]
+        new = [l for l in missing if l not in known]
+        checked_total += len(labs); missing_total += len(new)
+        rows.append((pre.name, labs, new, known))
 
     total = len(rows) + len(unlabelled)
     print(f"  {len(rows)} preregistrations, {checked_total} registered predictions, "
@@ -85,11 +99,21 @@ def main() -> int:
           f"  the **P1** bold-label convention and are INVISIBLE to this audit, not clean:\n"
           f"    {', '.join(unlabelled)}\n")
     flagged = [r for r in rows if r[2]]
-    for name, labs, missing in rows:
-        if missing or a.verbose:
-            mark = "FLAG" if missing else "ok  "
-            print(f"  {mark} {name:24s} registered {','.join(labs):<28s}"
-                  + (f" NO VERDICT: {','.join(missing)}" if missing else ""))
+    for name, labs, new, known in rows:
+        if new or known or a.verbose:
+            mark = "FLAG" if new else ("known" if known else "ok  ")
+            extra = ""
+            if new:
+                extra = f" NO VERDICT: {','.join(new)}"
+            elif known:
+                extra = f" accepted deviation: {','.join(known)}"
+            print(f"  {mark:5s} {name:24s} registered {','.join(labs):<28s}{extra}")
+    n_known = sum(len(r[3]) for r in rows)
+    if n_known:
+        print(f"\n  {n_known} accepted deviation(s), each with a reason recorded in the log:")
+        for name, _labs, _new, known in rows:
+            for lab in known:
+                print(f"    {name} {lab}: {KNOWN[(name, lab)]}")
     if not flagged:
         print("  No labelled prediction lacks a verdict -- but note what this CANNOT see: whether a\n"
               "  recorded verdict is narrower than what was registered. All three defects that\n"
