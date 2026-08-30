@@ -69,7 +69,10 @@ def main() -> int:
         missing = []
         for lab in labs:
             # a recorded verdict mentions the label as a JSON key: "P1_pass", "G2_evaluable", ...
-            key = re.compile(rf'"{lab}[_"]')
+            # the label can sit anywhere in the key: "P5_pass", but also "separates_P5".
+            # Matching only the prefix flagged F8's P5 as unevaluated when it is recorded as
+            # `separates_P5` -- a false alarm that buried a real one (P6) in the same line.
+            key = re.compile(rf'"[A-Za-z0-9_]*{lab}[_"]')
             if not any(key.search(b) for b in blobs.values()):
                 missing.append(lab)
         checked_total += len(labs); missing_total += len(missing)

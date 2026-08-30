@@ -8149,3 +8149,39 @@ queue --- at this point that would be motion rather than progress, and the hones
 work I can do alone is finished.
 
 `paper1.2/` untouched. `origin/main` unchanged at `20fa8b4`.
+
+---
+
+## 2026-08-30 --- The prereg audit earned its keep: F8's P6 was registered mandatory and never run
+
+A firing with no jobs and no new artefacts, so step (2) --- verify artefacts against their
+preregistrations --- was the only thing to do. It found something.
+
+`scripts/audit_preregs.py` now covers 12 preregistrations rather than 8, because this week's use the
+bold-label convention, and it flagged **F8's P5 and P6 as having no recorded verdict**. One is a
+false alarm and one is real:
+
+- **P5 was evaluated.** It is recorded as `separates_P5: False` at `T = 10`. My matcher only looked
+  for `"P5_...`, not `"separates_P5"`. Widened to match the label anywhere in the key --- the false
+  alarm mattered because it sat on the same line as a true one and could have buried it.
+- **P6 was never run, and it was registered as mandatory.** F8 amendment 2 states: *"P6 (the confound
+  check, mandatory before reading P5) ... P5 may only be read if the argmin follows the model rather
+  than the dataset that supplied `h_0`."* `T = 10` **passed** the P4 power gate, so P6 was owed, and
+  I read P5 without it.
+
+**My log entry at the time was also wrong about this.** It said "P6, the confound check that would
+have had to accompany any readable horizon, was never reached." It *was* reached --- `T = 10` was
+readable --- and I skipped it.
+
+### Does it change anything? No, and here is why that is not an excuse
+
+P5 came out **negative** at `T = 10` (the families did not separate), and P6 exists to stop a
+**positive** P5 being read as real when it might be confounded. There was no positive to protect.
+Separately, F8's whole axis was withdrawn hours later, so running P6 now would interrogate a contrast
+that does not exist in the observations.
+
+So the conclusion is unaffected. But the protocol was not followed, and the reason I know is a script
+rather than my own reading --- which is the argument for having written it. Recorded as a deviation
+rather than repaired, because repairing it means running a measurement on a withdrawn axis.
+
+`paper1.2/` untouched. `origin/main` unchanged at `20fa8b4`.
