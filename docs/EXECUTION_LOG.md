@@ -7769,3 +7769,83 @@ remaining empty-input artefacts (`f7_gate0`, `f6_physics`) are pure simulations 
 where empty is correct; the audit says so rather than flagging them as defects.
 
 `paper1.2/` untouched. `origin/main` unchanged at `20fa8b4`.
+
+---
+
+## 2026-08-30 --- RETRACTION: F7 and F10 could never have worked. The withdrawal of F6/E19 is wrong.
+
+While designing a free-rollout follow-up to F10, I checked something I should have checked before
+building any of this. **Semi-implicit Euler and velocity Verlet are the same map on positions.**
+
+    semi-implicit:  thd_{t+1} = thd_t + a(th_t) dt ;  th_{t+1} = th_t + thd_{t+1} dt
+    velocity Verlet: th_{t+1} = th_t + thd_t dt + 0.5 a(th_t) dt^2
+
+Eliminating velocity, **both** reduce to the identical three-term recurrence
+
+    th_{t+1} = 2 th_t - th_{t-1} + a(th_t) dt^2
+
+verified to machine precision on synthetic trajectories (residual `8.9e-16`) and on the actual
+datasets (`3.6e-15` and `7.1e-15`). They differ only in the first step and in **which finite
+difference is called the velocity**:
+
+| dataset | recorded `thetadot` vs **backward** difference | vs **central** difference |
+|---|---|---|
+| semi-implicit | **0.00000** | 0.29976 |
+| velocity Verlet | 0.30034 | **0.00000** |
+
+Exactly zero in each case. The two schemes are one position law under two velocity conventions.
+
+### What this destroys
+
+**The models see pixels. Pixels show position. Velocity is never rendered.** So the entire difference
+between F7's two arms lives in a bookkeeping label the model cannot observe.
+
+- **F7 was never a valid experiment.** Its two arms differ in an unobservable quantity. Its Gate 0
+  result --- semi-implicit "wants" `c = +0.125`, Verlet "wants" `c = 0.000` --- is now fully
+  explained as arithmetic: the target family `E(th, thd) + c thd sin(th)` is evaluated on the
+  *recorded* `thetadot`, and the two conventions differ by `0.30` rad/s. Relabelling the velocity
+  changes which `c` minimises the variation. That is not physics about the model.
+- **F7b likewise.** Its "sign-flipped" scheme is another velocity convention.
+- **F10's P2 failure is expected by construction.** Verlet-trained models preferring semi-implicit's
+  next state is not a finding about world models; the two families were trained on position data
+  obeying one law.
+- **F9's `D_scheme = 0.0144` rad is not a scheme gap.** It applied Verlet's update formula to a
+  semi-implicit-convention velocity --- a category error I did not notice.
+
+### The retraction
+
+**I told Richard that F6 and E19's model-side claims should be withdrawn, and that the title's
+integrator assertion should go with them. That recommendation was wrong and I withdraw it.** It
+rested on F10, whose control assumed the two schemes are distinguishable in the observations. They
+are not.
+
+**F6 and E19 revert to UNRESOLVED**, which is where they stood before F10. F6 varies the **timestep**,
+and `dt` genuinely does change the position recurrence through the `a(th) dt^2` term, so F6's
+question is well posed in a way F7's never was. It remains untested, because the cross-timestep
+control was degenerate (amendment 3) and every subsequent instrument I built was aimed at the wrong
+axis.
+
+### What still stands
+
+- F7 amendment 2 does still show the one-step statistic moves with the evaluation dataset --- but the
+  interpretation narrows sharply: I changed the velocity labels and a label-dependent statistic
+  changed. That is much weaker than "the measurement reads the data rather than the model", which is
+  how I reported it.
+- E1's amendment-4 control is unaffected: it fits `C` on a different dataset and finds repair
+  survives 3/3. That comparison does not depend on the two datasets being different *schemes*.
+- F4b, the dissociation, the four negatives, and the interventions are all untouched.
+- The published paper remains unaffected, and for a second independent reason: it makes no
+  scheme-level claim at all.
+
+### The error, and why it went unnoticed for four experiments
+
+I derived `c* = (dt/2) mg(l/2)` for semi-implicit Euler and the absence of that term for Verlet from
+the textbook shadow-Hamiltonian analysis, and never asked whether the difference survives into
+**position-only observations**. Four preregistrations, six training runs and five measurement designs
+were built on top of that gap. Every gate I wrote checked whether the instrument could see a
+difference; none checked whether the difference existed in the data the model actually consumes.
+
+The check that would have caught it costs three lines and no GPU, and I have now added it as the
+first thing any future scheme-comparison must pass.
+
+`paper1.2/` untouched. `origin/main` unchanged at `20fa8b4`.
