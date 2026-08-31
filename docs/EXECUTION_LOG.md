@@ -8209,3 +8209,53 @@ are named), and it cannot detect a verdict that is **narrower** than what was re
 failure mode that actually produced three defects this week.
 
 `paper1.2/` untouched.
+
+---
+
+## 2026-08-30 --- F12: validation loss picks checkpoints better than our statistic. Direction 2 closed.
+
+The top-ranked next step, and the cheapest route to a contribution the preprint does not contain: can
+`rho_obs` **choose between models** where the two earlier downstream attempts, which both tried to
+**fix** rollouts, failed? Preregistered in `docs/F12_PREREG.md`. No training --- 18 existing
+checkpoints (`dreamer_ref` seeds 3/4/5 at six training stages), one architecture, one dataset.
+
+Target was open-loop **pixel** fidelity over 100 imagined steps, deliberately not energy drift:
+`rho_obs` is a conservation statistic, and scoring it against a conservation target would have been
+near-circular.
+
+### Result --- negative, and unambiguous
+
+| ranker | Spearman vs fidelity | partialling out training step |
+|---|---|---|
+| **`val_recon`** (what everyone already has) | **+0.818** | -0.111 |
+| `rho_obs` (ours) | +0.472 | +0.099 |
+| `rho_E` (probe accuracy) | +0.492 | +0.115 |
+
+G1 passes --- fidelity spreads `2.8x` across the pool, so there was something to rank. P1, P2, P3 all
+fail. **Validation reconstruction loss ranks checkpoints substantially better than our statistic
+does**, and probe accuracy edges it out too.
+
+The partial correlations are the more interesting half. Controlling for training step, **every
+ranker collapses to roughly zero** (`+0.099`, `-0.111`, `+0.115`). Nothing here carries selection
+signal beyond "later checkpoints are better" --- ours included.
+
+### The gate that mattered
+
+G2 was registered precisely because both rankers improve with training, so any of them correlates
+with the target by tracking step count. Had `rho_obs` won the raw ranking I would have been ready to
+report a selection result; the partials show there would have been nothing behind it. That gate was
+written down first because F11 taught the lesson two days ago.
+
+### What this closes
+
+**Direction 2 is closed**, and it was the cheapest route to a claim the published preprint does not
+already contain. The reasoning that motivated it --- F4b separates two *architectures* by `767x`, so
+the statistic must discriminate --- does not survive contact with the granularity a practitioner
+works at. Discriminating a working model from a broken one is not the same as choosing between six
+checkpoints of a working one, and only the second is a selection method.
+
+This is a fifth preregistered negative with a measured cause, which is genuinely useful for the
+paper's boundary section. It is also the third failed attempt to give this work a downstream use, and
+that pattern is now worth stating plainly in the paper rather than discovering a fourth time.
+
+`paper1.2/` untouched.

@@ -1,6 +1,6 @@
 # Executive summary
 
-*Updated 2026-08-30. Kept current after every significant development — see CLAUDE.md.*
+*Updated 2026-08-30 (F12). Kept current after every significant development — see CLAUDE.md.*
 
 We are testing whether a world model trained only on video of a swinging pendulum learns physics it
 actually obeys. The distinction that matters: a probe can read a quantity out of the model's internal
@@ -15,10 +15,8 @@ down before each experiment.
 - **Now: correct and strengthen paper 1, post it as v2.** One published result is wrong (see
   Results); the fix makes it stronger. Add the two-degrees-of-freedom system, the supervised-probe
   control, and the four negatives.
-- **Next, cheapest: use our measurement to *choose* between models.** No new training. Would give the
-  paper the practical use it currently lacks. Two earlier attempts at a practical use both failed.
-- **Then: settle the big open question by training a model that is told its own timestep.** Needs new
-  training. This is the only route left to the stronger claim.
+- **Next: settle the big open question by training a model that is told its own timestep.** Needs new
+  training. Now the only route left to the stronger claim.
 - **Biggest lever, highest cost: repeat the result on a standard benchmark**, not a pendulum. The
   objection every reviewer will raise.
 - **Not doing:** more seeds, more toy systems, or anything comparing the two integration schemes —
@@ -39,9 +37,15 @@ down before each experiment.
 - Outside the training range, energy stays readable while conservation collapses (155–267×).
 - Everything replicates on a second, two-degrees-of-freedom system.
 
-**Negative, and useful.** Four things we predicted would work and measured not working, each with a
+**Negative, and useful.** Five things we predicted would work and measured not working, each with a
 diagnosed cause: it does not improve control performance, it is not a usable live warning signal, it
-does not learn the balance law under actuation, and fixed constraints cannot be extracted at all.
+does not learn the balance law under actuation, fixed constraints cannot be extracted at all, and
+**it does not help you pick a better checkpoint** — ordinary validation loss does that visibly better
+(+0.82 against our +0.47), and once you account for training length no measure carries any signal.
+
+That last one closes what had been our cheapest promising direction, and it is the third failed
+attempt to find a practical use. **The honest reading is that this work is a diagnostic, not a
+tool**, and the paper should say so rather than wait for a fourth attempt to fail.
 
 **Open.** Whether the model tracks its simulator's *timestep* is unresolved. The measurement showing
 it might be reading the training data rather than the model, and the tests that would tell them apart
