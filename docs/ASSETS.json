@@ -1,0 +1,282 @@
+{
+  "repo_id": "Zarand3r/world-model-invariants",
+  "repo_type": "model",
+  "local_fallback": "/home/rbao/world-model-invariants-extension/runs",
+  "files": {
+    "checkpoints/dreamer_damped_s0.pt": {
+      "sha256": "bd09017c72b0f2391709922ebfec55e56944733cdcaa3edec9fe668f2e4f8169",
+      "bytes": 53830853,
+      "backs": "Dissipative control (arm C): the method refuses on a damped system."
+    },
+    "checkpoints/dreamer_damped_s1.pt": {
+      "sha256": "5aec7344507b5a4383b782c9371fc834af9b54e2b2b630abdf7ad67fca9ad26c",
+      "bytes": 53830853,
+      "backs": "Dissipative control (arm C): the method refuses on a damped system."
+    },
+    "checkpoints/dreamer_damped_s2.pt": {
+      "sha256": "9c4b9339b92b94a0a8dc57235cb691d542a079680391d83ede6e3304790b9fe4",
+      "bytes": 53830853,
+      "backs": "Dissipative control (arm C): the method refuses on a damped system."
+    },
+    "checkpoints/dreamer_ref_s3.pt": {
+      "sha256": "41925a880287dba642e86b96854ec7ba1de2ffcd68c79a1f9c8823a7c51ce34f",
+      "bytes": 53828021,
+      "backs": ""
+    },
+    "checkpoints/dreamer_ref_s3_step60000.pt": {
+      "sha256": "6911b8e20a71734c24f2fcb3b44d9fbeb97d7825f006acb56237bcdcaa8e8ae3",
+      "bytes": 53831189,
+      "backs": "E8 training-saturation arm: the repair persists at convergence."
+    },
+    "checkpoints/dreamer_ref_s3_step6500.pt": {
+      "sha256": "706cc31890259decf020cc925021f5a5fc56e4fc55c896a8dc6d8d22ee6c33e1",
+      "bytes": 53828901,
+      "backs": "Primary analysis checkpoints. E1 repair, E4 dialing, E9 disjoint eval, E12c interchange, E18 supervised probe, E19 shadow Hamiltonian."
+    },
+    "checkpoints/dreamer_ref_s4.pt": {
+      "sha256": "22f23f8ff30b732c8443adb3cec4c80b9decccd1de7f1bd079e7fd079270a3b1",
+      "bytes": 53828021,
+      "backs": ""
+    },
+    "checkpoints/dreamer_ref_s4_step60000.pt": {
+      "sha256": "75c37f019786e68fb27863f53125b90cb7edae1fe3cd50f5b9569547fe74fee0",
+      "bytes": 53831189,
+      "backs": "E8 training-saturation arm: the repair persists at convergence."
+    },
+    "checkpoints/dreamer_ref_s4_step6500.pt": {
+      "sha256": "69f4f4eda49f4079d950d1e134fb268cb22425666840b37421d4e2ec293c0484",
+      "bytes": 53828901,
+      "backs": "Primary analysis checkpoints. E1 repair, E4 dialing, E9 disjoint eval, E12c interchange, E18 supervised probe, E19 shadow Hamiltonian."
+    },
+    "checkpoints/dreamer_ref_s5.pt": {
+      "sha256": "c8d449c11ea67d18dcf8a19922ba175760a3d5a17cf021653d989b3f3169bde5",
+      "bytes": 53828021,
+      "backs": ""
+    },
+    "checkpoints/dreamer_ref_s5_step60000.pt": {
+      "sha256": "1e6f22d2f4d913c3fcad8cf9f65c31aee8c0f0e3913a5428d4724c665270d113",
+      "bytes": 53831189,
+      "backs": "E8 training-saturation arm: the repair persists at convergence."
+    },
+    "checkpoints/dreamer_ref_s5_step6500.pt": {
+      "sha256": "9146998bba3ac59b6282c4df70fc32208a157a4452b2e1337801c1239ded9a0a",
+      "bytes": 53828901,
+      "backs": "Primary analysis checkpoints. E1 repair, E4 dialing, E9 disjoint eval, E12c interchange, E18 supervised probe, E19 shadow Hamiltonian."
+    },
+    "checkpoints/f1_act_s3.pt": {
+      "sha256": "bc3b4c8156feaa4e0616d566c29c3a6ba67a2acdd2a5e883be7c4a6fb157f8f6",
+      "bytes": 53830469,
+      "backs": "F1/F5, action-conditioned models."
+    },
+    "checkpoints/f1_act_s4.pt": {
+      "sha256": "b1aaa0382fa6ca3267043f569c29e3634e433568c64dc0d2919a9ce40079dcaf",
+      "bytes": 53830469,
+      "backs": "F1/F5, action-conditioned models."
+    },
+    "checkpoints/f1_act_s5.pt": {
+      "sha256": "ce29356c326f1e24159287bfb20905d8aeb82a2034ad15fc60bd1480126bfc61",
+      "bytes": 53830469,
+      "backs": "F1/F5, action-conditioned models."
+    },
+    "checkpoints/f6_dt0.02_s3_step6500.pt": {
+      "sha256": "4b5e54122040c385b5d7569ba5a6b9fe1669c97647082c61280c4bfc6415bc79",
+      "bytes": 53828677,
+      "backs": "F6, the timestep-scaling result: four simulator timesteps x three seeds. The models that recover c* = (dt/2) mg(l/2) across a 4x range of dt."
+    },
+    "checkpoints/f6_dt0.02_s4_step6500.pt": {
+      "sha256": "d7d17a195245fda03b81bd189f279589205b4084c92d395afdd570060cfdbb0c",
+      "bytes": 53828677,
+      "backs": "F6, the timestep-scaling result: four simulator timesteps x three seeds. The models that recover c* = (dt/2) mg(l/2) across a 4x range of dt."
+    },
+    "checkpoints/f6_dt0.02_s5_step6500.pt": {
+      "sha256": "73101479f47565323c79a21d677406e899e54d6035c34895316d5e6f4ec428e4",
+      "bytes": 53828677,
+      "backs": "F6, the timestep-scaling result: four simulator timesteps x three seeds. The models that recover c* = (dt/2) mg(l/2) across a 4x range of dt."
+    },
+    "checkpoints/f6_dt0.035_s3_step6500.pt": {
+      "sha256": "9064a6ae89993303ad97261e85292cdd7fe4f0cbaef1de49672d8cb8f2e6f4d6",
+      "bytes": 53828789,
+      "backs": "F6, the timestep-scaling result: four simulator timesteps x three seeds. The models that recover c* = (dt/2) mg(l/2) across a 4x range of dt."
+    },
+    "checkpoints/f6_dt0.035_s4_step6500.pt": {
+      "sha256": "374f10fe7c0a6b3cc0c9e3841fa54ab1bb6c292176a3e7be3d9b40e5af67ede3",
+      "bytes": 53828789,
+      "backs": "F6, the timestep-scaling result: four simulator timesteps x three seeds. The models that recover c* = (dt/2) mg(l/2) across a 4x range of dt."
+    },
+    "checkpoints/f6_dt0.035_s5_step6500.pt": {
+      "sha256": "22244ff9f3d25708c5f4a722f44734103d726f99a96b4b32788c620055927586",
+      "bytes": 53828789,
+      "backs": "F6, the timestep-scaling result: four simulator timesteps x three seeds. The models that recover c* = (dt/2) mg(l/2) across a 4x range of dt."
+    },
+    "checkpoints/f6_dt0.05_s3_step6500.pt": {
+      "sha256": "7716c91b0dfebfcab0d1a7505deefe70e0e92408777b2cbc2d2a12bd545327ec",
+      "bytes": 53828677,
+      "backs": "F6, the timestep-scaling result: four simulator timesteps x three seeds. The models that recover c* = (dt/2) mg(l/2) across a 4x range of dt."
+    },
+    "checkpoints/f6_dt0.05_s4_step6500.pt": {
+      "sha256": "b296a804d3d3586f9e97414f058d3a9ce9bd6b79709165e6ab714f388a1ea48a",
+      "bytes": 53828677,
+      "backs": "F6, the timestep-scaling result: four simulator timesteps x three seeds. The models that recover c* = (dt/2) mg(l/2) across a 4x range of dt."
+    },
+    "checkpoints/f6_dt0.05_s5_step6500.pt": {
+      "sha256": "1f100cf84ef1997ce61e3f8ba7c6809807a788a8f8ef79472afc005716b6dd3a",
+      "bytes": 53828677,
+      "backs": "F6, the timestep-scaling result: four simulator timesteps x three seeds. The models that recover c* = (dt/2) mg(l/2) across a 4x range of dt."
+    },
+    "checkpoints/f6_dt0.08_s3_step6500.pt": {
+      "sha256": "0d0544a94618ffa4cc8a340d8964e6348498ff7e08f4f91eff8fa742113f08b9",
+      "bytes": 53828677,
+      "backs": "F6, the timestep-scaling result: four simulator timesteps x three seeds. The models that recover c* = (dt/2) mg(l/2) across a 4x range of dt."
+    },
+    "checkpoints/f6_dt0.08_s4_step6500.pt": {
+      "sha256": "db997f0f61b7330e3ed264b08d44d427a1e609095fbc603c91cd2b8203228255",
+      "bytes": 53828677,
+      "backs": "F6, the timestep-scaling result: four simulator timesteps x three seeds. The models that recover c* = (dt/2) mg(l/2) across a 4x range of dt."
+    },
+    "checkpoints/f6_dt0.08_s5_step6500.pt": {
+      "sha256": "7c9136b9c8f9ffa0f29f0297cc32e20f9461c46edba5559b10b21409b463f8ed",
+      "bytes": 53828677,
+      "backs": "F6, the timestep-scaling result: four simulator timesteps x three seeds. The models that recover c* = (dt/2) mg(l/2) across a 4x range of dt."
+    },
+    "checkpoints/gru56_ref_s3.pt": {
+      "sha256": "9419279ba8db14e9eeff042f6346056354c474a907b96a08cd9bb66981d2fa1d",
+      "bytes": 22863219,
+      "backs": "F4b, conv-GRU with 7x more open-loop training."
+    },
+    "checkpoints/gru56_ref_s4.pt": {
+      "sha256": "a9e6b173a34dda101416d20b9699a239cacd15ca2a1e09c12142b9b4effdb9a1",
+      "bytes": 22863219,
+      "backs": "F4b, conv-GRU with 7x more open-loop training."
+    },
+    "checkpoints/gru56_ref_s5.pt": {
+      "sha256": "a8ac222324b58b0f9764207838bc10086c1c02ae4334fe3e1598346b0d500bed",
+      "bytes": 22863219,
+      "backs": "F4b, conv-GRU with 7x more open-loop training."
+    },
+    "checkpoints/gru_ref_s3.pt": {
+      "sha256": "4f2ba1f1413b02941dcd2429f222b02d0c3f667e4994b411e44b2291120b6db4",
+      "bytes": 22863093,
+      "backs": "F4, second architecture (conv-GRU)."
+    },
+    "checkpoints/gru_ref_s4.pt": {
+      "sha256": "8d5533480084e6df10c0c94378fea9eef9dc42631fcba403aa5b46ffda9cc095",
+      "bytes": 22863093,
+      "backs": "F4, second architecture (conv-GRU)."
+    },
+    "checkpoints/gru_ref_s5.pt": {
+      "sha256": "de474c4332902265bc20e7fa06859672820ad20a2f90617811f3b3f4a47b6267",
+      "bytes": 22863093,
+      "backs": "F4, second architecture (conv-GRU)."
+    },
+    "checkpoints/osc2d_ce_s0.pt": {
+      "sha256": "8043779b227edca4814a774c112fc018a613d1a1dcf3e82f9063b80943ebdfd5",
+      "bytes": 53830565,
+      "backs": "E17/E10b central arm (two-invariant degeneracy)."
+    },
+    "checkpoints/osc2d_ce_s2.pt": {
+      "sha256": "2a917444bedbf506a990b50e9030baeb5bcc6ccc443d8a43ed9ed6102bf57472",
+      "bytes": 53830565,
+      "backs": "E17/E10b central arm (two-invariant degeneracy)."
+    },
+    "checkpoints/osc2d_nc_s3.pt": {
+      "sha256": "055d17b240b98d5a949e1b7ce32c8cf19280249822f17d1bbfecec0351b88aaa",
+      "bytes": 53830565,
+      "backs": "E17, two degrees of freedom, non-central arm."
+    },
+    "checkpoints/osc2d_nc_s4.pt": {
+      "sha256": "05ccd2d6b05af48cb4d85719253c0eee5a3a21de88a686161abedf47ea81a2c5",
+      "bytes": 53830565,
+      "backs": "E17, two degrees of freedom, non-central arm."
+    },
+    "checkpoints/osc2d_nc_s5.pt": {
+      "sha256": "12605abde436434edccd3ff233bc7070bc9f6ec288e0c48bb666cb5f48af5921",
+      "bytes": 53830565,
+      "backs": "E17, two degrees of freedom, non-central arm."
+    },
+    "data/osc2d_central.npz": {
+      "sha256": "b5db1f18f8a3f1b881adfc07dadb2b7f30922bf2f3b61221a83441cea01830c9",
+      "bytes": 5320730,
+      "backs": "All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above."
+    },
+    "data/osc2d_noncentral.npz": {
+      "sha256": "c0aec11ea0b762793338d8e1359fdedbc992e0b42df7ddc156f83584db4be644",
+      "bytes": 5528842,
+      "backs": "All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above."
+    },
+    "data/osc2d_noncentral_eval.npz": {
+      "sha256": "469eb440f7a1abafe7aa85dd9b5b6471e087223596c313657582a3a6714f2a9c",
+      "bytes": 18413369,
+      "backs": "All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above."
+    },
+    "data/osc2d_ood_high.npz": {
+      "sha256": "277a9bae266bb8a9cd319e939077a4ced85a0f5f214dd56a21d001e60d3d2e55",
+      "bytes": 2769117,
+      "backs": "All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above."
+    },
+    "data/osc2d_ood_low.npz": {
+      "sha256": "b87451d804ef5bbd657ee3eeaa1fab13bbace9a385148da85d527ec528504d1b",
+      "bytes": 2755622,
+      "backs": "All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above."
+    },
+    "data/pend_dt0.02.npz": {
+      "sha256": "14c04b7347adaf4e7bec8ee456222650791d30df81ceb04512134339db5e832c",
+      "bytes": 6600362,
+      "backs": "All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above."
+    },
+    "data/pend_dt0.035.npz": {
+      "sha256": "ad78b6e39d81a73de661e03d481e7b04fb47a24a34aa793dcd5f875795de560b",
+      "bytes": 6728154,
+      "backs": "All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above."
+    },
+    "data/pend_dt0.05.npz": {
+      "sha256": "9eed2d0776a177961113f711b4ba4bd69d3db1a1c0f6f9c5519364824d910e8b",
+      "bytes": 6799505,
+      "backs": "All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above."
+    },
+    "data/pend_dt0.08.npz": {
+      "sha256": "aa95321c02adaccdf5683d635d4a38d2fd3f1017a0b7520e55b9e77c55ceaae6",
+      "bytes": 6901882,
+      "backs": "All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above."
+    },
+    "data/pend_reversed_dt0.05.npz": {
+      "sha256": "39665b7406fc44fab364db02fd14bfbfc4c45edc2d6aff90b2b9af2825d64a28",
+      "bytes": 6803068,
+      "backs": ""
+    },
+    "data/pend_verlet_dt0.05.npz": {
+      "sha256": "3327b043eba21530a936c46e79ed3e1fb5dede2cfe32d0a3bf4cef83b00bf2b8",
+      "bytes": 6793222,
+      "backs": ""
+    },
+    "data/pendulum_actuated.npz": {
+      "sha256": "ea7b6c2e19522825188574425c85aca48ccbde520a31738c1a5821985f0b3583",
+      "bytes": 7269181,
+      "backs": "All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above."
+    },
+    "data/pendulum_ood_low.npz": {
+      "sha256": "d6f64947d2405c2d5e89663082eb8b47984d65d35e9ff6ddc2ad4835ecbf8474",
+      "bytes": 3412676,
+      "backs": "All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above."
+    },
+    "data/pendulum_pixels.npz": {
+      "sha256": "9eed2d0776a177961113f711b4ba4bd69d3db1a1c0f6f9c5519364824d910e8b",
+      "bytes": 6799505,
+      "backs": "All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above."
+    },
+    "data/pendulum_pixels_damped.npz": {
+      "sha256": "082cbfde0afa20c24f4f151cccf5efa80da739934a3bac6061aadf2904efc750",
+      "bytes": 6834005,
+      "backs": "All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above."
+    },
+    "data/pendulum_pixels_eval.npz": {
+      "sha256": "c2bdf8bea9db44fdb4f2c643f49a35c97d7eed855a2be751ce2240415595f3b5",
+      "bytes": 22600263,
+      "backs": "All datasets, including the four F6 timestep variants. Every result is reproducible from these plus the checkpoints above."
+    },
+    "meta/pixel_readout_calibration.json": {
+      "sha256": "e69a841d738e383bc2414453bac1384bc4319e92861234acdf695c0b3d7a350a",
+      "bytes": 382,
+      "backs": "The frozen pixel-readout pivot; the decoded-energy metric depends on it."
+    }
+  }
+}

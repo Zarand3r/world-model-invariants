@@ -1,16 +1,49 @@
-# Reproducing Phase 3 (DreamerV3)
+# Reproducing paper 1.2
 
-The reference implementation is a **vendored third-party checkout**, not committed here — it is a
-nested git repository, and copying it into this tree would silently fork it. Reproduction therefore
-needs the exact upstream commit, recorded below.
-
-## 1. The world-model implementation
+## 0. From nothing
 
 ```bash
-mkdir -p external && cd external
-git clone https://github.com/NM512/dreamerv3-torch.git
-cd dreamerv3-torch && git checkout 6ef8646d807cd10ce0c88e10a7e943211e7fc44c
+git clone --recurse-submodules -b paper1.2 https://github.com/Zarand3r/world-model-invariants
+cd world-model-invariants
+uv sync
+uv run python scripts/fetch_assets.py          # 1.98 GB, every file sha256-checked
+uv run pytest tests/ -q                        # 58 tests
+uv run python scripts/make_results_summary.py  # regenerates docs/RESULTS.md byte-for-byte
 ```
+
+`fetch_assets.py --what-backs` lists every artifact against the claim it supports, so a partial
+download is possible: `--only e18` or `--only osc2d` pulls just what one result needs. On a machine
+that already has the artifacts in a sibling checkout, `--from-local` copies instead of downloading
+and checks the same hashes.
+
+The results in `docs/RESULTS.md` need no GPU and no artifacts at all — they are regenerated from the
+committed run records, which is the cheapest way to check that the reported numbers are the ones the
+experiments produced.
+
+To re-derive a headline rather than read it, E18 is the central claim and the cheapest to run:
+
+```bash
+uv run python scripts/fetch_assets.py --only dreamer_ref_s3_step6500 pendulum_pixels
+uv run python scripts/run_e18_supervised_baseline.py --ckpts runs/dreamer_ref_s3_step6500.pt \
+    --out runs/e18_check.json
+```
+
+Expected on seed 3: the supervised probe reaches `rho_E` 0.9999 but `rho_obs` 0.0458 and makes the
+rollout **worse** by 26.8%; the label-free scalar reaches `rho_E` 0.9730 with `rho_obs` 0.0063 and
+improves it by 50.9%. Verified 2026-09-03: effect sizes reproduce to 3e-05 relative, the small
+residual being the GPU nondeterminism recorded in the audit.
+
+## 1. The reference implementation
+
+A git submodule pinned at one upstream commit, rather than a copy in this tree: copying would
+silently fork it, and a floating branch would let it move underneath us. `--recurse-submodules`
+above fetches it; for an existing checkout:
+
+```bash
+git submodule update --init external/dreamerv3-torch
+```
+
+That lands `external/dreamerv3-torch` at `6ef8646d807cd10ce0c88e10a7e943211e7fc44c`.
 
 `latent_noether/dreamer_adapter.py` adds `external/dreamerv3-torch` to `sys.path` and imports
 `networks` from it. The adapter is ~30 lines of interface — `encode`, `transition`,
