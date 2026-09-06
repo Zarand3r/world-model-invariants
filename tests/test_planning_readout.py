@@ -1,5 +1,7 @@
 """The GPU planning readout must agree with the validated numpy one, on real frames."""
 import numpy as np
+import pathlib
+
 import pytest
 import torch
 
@@ -8,6 +10,9 @@ from latent_noether.planning_readout import energy_from_frames
 
 
 @pytest.mark.parametrize("data", ["runs/pendulum_pixels.npz", "runs/pendulum_actuated.npz"])
+# Skip rather than fail when the dataset is absent, which is the state of a fresh clone
+# before scripts/fetch_assets.py runs. Six other tests in this suite already skip that way;
+# these two hard-failed, so a cold checkout read "2 failed" for a missing download.
 def test_torch_readout_matches_numpy_reference(data):
     """A port, not a reimplementation: any divergence here invalidates every planning number.
 
@@ -15,6 +20,8 @@ def test_torch_readout_matches_numpy_reference(data):
     planner needs the same quantity thousands of times per control step, so it is ported to torch --
     and pinned here, because a silent divergence would be invisible in the planning results.
     """
+    if not pathlib.Path(data).exists():
+        pytest.skip(f"{data} not present; run scripts/fetch_assets.py")
     d = np.load(data)
     fr = d["frames"][:8]                                   # (8, T, 64, 64, 3) uint8
     ref = decode_physics(fr)

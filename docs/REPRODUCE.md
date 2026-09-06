@@ -6,8 +6,8 @@
 git clone --recurse-submodules -b paper1.2 https://github.com/Zarand3r/world-model-invariants
 cd world-model-invariants
 uv sync
-uv run python scripts/fetch_assets.py          # 1.98 GB, every file sha256-checked
-uv run pytest tests/ -q                        # 58 tests
+uv run python scripts/fetch_assets.py          # 4.34 GB, every file sha256-checked
+uv run pytest tests/ -q                        # 51 pass, 8 skip without assets; 0 fail
 uv run python scripts/make_results_summary.py  # regenerates docs/RESULTS.md byte-for-byte
 ```
 
@@ -15,6 +15,20 @@ uv run python scripts/make_results_summary.py  # regenerates docs/RESULTS.md byt
 download is possible: `--only e18` or `--only osc2d` pulls just what one result needs. On a machine
 that already has the artifacts in a sibling checkout, `--from-local` copies instead of downloading
 and checks the same hashes.
+
+**The manifest is built from what the committed run records name, not from what the artifact host
+happens to hold.** That distinction is not academic: an earlier version was built the other way
+round and published `dreamer_damped_s0.pt` where the records had used `dreamer_damped_s0_step6500.pt`
+— a different file with a different hash. A reproducer would have downloaded a checkpoint that never
+produced the published number, and the hash check would have passed, because the wrong file had been
+hashed. 97 of the 100 artifacts the records name are published; the other three
+(`dreamer_ref_s{0,1,2}.pt`) are argparse defaults that never existed, listed under `unavailable` in
+the manifest.
+
+One name is ambiguous on this machine and the manifest says so under `overwritten_locally`:
+`dreamer_ref_s{3,4,5}.pt` are paper 1.0's originals, and a later retrain overwrote files of the same
+name in the local fallback directory. `--from-local` fails its hash check on those three. That is the
+guard working; fetch them from the artifact host instead.
 
 The results in `docs/RESULTS.md` need no GPU and no artifacts at all — they are regenerated from the
 committed run records, which is the cheapest way to check that the reported numbers are the ones the
