@@ -1,17 +1,32 @@
 \section{Introduction}
 \label{sec:intro}
 
-A world model trained on simulated video is trained on the output of an integrator. We show it learns
-the integrator.
+Probing is how the field asks whether a model represents a quantity: fit a readout, report the
+accuracy. On a DreamerV3 world model trained only on pendulum video, a polynomial readout fitted to
+the pendulum's \emph{true} energy reaches $|\rho|_E = 0.9999$. By the usual reading, the model
+represents energy about as well as anything can be represented.
 
-On a DreamerV3 world model trained only on pendulum video, a label-free search recovers a conserved
-scalar --- and that scalar is not textbook energy but the \emph{shadow} Hamiltonian of the
-simulator's numerical scheme, $\tilde H = H + \tfrac{\Delta t}{2}mg\tfrac{l}{2}\dot\theta\sin\theta$
-\citep{hairer2006geometric}. The correction coefficient is a property of the discretisation, not of
-pendulums, so it makes a parameter-free prediction: vary the simulator's timestep and the recovered
-coefficient must follow. It does. Across a $4\times$ range of $\Delta t$ the recovered coefficient
-tracks the integrator's prediction with slope $2.484 \pm 0.058$ against a predicted $2.500$, the
-minimum landing exactly on prediction for 10 of 12 models and a wrong-sign control beaten 12 of 12.
+It does not use it. The direction that readout identifies is one the model's own transition fails to
+preserve, and enforcing it during imagination makes the model's physics \emph{worse}. A label-free
+search that tracks energy less well --- $|\rho|_E = 0.973$ --- but is $6.7\times$ better preserved by
+the transition improves it by 42\%. Whether a latent \emph{encodes} a quantity and whether the
+dynamics \emph{preserve} it are different properties, and no amount of probe hygiene closes the gap,
+because nothing is wrong with the probe.
+
+We measure the second property directly with a statistic on the transition operator, show the two
+dissociate on six axes, and show the quantity the operator selects is causally deployed rather than
+descriptive: enforcing it cuts drift in decoded physical energy by 55--76\% on unseen trajectories,
+setting it steers the imagined world's true energy, and the effect survives 50 steps into autonomous
+imagination.
+
+Why should the two come apart at all, when the model was trained on pendulums? A candidate answer is
+that the training data does not conserve textbook energy either: it comes from a symplectic
+integrator, which conserves a nearby shadow $\tilde H = H + \mathcal{O}(\Delta t)$
+\citep{hairer2006geometric}. On ground truth that predicted coefficient is conserved $591\times$
+better than $H$ with nothing fitted, and correcting the $\mathcal{O}(\Delta t)$ term flips the
+intervention from harmful to repairing on every model. We present this as an account of the data and
+are explicit in Section~\ref{sec:mechanism} that the corresponding claim about the \emph{model} is
+one our instruments cannot decide.
 
 \paragraph{Why this matters for interpretability.}
 The immediate consequence is that a probe can be perfect and still wrong. We fit a polynomial readout
@@ -42,15 +57,17 @@ steps into an autonomous rollout --- on a state the model reached by itself --- 
 which a dormant pathway would not \citep{makelov2024illusion}.
 
 \paragraph{Contributions.}
-(i) \textbf{World models learn their simulator's numerical scheme}: the recovered invariant is the
-integrator's shadow Hamiltonian, and its coefficient tracks the simulator timestep across a $4\times$
-range with a parameter-free slope of $2.484 \pm 0.058$ against $2.500$. (ii) \textbf{A demonstration
-that probing over-reports, with a decisive control and a mechanism}: a supervised probe of the true
-quantity, at $|\rho| = 0.9999$, identifies a direction the dynamics do not use, because it is fitted
-to a quantity the generating process does not conserve; the dissociation appears on five independent
-axes and is directional in all of them. (iii) \textbf{An operator statistic that discriminates where
-probes cannot}, with magnitude-matched rather than norm-matched controls --- the norm-matched null
-used in prior work on this system controls nothing, because the correction is scale-invariant in the
-constraint. (iv) \textbf{Causal evidence and stated boundaries}: the selected direction is deployed,
-including 50 steps into autonomous imagination, and the correction confers no benefit to a planner,
-for a reason we measure.
+(i) \textbf{A demonstration that probing over-reports, with a decisive control}: a supervised probe of
+the true quantity, at $|\rho| = 0.9999$, identifies a direction the dynamics do not use and that harms
+the model when enforced; the dissociation appears on six axes and is directional in all of them, the
+cleanest holding the data fixed while changing the architecture ($767\times$).
+(ii) \textbf{An operator statistic that discriminates where probes cannot}, with magnitude-matched
+rather than norm-matched controls --- the norm-matched null used in prior work on this system
+controls nothing, because the correction is scale-invariant in the constraint.
+(iii) \textbf{Causal evidence}: the selected direction is deployed, on 512 unseen trajectories and 50
+steps into autonomous imagination, against magnitude-matched nulls that fail 0 of 60 and 0 of 75.
+(iv) \textbf{An account of the gap, with its evidential status separated}: the shadow Hamiltonian of
+the generating integrator explains why the perfect probe is fitted to the wrong target, verified on
+ground truth; we report in full why the parallel claim about the model resists measurement here.
+(v) \textbf{Stated boundaries}: the correction confers no benefit to a planner and does not select
+checkpoints better than validation loss, for reasons we measure.

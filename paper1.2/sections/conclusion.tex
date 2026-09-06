@@ -1,13 +1,22 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-A world model trained only on pendulum video learns a conserved quantity, and it is the one its
-\emph{simulator} conserves rather than the one physics prescribes. Vary the simulator's timestep and
-the recovered coefficient follows the integrator's parameter-free prediction, slope
-$2.484 \pm 0.058$ against $2.500$. What the model has internalised is the numerical scheme, not the
-physics that scheme approximates.
+A probe can read a quantity out of a world model almost perfectly while the model's own dynamics
+ignore it. In a DreamerV3 trained only on pendulum video, a readout fitted to true energy reaches
+$|\rho| = 0.9999$ and \emph{harms} the imagined physics when enforced, while a label-free direction
+that the transition actually preserves repairs it. Decodability and dynamical structure are separate
+properties of a representation, and probing measures only the first.
 
-That reframes a failure of interpretability rather than excusing it. A probe fitted to true energy at
+We can say why the target was wrong without being able to say what the model internalised. The
+training data comes from a symplectic integrator and does not conserve textbook energy either; on
+ground truth the integrator's predicted correction is conserved $591\times$ better than $H$ with
+nothing fitted, and applying it flips the intervention from harmful to repairing on every model. The
+stronger reading --- that the network has learned the numerical scheme --- we could not establish: our
+one-step statistic depends on the trajectories it is evaluated on, and the two instruments that would
+remove that dependence are respectively powerless and unreadable on these models. We report that in
+full, because the alternative is a headline the measurement does not carry.
+
+None of the causal results rest on it. A probe fitted to true energy at
 $|\rho| = 0.9999$ identifies a direction the dynamics do not use, and enforcing it degrades the
 model's imagined physics --- not because the probe is poor, but because it is fitted to a quantity
 the generating process does not conserve. No probe hygiene detects that. Decodability and dynamical

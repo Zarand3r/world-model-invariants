@@ -1,10 +1,13 @@
-\section{What the model conserves: the integrator's shadow Hamiltonian}
+\section{A candidate account: the integrator's shadow Hamiltonian}
 \label{sec:mechanism}
 
-We can now ask the paper's central question. The transition preserves \emph{something}; the previous
-section shows it is not the optimal readout of true energy. What it preserves is the conserved
-quantity of the \emph{integrator that generated the training data} --- and that identification, not
-the dissociation itself, is what explains why a perfect probe fails.
+The transition preserves \emph{something}; the previous section shows it is not the optimal readout
+of true energy. This section offers an account of what, and is explicit about which half of it we can
+establish. On the data side the account is provable and we verify it. On the model side --- whether
+the network has internalised the integrator's quantity, as opposed to our statistic reflecting the
+trajectories it is measured on --- the instrument we have cannot decide, and we say so rather than
+leave the reader to assume otherwise. Nothing in Sections~\ref{sec:dissociation}
+or~\ref{sec:causality} depends on this section.
 
 \paragraph{The data does not conserve textbook energy.}
 Trajectories come from semi-implicit (symplectic) Euler,
@@ -67,7 +70,7 @@ $-49.5\%$, $-31.5\%$ and $-29.3\%$ on the three models --- a repair on all three
 $T_0$, the perfect probe, gives $+26.8\%$, $-0.3\%$ and $+33.4\%$. Correcting an
 $\mathcal{O}(\Delta t)$ term in the target flips the intervention from harmful to helpful.
 
-\paragraph{The model tracks the simulator's timestep.}
+\paragraph{The coefficient tracks the simulator's timestep --- on the evaluation data.}
 If the model has learned the integrator rather than the physics, then $c^\star$ is not a constant of
 the pendulum but a property of the discretisation, and changing the simulator's timestep should move
 it: $c^\star(\Delta t) = \tfrac{\Delta t}{2}mg\tfrac{l}{2} = 2.5\,\Delta t$. We test this directly.
@@ -101,8 +104,8 @@ Two scalings make the mechanism visible. As the timestep coarsens, $\rho_{\mathr
 energy grows as $\Delta t^{1.41}$, while $\rho_{\mathrm{obs}}$ for the shadow quantity stays at the
 model's own floor, $0.008$--$0.017$ across the whole range. The separation between them therefore
 grows from $1.03\times$ to $13.5\times$ purely because textbook energy becomes worse conserved while
-the shadow quantity does not. \textbf{At every timestep, the model conserves the integrator's
-quantity rather than the physicist's.}
+the shadow quantity does not. \textbf{At every timestep, the quantity best conserved along these
+trajectories is the integrator's rather than the physicist's.}
 
 We report one registered failure. Our preregistration required both a slope within $20\%$ and an
 intercept whose interval contains zero; the two-parameter fit gives a slope of $2.611 \pm 0.110$ but
@@ -111,19 +114,45 @@ timestep, where a post-hoc finer grid puts the minimum at $r = 0.875$ on all thr
 $12\%$ low bias rather than grid coarseness, in the regime where the whole separation is only
 $1.03\times$ and the residual curve is flat to within $2\%$.
 
-\paragraph{What this does and does not settle.}
-The residual matters and we report it: median $\rho_{\mathrm{obs}}$ at $c^\star$ is
-$7.5\times10^{-3}$ against the label-free scalar's $6.9\times10^{-3}$, a gap of $1.10\times$ --- so
-the shadow Hamiltonian accounts for essentially all of the $6.7\times$ gap in
-Section~\ref{sec:dissociation}. It does \emph{not} follow that the model conserves $\tilde H$ exactly:
-it is a learned approximation to the integrator, so its own invariant is its own modified quantity,
-of which $\tilde H$ is a first-order proxy. That $1.10\times$ measures the difference.
+\paragraph{What this does not settle, and why we report it anyway.}
+Table~\ref{tab:timestep} is a statement about the data with the model in the loop, and we cannot
+cleanly remove the data. Our statistic $\rho_{\mathrm{obs}}$ evaluates how well a candidate is
+conserved \emph{along given trajectories}, so a model trained at one timestep and a dataset generated
+at another both influence the argmin. A registered cross-evaluation control settles which dominates,
+and the answer is unfavourable: crossing models against datasets, the argmin follows the
+\emph{evaluation set} in all six cells and the checkpoint in none ($0/3$ on both off-diagonals). The
+same control voids a companion experiment that appeared to identify the integration \emph{scheme};
+semi-implicit Euler and velocity Verlet reduce to the identical position recurrence
+$\theta_{t+1} = 2\theta_t - \theta_{t-1} + a(\theta_t)\Delta t^2$, differing only in whether
+$\dot\theta$ is labelled by a backward or a central difference --- a variable the pixels never show.
 
-Two consequences follow. A probe reaching $|\rho|_E = 0.9999$ can be fitted to a quantity \emph{the
-generating process does not conserve}, and no probe hygiene detects this, because nothing is wrong
-with the probe --- the target is. And the label-free method's advantage has a name: it optimises
+Two alternative instruments fail as well. Measuring conservation along the model's \emph{own}
+imagined rollout removes the evaluation trajectory entirely, but has no power here: the sweep
+contrast is $1.12$--$1.45\times$ against $\sim\!5.7\times$ for the one-step measure, and within a
+single model the argmin spans the full grid across horizons $2$--$100$. A forced choice across
+timesteps is unreadable for a different reason: a model evaluated at a timestep it was not trained on
+is $\sim\!90\times$ worse in one-step error ($0.007 \to 0.6$ rad), giving a prediction error nine
+times the separation between candidates. A pre-committed gate withheld what would otherwise have read
+as a clean positive.
+
+So the model-side claim is \textbf{not shown false --- shown unsubstantiable with these assets}.
+Separating model from data needs a model that is in distribution at more than one timestep, which we
+do not have. What survives is the data-side fact, which is provable and which we verify: on ground
+truth the integrator's predicted coefficient is conserved $591\times$ better than textbook energy
+with nothing fitted, and correcting that $\mathcal{O}(\Delta t)$ term flips the intervention from
+harmful to repairing on every model. That is enough to explain the perfect probe's failure --- it was
+fitted to a quantity \emph{the generating process does not conserve}, and no probe hygiene detects
+this, because nothing is wrong with the probe; the target is. It is not enough to claim the model
+learned the integrator, and we do not.
+
+The residual is worth recording either way: median $\rho_{\mathrm{obs}}$ at $c^\star$ is
+$7.5\times10^{-3}$ against the label-free scalar's $6.9\times10^{-3}$, a gap of $1.10\times$, so the
+shadow quantity accounts for essentially all of the $6.7\times$ gap in
+Section~\ref{sec:dissociation}. The sweep is also internally decisive about the probing point, which
+needs no model-versus-data attribution at all: at $c^\star$ the readout correlates with textbook
+energy \emph{worse} than at $c=0$ ($0.977$ against $0.9999$) while being conserved six times better
+and repairing the rollout instead of harming it. Correlation with the labelled quantity and fitness
+for the dynamics move in opposite directions along a single one-parameter family. The label-free
+method's advantage has a name that likewise does not depend on this section: it optimises
 conservation under the learned transition, so it is not restricted to targets a human knows how to
-write down, and here it recovered an $\mathcal{O}(\Delta t)$ correction nobody supplied. The thesis
-is internal to a single sweep: at $c^\star$ the probe correlates with textbook energy \emph{worse}
-than at $c=0$ ($0.977$ against $0.9999$) while being conserved six times better and repairing the
-rollout instead of harming it.
+write down, and here it recovered an $\mathcal{O}(\Delta t)$ correction nobody supplied.

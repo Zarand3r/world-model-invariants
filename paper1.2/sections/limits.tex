@@ -39,3 +39,13 @@ Finally, the two-invariant case limits the extraction rather than the model. Whe
 angular momentum are conserved, the conserved subspace reliably contains both (angular-momentum
 correlation $0.94$--$0.98$) while the joint fit isolates either in only 1 of 7 measurements: flow
 alignment selects a single direction inside that subspace and has no unique answer when two exist.
+
+\paragraph{We cannot attribute the shadow correction to the model rather than the data.}
+Section~\ref{sec:mechanism} establishes the account on the data side and reports, in the same place,
+why the model side resists measurement here: $\rho_{\mathrm{obs}}$ is computed along evaluation
+trajectories, a registered cross-evaluation control shows the argmin follows the evaluation set in
+$6/6$ cells and the checkpoint in $0/6$, and the alternatives are a rollout statistic with no power
+(contrast $1.12$--$1.45\times$) and a cross-timestep forced choice that is unreadable because a model
+evaluated off its training timestep is $\sim\!90\times$ worse in one-step error. Deciding it needs a
+model in distribution at more than one timestep. Until then the claim is unsubstantiated rather than
+refuted, and the paper's other results are constructed so as not to depend on it.
