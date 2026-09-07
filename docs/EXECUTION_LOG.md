@@ -8259,3 +8259,69 @@ paper's boundary section. It is also the third failed attempt to give this work 
 that pattern is now worth stating plainly in the paper rather than discovering a fourth time.
 
 `paper1.2/` untouched.
+
+---
+
+## 2026-09-07 --- The roadmap workflow audited our own headline numbers. Three findings, all verified.
+
+An 11-agent workflow was run to design and adversarially critique three extension directions. Its
+most valuable output was not a direction. Its feasibility critics read the run records and the code
+and found three defects in claims I have been repeating. **I verified all three myself before
+recording them**; the workflow's agents are no more trustworthy than any other checking tool.
+
+### 1. F6's headline slope is algebraically equivalent to "argmin is near 1"
+
+`c_recovered` is **defined** as `argmin_r * c*(dt)`, exactly, on **12 of 12** models. So the
+origin-forced slope of `c_recovered` against `dt` is `2.5 x` (a weighted mean of `argmin_r`) and
+nothing more:
+
+    origin-forced slope from c_recovered   2.4842
+    same quantity from argmin_r alone      2.4842   (identical by algebra)
+    mean argmin_r 0.9583, slope/2.5 = 0.9937
+
+**"Slope 2.484 against a parameter-free 2.500" and "the argmin lands on the prediction" are the same
+fact stated twice.** Presenting them as separate lines of evidence overstates the result. This was
+not recorded anywhere and I did not know it.
+
+### 2. The quoted `2.484 +/- 0.058` is the constrained fit whose assumption the registered test rejected
+
+F6's preregistration demanded slope **and** intercept. The two-parameter fit gives
+
+    slope 2.611 +/- 0.110,  intercept -0.00722 +/- 0.00566   (CI excludes zero)   P3_pass: false
+
+The `2.484 +/- 0.058` everyone quotes is the **origin-forced** fit --- it assumes the intercept that
+the registered test rejected. The roadmap and `verify_paper_numbers.py` do label it "origin-forced"
+and do record P3 as failing, so the repository has been honest. **My verbal summaries were not**: I
+have repeatedly quoted `2.484 +/- 0.058 against a parameter-free 2.500` as the headline without the
+caveat that the registered test asked a different question and failed it.
+
+### 3. E18's `6.7x` is measured with `C` fitted in-sample
+
+`run_e18_supervised_baseline.py` encodes `fr[ANALYSIS]` --- 52 trajectories --- calls
+`cached_fit(Z, F)` on exactly those, and scores `rho_obs` on the same `Z`, `F`. **Model held out,
+`C` in-sample.**
+
+Both arms are fitted in-sample, which is symmetric, but the asymmetry that matters is what each is
+fitted *for*: the label-free arm is fitted to minimise conservation error and is then scored on
+conservation error, on the same trajectories. E9 does hold out trajectories for the **repair**
+result, so that half is clean. The `6.7x` gap is not, and the cross-fit control has never been run.
+
+This touches the surviving headline --- the one the reframe and the Newton program both rest on ---
+so it outranks every new direction in the packet.
+
+### What the workflow got right about sequencing
+
+It also caught that one of its own proposed experiments duplicates F13, which is training on this
+machine right now, and that E17b's sample-size concern was already discharged in this log. Both
+correct.
+
+### Consequence
+
+The top-ranked next action is no longer a new experiment. It is a **cross-fit audit** of the two
+headline numbers: fit `C` and the supervised probe on one set of trajectories, freeze coefficients
+and frame, score on a disjoint set, and report what survives. Under a day, under one GPU-hour, on
+existing checkpoints. If the `6.7x` gap holds at `>=3x` cross-fit, the claim is stronger than it is
+now because it will have survived the control a reviewer will demand. If it collapses below `2x`,
+we need to know before submission rather than after.
+
+F13 continues training; it is unaffected by any of this.

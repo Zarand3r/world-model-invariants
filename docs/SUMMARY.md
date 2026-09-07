@@ -1,6 +1,6 @@
 # Executive summary
 
-*Updated 2026-08-30 (F12). Kept current after every significant development — see CLAUDE.md.*
+*Updated 2026-09-07 (headline audit). Kept current after every significant development — see CLAUDE.md.*
 
 We are testing whether a world model trained only on video of a swinging pendulum learns physics it
 actually obeys. The distinction that matters: a probe can read a quantity out of the model's internal
@@ -28,7 +28,9 @@ down before each experiment.
 
 - A probe fitted to the pendulum's true energy reads it almost perfectly (0.9999) yet the model's own
   transition preserves it **6.7× worse** than a quantity found without labels — and forcing the
-  model to obey the probe makes its physics *worse*, never better.
+  model to obey the probe makes its physics *worse*, never better. **Caveat found 2026-09-07:** that
+  6.7× is measured with the label-free quantity fitted on the same 52 trajectories it is scored on.
+  The repair half is held out; this half is not. A cross-fit check is the top priority.
 - Nudging the model back toward the label-free quantity during imagination **cuts physical error
   55–76%** on trajectories it never saw, where 0 of 60 matched random controls help. Survives being
   applied 50 steps into imagination.
@@ -46,6 +48,12 @@ does not learn the balance law under actuation, fixed constraints cannot be extr
 That last one closes what had been our cheapest promising direction, and it is the third failed
 attempt to find a practical use. **The honest reading is that this work is a diagnostic, not a
 tool**, and the paper should say so rather than wait for a fourth attempt to fail.
+
+**Weaker than we said.** Two presentation defects found by auditing our own numbers. The headline
+"slope 2.484 vs a parameter-free 2.500" is *algebraically the same fact* as "the argmin lands on the
+prediction" — one number, not two independent ones. And that 2.484 is a fit forced through the
+origin; the two-parameter fit the preregistration actually asked for gives 2.611 with an intercept
+excluding zero, and it was recorded as failing.
 
 **Open.** Whether the model tracks its simulator's *timestep* is unresolved. The measurement showing
 it might be reading the training data rather than the model, and the tests that would tell them apart
