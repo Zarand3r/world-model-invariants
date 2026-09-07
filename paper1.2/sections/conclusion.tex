@@ -3,28 +3,28 @@
 
 A probe can read a quantity out of a world model almost perfectly while the model's own dynamics
 ignore it. In a DreamerV3 trained only on pendulum video, a readout fitted to true energy reaches
-$|\rho| = 0.9999$ and \emph{harms} the imagined physics when enforced, while a label-free direction
+$|\rho| = 0.9999$, and enforcing it \emph{harms} the imagined physics, while a label-free direction
 that the transition actually preserves repairs it. Decodability and dynamical structure are separate
 properties of a representation, and probing measures only the first.
 
 We can say why the target was wrong without being able to say what the model internalised. The
-training data comes from a symplectic integrator and does not conserve textbook energy either; on
-ground truth the integrator's predicted correction is conserved $591\times$ better than $H$ with
-nothing fitted, and applying it flips the intervention from harmful to repairing on every model. The
-stronger reading --- that the network has learned the numerical scheme --- we could not establish: our
-one-step statistic depends on the trajectories it is evaluated on, and the two instruments that would
-remove that dependence are respectively powerless and unreadable on these models. We report that in
-full, because the alternative is a headline the measurement does not carry.
+training data comes from a symplectic integrator and does not conserve textbook energy either. On
+ground truth the trajectories conserve the integrator's predicted quantity $591\times$ better than $H$ with
+nothing fitted, and applying that correction flips the intervention from harmful to repairing on
+every model. The stronger reading, that the network has learned the numerical scheme, we could not
+establish. Our one-step statistic depends on which trajectories we evaluate it on, and the two
+instruments that would remove that dependence are respectively powerless and unreadable on these
+models. We report that in full, because the alternative is a headline the measurement does not carry.
 
-None of the causal results rest on it. A probe fitted to true energy at
-$|\rho| = 0.9999$ identifies a direction the dynamics do not use, and enforcing it degrades the
-model's imagined physics --- not because the probe is poor, but because it is fitted to a quantity
-the generating process does not conserve. No probe hygiene detects that. Decodability and dynamical
-structure are different properties, they come apart in every setting we could construct, and only a
-measurement on the transition operator tells them apart.
+None of the causal results rest on it. A probe fitted to true energy at $|\rho| = 0.9999$ identifies
+a direction the dynamics do not use, and enforcing it degrades the model's imagined physics. The
+cause is not a poor probe: we fitted it to a quantity the generating process does not conserve, and
+no probe hygiene detects that. Decodability and dynamical structure are different properties that
+come apart in every setting we could construct, and only a measurement on the transition operator
+tells them apart.
 
 The practical consequence is narrow. That a physical variable is decodable says little about whether
-the model's rollouts respect it, and says least where it matters most: out of distribution, in
+the model's rollouts respect it. It says least where it matters most: out of distribution, in
 architectures that predict well without conserving, and when the variable comes from supervision
-rather than from the dynamics. The operator statistic costs one autonomous step per state; it does
-not, on this evidence, buy a better controller.
+rather than from the dynamics. The operator statistic costs one autonomous step per state, and on
+this evidence it does not buy a better controller.

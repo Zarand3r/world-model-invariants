@@ -2,72 +2,74 @@
 \label{sec:intro}
 
 Probing is how the field asks whether a model represents a quantity: fit a readout, report the
-accuracy. On a DreamerV3 world model trained only on pendulum video, a polynomial readout fitted to
-the pendulum's \emph{true} energy reaches $|\rho|_E = 0.9999$. By the usual reading, the model
-represents energy about as well as anything can be represented.
+accuracy. We train a DreamerV3 world model on pendulum video alone, and a polynomial readout fitted
+to the pendulum's \emph{true} energy reaches $|\rho|_E = 0.9999$. By the usual reading, the model
+represents energy about as well as a model can.
 
-It does not use it. The direction that readout identifies is one the model's own transition fails to
-preserve, and enforcing it during imagination makes the model's physics \emph{worse}. A label-free
-search that tracks energy less well --- $|\rho|_E = 0.973$ --- but is $6.7\times$ better preserved by
-the transition improves it by 42\%. Whether a latent \emph{encodes} a quantity and whether the
-dynamics \emph{preserve} it are different properties, and no amount of probe hygiene closes the gap,
-because nothing is wrong with the probe.
+It does not use it. The model's own transition fails to preserve the direction that readout
+identifies, and enforcing it during imagination makes the model's physics \emph{worse}. A label-free
+search tracks energy less well, at $|\rho|_E = 0.973$, but the transition preserves it $6.7\times$
+better, and enforcing that one improves the physics by 42\%. Whether a latent \emph{encodes} a
+quantity and whether the dynamics \emph{preserve} it are different properties, and no amount of probe
+hygiene closes the gap, because nothing is wrong with the probe.
 
-We measure the second property directly with a statistic on the transition operator, show the two
-dissociate on six axes, and show the quantity the operator selects is causally deployed rather than
-descriptive: enforcing it cuts drift in decoded physical energy by 55--76\% on unseen trajectories,
-setting it steers the imagined world's true energy, and the effect survives 50 steps into autonomous
-imagination.
+We measure the second property directly, with a statistic on the transition operator. The two
+dissociate on six axes, and the model causally uses the quantity the operator selects rather than
+merely encoding it. Enforcing that quantity cuts drift in decoded physical energy by 55--76\% on
+unseen trajectories. Setting it steers the imagined world's true energy, and the effect survives 50
+steps into autonomous imagination.
 
-Why should the two come apart at all, when the model was trained on pendulums? A candidate answer is
-that the training data does not conserve textbook energy either: it comes from a symplectic
+Why should the two come apart at all, when we trained the model on pendulums? One candidate answer is
+that the training data does not conserve textbook energy either. It comes from a symplectic
 integrator, which conserves a nearby shadow $\tilde H = H + \mathcal{O}(\Delta t)$
 \citep{hairer2006geometric}. On ground truth that predicted coefficient is conserved $591\times$
 better than $H$ with nothing fitted, and correcting the $\mathcal{O}(\Delta t)$ term flips the
-intervention from harmful to repairing on every model. We present this as an account of the data and
-are explicit in Section~\ref{sec:mechanism} that the corresponding claim about the \emph{model} is
-one our instruments cannot decide.
+intervention from harmful to repairing on every model. We offer this as an account of the data, and
+Section~\ref{sec:mechanism} is explicit that our instruments cannot decide the corresponding claim
+about the \emph{model}.
 
 \paragraph{Why this matters for interpretability.}
-The immediate consequence is that a probe can be perfect and still wrong. We fit a polynomial readout
-to \emph{true} physical energy; it reaches $|\rho| = 0.9999$, as good as a probe can be. Yet it is
-$6.7\times$ less preserved by the model's own transition than the label-free scalar, and enforcing it
-during imagination makes the model's physics \emph{worse}, while the label-free scalar improves it by
-42\%. Nothing is wrong with the probe. The probe is fitted to a quantity the generating process does
-not conserve --- and no amount of probe hygiene \citep{hewitt2019control,belinkov2022probing} detects
-that, because probe hygiene tests the probe.
+A probe can be perfect and still wrong. We fit a polynomial readout to \emph{true} physical energy,
+and it reaches $|\rho| = 0.9999$, as good as a probe gets. Yet the model's own transition preserves
+it $6.7\times$ less well than the label-free scalar, and enforcing it during imagination makes the
+model's physics \emph{worse}, while the label-free scalar improves it by 42\%. Nothing is wrong with
+the probe. We fitted it to a quantity the generating process does not conserve, and no amount of
+probe hygiene \citep{hewitt2019control,belinkov2022probing} detects that, because probe hygiene tests
+the probe.
 
 \paragraph{Measuring the operator instead.}
-The discriminating measurement is not on the representation but on the transition: apply one
+The discriminating measurement runs on the transition, not on the representation: we apply one
 autonomous step at a real encoded state and ask how much a candidate scalar moves
 (Equation~\ref{eq:rhoobs}). This single statistic separates trained from untrained models
-($74\times$), conservative from dissipative ($39\times$, no overlap), in-distribution from out
-($55$--$267\times$), one architecture from another ($767\times$), and a label-free scalar from a
-supervised probe of the same quantity ($6.7\times$). On every one of those contrasts a probe reports
-success. The dissociation is directional in each case we can construct: decodability is retained
-where dynamical structure fails.
+($74\times$) and conservative from dissipative ($39\times$, no overlap). It also separates
+in-distribution from out ($55$--$267\times$), one architecture from another ($767\times$), and a
+label-free scalar from a supervised probe of the same quantity ($6.7\times$). A probe reports success
+on every one of those contrasts, and the dissociation runs one way in each case we can construct:
+decodability survives where dynamical structure fails.
 
-\paragraph{The quantity the operator selects is used by the model.}
-Projecting the latent back toward its level set during imagination reduces drift in \emph{decoded
-physical energy} by 55--76\% at long horizon on trajectories the method never saw, with 0 of 60
-magnitude-matched random directions and 0 of 15 equal-norm tangent directions beating it. Setting the
-scalar to an independent trajectory's value moves the imagined world's true energy toward that
-trajectory's (rank correlation $0.80$--$0.91$, 0 of 75 controls). The same interchange applied 50
-steps into an autonomous rollout --- on a state the model reached by itself --- works nearly as well,
-which a dormant pathway would not \citep{makelov2024illusion}.
+\paragraph{The model uses the quantity the operator selects.}
+During imagination we project the latent back toward its level set, and on trajectories the method
+never saw that reduces drift in \emph{decoded physical energy} by 55--76\% at long horizon. No
+control beats it: 0 of 60 magnitude-matched random directions and 0 of 15 equal-norm tangent
+directions. Setting the scalar to an independent trajectory's value moves the imagined world's true
+energy toward that trajectory's (rank correlation $0.80$--$0.91$, 0 of 75 controls). We apply the
+same interchange 50 steps into an autonomous rollout, at a state the model reached by itself, and it
+works nearly as well. A dormant pathway would not \citep{makelov2024illusion}.
 
 \paragraph{Contributions.}
-(i) \textbf{A demonstration that probing over-reports, with a decisive control}: a supervised probe of
-the true quantity, at $|\rho| = 0.9999$, identifies a direction the dynamics do not use and that harms
-the model when enforced; the dissociation appears on six axes and is directional in all of them, the
-cleanest holding the data fixed while changing the architecture ($767\times$).
+(i) \textbf{A demonstration that probing over-reports, with a decisive control}: a supervised probe
+of the true quantity, at $|\rho| = 0.9999$, identifies a direction the dynamics do not use.
+Enforcing it harms the model. The dissociation appears on six axes and runs one way in all of them,
+the cleanest holding the data fixed while changing the architecture ($767\times$).
 (ii) \textbf{An operator statistic that discriminates where probes cannot}, with magnitude-matched
-rather than norm-matched controls --- the norm-matched null used in prior work on this system
-controls nothing, because the correction is scale-invariant in the constraint.
-(iii) \textbf{Causal evidence}: the selected direction is deployed, on 512 unseen trajectories and 50
-steps into autonomous imagination, against magnitude-matched nulls that fail 0 of 60 and 0 of 75.
+rather than norm-matched controls. Prior work on this system used a norm-matched null, which controls
+nothing, because the correction is scale-invariant in the constraint.
+(iii) \textbf{Causal evidence}: the model deploys the selected direction, on 512 unseen trajectories
+and 50 steps into autonomous imagination, against magnitude-matched nulls that fail 0 of 60 and 0 of
+75.
 (iv) \textbf{An account of the gap, with its evidential status separated}: the shadow Hamiltonian of
-the generating integrator explains why the perfect probe is fitted to the wrong target, verified on
-ground truth; we report in full why the parallel claim about the model resists measurement here.
+the generating integrator explains why the perfect probe targets the wrong quantity, and we verify
+that on ground truth. We also report in full why the parallel claim about the model resists
+measurement here.
 (v) \textbf{Stated boundaries}: the correction confers no benefit to a planner and does not select
 checkpoints better than validation loss, for reasons we measure.

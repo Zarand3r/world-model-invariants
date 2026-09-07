@@ -3,28 +3,30 @@ Probing asks whether a model represents a quantity by fitting a readout to it. I
 that accuracy mixes what the representation stores with what the probe can learn, and the accepted
 remedy is better probe hygiene. We show the remedy addresses the wrong failure. In a DreamerV3 world
 model trained only on pendulum video, a polynomial readout fitted to \emph{true} physical energy
-reaches a correlation of $0.9999$ --- yet the direction it identifies is one the model's own
-transition does not preserve, and enforcing it during imagination makes the model's physics
-\emph{worse}. A label-free search that tracks energy slightly less well, but is $6.7\times$ better
-preserved by the transition, improves it by 42\%. Whether a latent encodes a quantity and whether the
-dynamics preserve it are different properties, and they dissociate on five further axes --- untrained
-models, out-of-distribution states, a second architecture, an untrained transition, and actuation ---
-always with decodability surviving where dynamical structure fails. The cleanest holds the data
-fixed: a different architecture on \emph{identical} trajectories is $767\times$ worse.
+reaches a correlation of $0.9999$. The model's own transition does not preserve that direction, and
+enforcing it during imagination makes the model's physics \emph{worse}. A label-free search tracks
+energy slightly less well, but the transition preserves it $6.7\times$ better, and that search
+improves the physics by 42\%. Whether a latent encodes a quantity and whether the dynamics preserve
+it are different properties. They dissociate on five further axes: untrained models,
+out-of-distribution states, a second architecture, an untrained transition, and actuation, with
+decodability surviving in every case where dynamical structure fails. The cleanest axis holds the
+data fixed: a different architecture on \emph{identical} trajectories is $767\times$ worse.
 
-A statistic on the transition operator separates the two properties in every case, and the quantity
-it selects is causally deployed. Enforcing it cuts drift in decoded physical energy by 55--76\% on
-512 unseen trajectories, with 0 of 60 magnitude-matched random directions beating it; setting it
-steers the imagined world's true energy (rank correlation 0.80--0.91, 0 of 75 controls); and the
-effect survives an interchange 50 steps into autonomous imagination. These are measured on the
-model's own imagined rollouts against matched nulls.
+A statistic on the transition operator separates the two properties in every case, and we causally
+deploy the quantity it selects. Enforcing it cuts drift in decoded physical energy by 55--76\% on
+512 unseen trajectories, and 0 of 60 magnitude-matched random directions beat it. Setting it steers
+the imagined world's true energy, with rank correlation 0.80--0.91 and 0 of 75 controls beating it,
+and the effect survives an interchange 50 steps into autonomous imagination. We measure all of this
+on the model's own imagined rollouts against matched nulls.
 
-Why the selected quantity differs from textbook energy has a candidate answer, whose status we state
-precisely. The data comes from a symplectic integrator, which conserves a shadow
-$\tilde H = H + \mathcal{O}(\Delta t)$ rather than $H$; on ground truth the coefficient the
-integrator predicts is conserved $591\times$ better than $H$ with nothing fitted, and correcting that
-term flips the intervention from harmful to helpful on every model. That the \emph{model} has
-internalised it we cannot establish: a cross-evaluation control shows our one-step statistic depends
-on the trajectories it is evaluated on, and the instruments that would separate model from data are
-degenerate on these assets. The dissociation and its causal deployment do not rest on that account.
+Why the selected quantity differs from textbook energy has a candidate answer, and we state its
+status precisely. The data comes from a symplectic integrator, which conserves a shadow
+$\tilde H = H + \mathcal{O}(\Delta t)$ rather than $H$. On ground truth the trajectories conserve
+the quantity at the integrator's predicted coefficient $591\times$ better than $H$, with nothing
+fitted, and
+correcting that term flips the intervention from harmful to helpful on every model. We cannot
+establish that the \emph{model} has internalised it: a cross-evaluation control shows our one-step
+statistic depends on the trajectories we evaluate it on, and the instruments that would separate
+model from data are degenerate on these assets. The dissociation and its causal deployment do not
+rest on that account.
 \end{abstract}

@@ -1,13 +1,13 @@
 \section{Decodability is not dynamical structure}
 \label{sec:dissociation}
 
-Establishing what the model conserves requires first separating two things a probe conflates. A probe
-shows a quantity can be read out of a representation; it says nothing about whether the model's own
-transition uses or preserves that quantity. This section builds the statistic that distinguishes
-them, and shows the two properties come apart --- which is what makes it possible, in
-Section~\ref{sec:mechanism}, to ask \emph{which} quantity the transition actually preserves. We measure the second property
-directly, with a statistic on the transition operator: apply one autonomous step at a real encoded
-state and ask how much a candidate scalar changes,
+Establishing what the model conserves requires separating two things a probe conflates. A probe
+shows that a readout recovers a quantity from a representation; it says nothing about whether the
+model's own transition uses or preserves that quantity. We build the statistic that separates them,
+and we show that the two properties come apart. That separation is what lets
+Section~\ref{sec:mechanism} ask \emph{which} quantity the transition actually preserves. We measure
+the second property directly, with a statistic on the transition operator. At a real encoded state
+we take one autonomous step and ask how much a candidate scalar changes,
 \begin{equation}
 \rho_{\mathrm{obs}}(C) \;=\;
 \frac{\operatorname{median}_t \bigl| C(T(z_t)) - C(z_t) \bigr|}
@@ -38,29 +38,29 @@ constraints differently.}
 
 
 
-Figure~\ref{fig:probe_vs_operator} shows the outcome. The supervised
-probe tracks energy better than the label-free scalar on every seed, yet is $6.7\times$ less
-preserved by the transition --- median $\rho_{\mathrm{obs}}$ of $4.58\times10^{-2}$ against
+Figure~\ref{fig:probe_vs_operator} shows the outcome: the supervised
+probe tracks energy better than the label-free scalar on every seed, yet the transition preserves it
+$6.7\times$ worse. The median $\rho_{\mathrm{obs}}$ is $4.58\times10^{-2}$ against
 $6.9\times10^{-3}$, and $5.3$--$7.3\times$ per seed; both hold on 3 of 3 models. It also never repairs the
-rollout: its effect on energy drift is $+26.8\%$ and $+33.4\%$ on two models and $-0.3\%$ on the third,
-against a median $-42.2\%$ ($32$--$51\%$) reduction from the label-free scalar on all three. A
+rollout. Its effect on energy drift is $+26.8\%$ and $+33.4\%$ on two models and $-0.3\%$ on the third,
+while the label-free scalar cuts drift on all three by a median $-42.2\%$ ($32$--$51\%$). A
 magnitude-matched random constraint sits at $\rho_{\mathrm{obs}} \approx 1.07$ and changes drift by
 $+4.0\%$. The direction that best
 predicts the physical variable and the direction the model's dynamics actually respect are not the
 same direction.
 
-This also answers the practical objection to a label-free method. The search is not a workaround for
-missing labels: it finds something a supervised fit on perfect labels does not, because it optimises
+This also answers the practical objection to a label-free method: the search is not a workaround for
+missing labels. It finds something a supervised fit on perfect labels does not, because it optimises
 conservation by the transition rather than agreement with the variable.
 Section~\ref{sec:mechanism} identifies what it finds, and why fitting true energy cannot find it.
 
 \paragraph{The dissociation is directional, and appears on five further axes.}
 In every case we can construct, decodability survives where conservation fails; we have not found the
-converse. Table~\ref{tab:axes} collects them. On each row a probe would report success.
+converse. Table~\ref{tab:axes} collects them, and on each row a probe would report success.
 
 \begin{table}[t]
 \centering\small
-\caption{Decodability is retained while dynamical structure degrades, across five independent axes.
+\caption{Decodability survives while dynamical structure degrades, across five independent axes.
 $\rho_{\mathrm{obs}}$ for the trained conservative model in-distribution is $6.3$--$8.7\times10^{-3}$.}
 \label{tab:axes}
 \begin{tabular}{llcc}
@@ -76,28 +76,29 @@ actuation & torque applied & $|\rho|_E$ 0.72--0.88 & balance law absent \\
 \end{tabular}
 \end{table}
 
-The out-of-distribution row is cleanest: it holds the model fixed and varies only the region of
-state space. Outside the training energy band a freely fitted probe still recovers energy at $0.999$
---- the encoder generalises --- while the transition conserves it $55$--$267\times$ worse, reaching
+The out-of-distribution row is cleanest, since it holds the model fixed and varies only the region
+of state space. Outside the training energy band a freely fitted probe still recovers energy at
+$0.999$, so the encoder generalises. The transition conserves it $55$--$267\times$ worse there, reaching
 values indistinguishable from a random constraint. The two properties come apart inside a single
-trained model, split by where in state space it is asked.
+trained model, split by where in state space we ask.
 
 The actuation row is the only axis testing a \emph{balance} law rather than a conservation law;
 Appendix~\ref{sec:causal-detail} gives it in full.
 
-\paragraph{Whether conservation \emph{alone} predicts the intervention is not established.}
-Among candidates matched in energy correlation and spanning five orders of magnitude of conservation,
-the rank correlation with repair is $+0.19$, $+0.57$ and $+0.19$ across seeds, with the 95\% interval
-excluding zero on \textbf{one of three}. We report this as a negative, and note why the control is
-hard: on a system whose transition conserves energy the well-conserved latent directions \emph{are}
-the energy-like ones, so a matched band exists only at low decodability and on one seed cannot be
-built at all. Appendix~\ref{sec:causal-detail} gives the full analysis. What holds on all three seeds
-is that the recovered scalar repairs: $-16.7\%$, $-7.3\%$ and $-6.8\%$.
+\paragraph{We have not established whether conservation \emph{alone} predicts the intervention.}
+The candidate set holds energy correlation fixed and spans five orders of magnitude of conservation.
+Within it, the rank correlation with repair is $+0.19$, $+0.57$ and $+0.19$ across seeds, and the
+95\% interval excludes zero on \textbf{one of three}. We report this as a negative, and the control
+is hard for a reason. On a system whose transition conserves energy the well-conserved latent
+directions \emph{are} the energy-like ones, so a matched band exists only at low decodability, and on
+one seed we cannot build one at all. Appendix~\ref{sec:causal-detail} gives the full analysis. What
+holds on all three seeds is that the recovered scalar repairs: $-16.7\%$, $-7.3\%$ and $-6.8\%$.
 
 \paragraph{Where the phenomenon stops.}
-Both boundaries are the same statement twice: the invariant is bounded to the \emph{training
-distribution} and to \emph{RSSM-like architectures}. On a deterministic conv-GRU, identification
-transfers on 2 of 3 seeds under both training budgets while conservation transfers on none --- a
-$767\times$ gap --- and seven times more open-loop training moves the median barely. That comparison
-does not isolate architecture, since an open-loop reconstruction term and a prior--posterior KL are
-different losses; Appendix~\ref{sec:causal-detail} gives both boundaries in full.
+Both boundaries state the same thing twice: the invariant extends no further than the \emph{training
+distribution} and no further than \emph{RSSM-like architectures}. On a deterministic conv-GRU,
+identification transfers on 2 of 3 seeds under both training budgets while conservation transfers on
+none, a $767\times$ gap, and seven times more open-loop training moves the median barely. That
+comparison does not isolate architecture, since an open-loop reconstruction term and a
+prior--posterior KL are different losses; Appendix~\ref{sec:causal-detail} gives both boundaries in
+full.

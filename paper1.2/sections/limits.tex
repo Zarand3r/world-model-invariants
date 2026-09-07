@@ -1,51 +1,54 @@
 \section{Limitations}
 \label{sec:limits}
 
-Two smooth Hamiltonian systems --- a pendulum and a two-degree-of-freedom anharmonic oscillator ---
-with no contacts and no multiple interacting objects; whether any of this survives discontinuous
-dynamics is untested. Three trained models per arm, with the model seed as the independent unit and
-ranges rather than confidence intervals, because three is too few for a precise effect size. The
-extraction minimises an invariance ratio that \emph{is} the normal component of one-step error, so a
-low normal error is the objective being met, not a finding; the empirical content is that the
-resulting direction coincides with physical energy, which supervision does not reproduce. The
-architecture comparison likewise does not isolate architecture: an open-loop reconstruction term and
-a prior--posterior KL are different losses, not the same loss at different strengths.
+This study covers two smooth Hamiltonian systems, a pendulum and a two-degree-of-freedom anharmonic
+oscillator, and neither has contacts or multiple interacting objects, nor have we tested
+discontinuous dynamics. Each arm has three trained models, and the model seed is the independent
+unit. Three is too few for a precise effect size, so we report ranges rather than confidence
+intervals. The extraction minimises an invariance ratio that \emph{is} the normal component of
+one-step error, so a low normal error shows the optimiser meeting its objective, not a finding. The
+empirical content is that the resulting direction coincides with physical energy, which supervision
+does not reproduce. The architecture comparison likewise does not isolate architecture, because an
+open-loop reconstruction term and a prior--posterior KL are different losses, not the same loss at
+different strengths.
 
 \paragraph{No downstream benefit, and we measured why.}
-Both practical uses we tested fail, for one reason. Planning with CEM over the learned model on an
-energy-targeting task, the model plans well --- beating random actions by $+1.65$, 95\% CI
-$[+0.50,+2.79]$ --- yet no correction arm differs from no correction over three models and 20
-episodes each: the largest effect is $0.0014$ against a return standard deviation of $0.575$,
-\textbf{0.24\% of one episode's spread}, with all four registered predictions failing. The cause is
-structural. The correction acts on \emph{accumulated} drift, and at the planner's horizon it shifts
-imagined energy by $0.3\%$ of the spread across candidate action sequences --- the quantity the
-planner ranks plans by --- so it cannot change which plan is chosen. Our repair is measured over 100
-autonomous steps; a re-planning controller never imagines long enough to accumulate what the method
-removes, and looking further ahead does not help, because planning quality itself degrades with
-horizon. The same effect-size limit defeats drift as an online trust signal, which is beaten by plain
-latent displacement on every model. Appendix~\ref{sec:causal-detail} gives both in full.
+Both practical uses we tested fail, for one reason. We plan with CEM over the learned model on an
+energy-targeting task, and the model plans well, beating random actions by $+1.65$, 95\% CI
+$[+0.50,+2.79]$. Yet no correction arm differs from no correction over three models and 20 episodes
+each, and the largest effect is $0.0014$ against a return standard deviation of $0.575$, or
+\textbf{0.24\% of one episode's spread}. All four registered predictions fail. The cause is
+structural: the correction acts on \emph{accumulated} drift, and at the planner's horizon it shifts
+imagined energy by $0.3\%$ of the spread across candidate action sequences. The planner ranks plans
+by that spread, so a shift this small cannot change which plan wins. We measure our repair over 100
+autonomous steps, and a re-planning controller never imagines long enough to accumulate what the
+method removes. Looking further ahead does not help, because planning quality itself degrades with
+horizon. The same effect-size limit defeats drift as an online trust signal, which plain latent
+displacement beats on every model, and Appendix~\ref{sec:causal-detail} gives both in full.
 
 \paragraph{The method finds only what the data gave the model a reason to represent.}
-The pendulum's rod length is fixed, an exact constraint, yet searching for a residual $G(z)=0$ fails:
-the recovered direction correlates with the true residual at $0.004$--$0.032$. Minimising
-$\mathbb{E}[G^2]$ is the wrong objective, ranking the true constraint $1525$th of $1819$ directions,
-and the constraint is barely encoded at all --- predicted from the latent at held-out $|\rho|=0.19$.
-\textbf{A quantity that never varies carries no information}, so nothing in a reconstruction
-objective pushes it into the latent; it can live in the decoder's weights. This bounds the approach
-to quantities that \emph{vary}, and is why we report no released-checkpoint experiment: limb lengths
-do not vary either.
+The pendulum's rod length never changes, an exact constraint, yet a search for a residual $G(z)=0$
+fails, and the recovered direction correlates with the true residual at $0.004$--$0.032$. Minimising
+$\mathbb{E}[G^2]$ is the wrong objective, ranking the true constraint $1525$th of $1819$ directions.
+The model barely encodes the constraint at all, and a probe predicts it from the latent at held-out
+$|\rho|=0.19$. \textbf{A quantity that never varies carries no information}, so nothing in a
+reconstruction objective pushes it into the latent, and it can live in the decoder's weights. This
+bounds the approach to quantities that \emph{vary}, and it is why we report no released-checkpoint
+experiment: limb lengths do not vary either.
 
-Finally, the two-invariant case limits the extraction rather than the model. Where both energy and
-angular momentum are conserved, the conserved subspace reliably contains both (angular-momentum
-correlation $0.94$--$0.98$) while the joint fit isolates either in only 1 of 7 measurements: flow
-alignment selects a single direction inside that subspace and has no unique answer when two exist.
+Finally, the two-invariant case limits the extraction rather than the model. Where the system
+conserves both energy and angular momentum, the conserved subspace reliably contains both, at
+angular-momentum correlation $0.94$--$0.98$, while the joint fit isolates either in only 1 of 7
+measurements. Flow alignment selects a single direction inside that subspace, and it has no unique
+answer when two exist.
 
 \paragraph{We cannot attribute the shadow correction to the model rather than the data.}
 Section~\ref{sec:mechanism} establishes the account on the data side and reports, in the same place,
-why the model side resists measurement here: $\rho_{\mathrm{obs}}$ is computed along evaluation
-trajectories, a registered cross-evaluation control shows the argmin follows the evaluation set in
-$6/6$ cells and the checkpoint in $0/6$, and the alternatives are a rollout statistic with no power
-(contrast $1.12$--$1.45\times$) and a cross-timestep forced choice that is unreadable because a model
-evaluated off its training timestep is $\sim\!90\times$ worse in one-step error. Deciding it needs a
-model in distribution at more than one timestep. Until then the claim is unsubstantiated rather than
-refuted, and the paper's other results are constructed so as not to depend on it.
+why the model side resists measurement here. We compute $\rho_{\mathrm{obs}}$ along evaluation
+trajectories, and a registered cross-evaluation control shows the argmin follows the evaluation set
+in $6/6$ cells and the checkpoint in $0/6$. Of the two alternatives that remain, the rollout
+statistic has no power, at a contrast of $1.12$--$1.45\times$. The cross-timestep forced choice is
+unreadable, because a model evaluated off its training timestep is $\sim\!90\times$ worse in one-step
+error. Deciding the question needs a model in distribution at more than one timestep. Until then the
+claim is unsubstantiated rather than refuted, and we construct the paper's other results so that they
+do not depend on it.

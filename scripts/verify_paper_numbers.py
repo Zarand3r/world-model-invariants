@@ -78,7 +78,7 @@ check("E18 supervised effect median", st.median(r["effect_pct"] for r in sup), f
       near=r"\+VALUE\\%[^.]{0,60}(two models|33\.4)")
 check("E18 rho_obs ratio sup/lf",
       st.median(r["rho_obs"] for r in sup) / st.median(r["rho_obs"] for r in lf), fmt="{:.1f}",
-      near=r"VALUE\\times[^.]{0,40}less\s+preserved")
+      near=r"VALUE\\times[^.]{0,60}preserv|preserv[^.]{0,60}VALUE\\times")
 
 # --- E19 ---
 phys = e19["physics_P1"]
@@ -121,7 +121,7 @@ for _sig in ("acc_drift", "latent_disp"):
         _s = _spear(_m["signals"][_sig], _m["target_energy_error"])
         check(f"F2 {_sig} {_m['ckpt'][-16:-3]}", _s, fmt="{:+.2f}",
               near=(r"Spearman[^\n]{0,60}VALUE" if _sig == "acc_drift"
-                    else r"against[\s\S]{0,50}VALUE"))
+                    else r"latent displacement[\s\S]{0,60}VALUE|VALUE[\s\S]{0,80}latent displacement"))
 # Guard the RISK (claiming it is untested), not a phrasing. An earlier version required the
 # literal "was tested" and failed on a legitimate rewrite during compression, which is a guard
 # training you to ignore it. The numbers themselves are checked above.

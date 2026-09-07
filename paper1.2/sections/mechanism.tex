@@ -1,13 +1,12 @@
 \section{A candidate account: the integrator's shadow Hamiltonian}
 \label{sec:mechanism}
 
-The transition preserves \emph{something}; the previous section shows it is not the optimal readout
-of true energy. This section offers an account of what, and is explicit about which half of it we can
-establish. On the data side the account is provable and we verify it. On the model side --- whether
-the network has internalised the integrator's quantity, as opposed to our statistic reflecting the
-trajectories it is measured on --- the instrument we have cannot decide, and we say so rather than
-leave the reader to assume otherwise. Nothing in Sections~\ref{sec:dissociation}
-or~\ref{sec:causality} depends on this section.
+The transition preserves something, and the previous section shows it is not the optimal readout of
+true energy. We give a candidate account of what, and we are explicit about which half of it we can
+establish. On the data side the account is provable and we verify it. The model side asks whether the
+network has internalised the integrator's quantity, or whether our statistic instead reflects the
+trajectories it runs on. The instrument we have cannot decide that, and we say so. Nothing in
+Sections~\ref{sec:dissociation} or~\ref{sec:causality} depends on this section.
 
 \paragraph{The data does not conserve textbook energy.}
 Trajectories come from semi-implicit (symplectic) Euler,
@@ -16,8 +15,8 @@ Trajectories come from semi-implicit (symplectic) Euler,
 \qquad
 \theta_{n+1} = \theta_n + \dot\theta_{n+1}\,\Delta t .
 \end{equation}
-A symplectic integrator conserves not the continuous system's Hamiltonian $H$ but a nearby
-\emph{shadow} $\tilde H = H + \mathcal{O}(\Delta t)$ \citep{hairer2006geometric}. Here the
+A symplectic integrator does not conserve the continuous system's Hamiltonian $H$. It conserves a
+nearby \emph{shadow} $\tilde H = H + \mathcal{O}(\Delta t)$ \citep{hairer2006geometric}. Here the
 first-order correction is $\tfrac{\Delta t}{2}\{T,V\} \propto \dot\theta\sin\theta$, giving
 \begin{equation}
 \tilde H \;=\; E \;+\; c^\star\,\dot\theta\sin\theta,
@@ -26,21 +25,21 @@ c^\star \;=\; \tfrac{\Delta t}{2}\,mg\tfrac{l}{2} \;=\; 0.125 ,
 \label{eq:shadow}
 \end{equation}
 with no free parameters. If the model learned the integrator's map rather than the textbook physics,
-$\tilde H$ is what its transition should preserve, and a probe fitted to $E$ is fitting the wrong
-target however well it fits.
+its transition should preserve $\tilde H$, and a probe fitted to $E$ then has the wrong target
+however well it fits.
 
 \paragraph{A sweep, not a two-point test.}
-Comparing a probe fitted to $E$ against one fitted to $\tilde H$ would not settle this: $\tilde H$ is
-a different function and might be better conserved merely because it is easier to represent. We
-therefore sweep the family
+A two-point comparison, a probe fitted to $E$ against one fitted to $\tilde H$, would not settle
+this: $\tilde H$ is a different function, and its advantage could come from being easier to
+represent. We therefore sweep the family
 \begin{equation}
 T_c(\theta,\dot\theta) \;=\; E(\theta,\dot\theta) \;+\; c\,\dot\theta\sin\theta ,
 \end{equation}
-over a grid containing $c^\star$, \emph{both signs}, and wrong magnitudes $2\times$ and $4\times$
-either way, refitting at each $c$ with everything else fixed. At $c=0$ this is exactly the supervised
-probe of Section~\ref{sec:dissociation}, reproducing its numbers to five decimals. The prediction is
-then the \emph{location of a minimum}, which no representational-ease artifact produces, and it was
-registered before the sweep ran.
+over a grid that contains $c^\star$, both signs, and wrong magnitudes $2\times$ and $4\times$ either
+way, refitting at each $c$ with everything else held fixed. At $c=0$ the sweep reduces to the
+supervised probe of Section~\ref{sec:dissociation} and reproduces its numbers to five decimals. The
+prediction is the location of a minimum, which no representational-ease artifact produces, and we
+registered it before the sweep ran.
 
 
 \begin{figure}[t]
@@ -58,25 +57,25 @@ $c=-c^\star$ is $12\times$ worse (median over seeds), so this is not monotone in
 
 \paragraph{The minimum is where the integrator says it is.}
 Figure~\ref{fig:shadow} shows both halves. On ground-truth trajectories, with no model involved, the
-invariance ratio of $T_c$ falls by $591\times$ between $c=0$ and $c=c^\star$, confirming the
-derivation and fixing the sign. On the learned transition, $\rho_{\mathrm{obs}}$ is minimised at
-$c^\star$ on 3 of 3 models, falling $4.9$--$6.9\times$ below its value at $c=0$. The curve is not
-monotone in $|c|$: the wrong-sign, right-magnitude control at $c=-c^\star$ is $12\times$ worse than
-at $c=+c^\star$ (range $10$--$14\times$ over the three models). A post-hoc refinement over $c \in [0.090, 0.170]$ locates the minimum at
-$0.125 \pm 0.005$ on every seed.
+invariance ratio of $T_c$ falls by $591\times$ between $c=0$ and $c=c^\star$, which confirms the
+derivation and fixes the sign. On the learned transition, $\rho_{\mathrm{obs}}$ reaches its minimum
+at $c^\star$ on 3 of 3 models, falling $4.9$--$6.9\times$ below its value at $c=0$. The curve is
+not monotone in $|c|$: the wrong-sign, right-magnitude control at $c=-c^\star$ is $12\times$ worse
+than at $c=+c^\star$ (range $10$--$14\times$ over the three models). A post-hoc refinement over
+$c \in [0.090, 0.170]$ locates the minimum at $0.125 \pm 0.005$ on every seed.
 
 The repair follows the same curve. Enforcing $T_{c^\star}$ during imagination changes energy drift by
-$-49.5\%$, $-31.5\%$ and $-29.3\%$ on the three models --- a repair on all three --- where enforcing
+$-49.5\%$, $-31.5\%$ and $-29.3\%$ on the three models, a repair on all three, while enforcing
 $T_0$, the perfect probe, gives $+26.8\%$, $-0.3\%$ and $+33.4\%$. Correcting an
 $\mathcal{O}(\Delta t)$ term in the target flips the intervention from harmful to helpful.
 
-\paragraph{The coefficient tracks the simulator's timestep --- on the evaluation data.}
-If the model has learned the integrator rather than the physics, then $c^\star$ is not a constant of
-the pendulum but a property of the discretisation, and changing the simulator's timestep should move
-it: $c^\star(\Delta t) = \tfrac{\Delta t}{2}mg\tfrac{l}{2} = 2.5\,\Delta t$. We test this directly.
-Four datasets are generated at $\Delta t \in \{0.02, 0.035, 0.05, 0.08\}$, identical in every other
-respect, and three models are trained on each. The sweep is expressed relatively, $r = c/2.5\Delta t$,
-so the prediction is a single value of $r$ at every timestep.
+\paragraph{The coefficient tracks the simulator's timestep on the evaluation data.}
+If the model has learned the integrator rather than the physics, $c^\star$ is a property of the
+discretisation and not a constant of the pendulum, so changing the simulator's timestep should move
+it: $c^\star(\Delta t) = \tfrac{\Delta t}{2}mg\tfrac{l}{2} = 2.5\,\Delta t$. We test this directly,
+generating four datasets at $\Delta t \in \{0.02, 0.035, 0.05, 0.08\}$ that are identical in every
+other respect and training three models on each. We express the sweep relatively,
+$r = c/2.5\Delta t$, so the prediction is a single value of $r$ at every timestep.
 
 \begin{table}[t]
 \centering\small
@@ -96,63 +95,65 @@ $\Delta t$ & predicted $c^\star$ & $\arg\min_r$ per seed & $\rho_{\mathrm{obs}}$
 \end{table}
 
 Table~\ref{tab:timestep} shows the outcome. The minimum sits exactly at the predicted $r=1$ on 10 of
-12 models, and the wrong-sign control is beaten on 12 of 12. Regressing the recovered coefficient on
-$\Delta t$ through the origin, as the theory requires, gives a slope of $2.484 \pm 0.058$ against a
-parameter-free prediction of $2.500$ --- agreement to $0.6\%$ with nothing fitted.
+12 models, and the models beat the wrong-sign control on 12 of 12. We regress the recovered
+coefficient on $\Delta t$ through the origin, as the theory requires, and get a slope of
+$2.484 \pm 0.058$ against a parameter-free prediction of $2.500$, agreement to $0.6\%$ with nothing
+fitted.
 
 Two scalings make the mechanism visible. As the timestep coarsens, $\rho_{\mathrm{obs}}$ for textbook
 energy grows as $\Delta t^{1.41}$, while $\rho_{\mathrm{obs}}$ for the shadow quantity stays at the
 model's own floor, $0.008$--$0.017$ across the whole range. The separation between them therefore
-grows from $1.03\times$ to $13.5\times$ purely because textbook energy becomes worse conserved while
-the shadow quantity does not. \textbf{At every timestep, the quantity best conserved along these
-trajectories is the integrator's rather than the physicist's.}
+grows from $1.03\times$ to $13.5\times$, purely because textbook energy becomes worse conserved while
+the shadow quantity does not. At every timestep, the quantity best conserved along these trajectories
+is the integrator's rather than the physicist's.
 
-We report one registered failure. Our preregistration required both a slope within $20\%$ and an
-intercept whose interval contains zero; the two-parameter fit gives a slope of $2.611 \pm 0.110$ but
-an intercept of $-0.0072 \pm 0.0057$, which excludes zero. It is driven entirely by the smallest
-timestep, where a post-hoc finer grid puts the minimum at $r = 0.875$ on all three seeds --- a real
-$12\%$ low bias rather than grid coarseness, in the regime where the whole separation is only
-$1.03\times$ and the residual curve is flat to within $2\%$.
+We report one registered failure. Our preregistration required a slope within $20\%$ and an intercept
+whose interval contains zero; the two-parameter fit gives a slope of $2.611 \pm 0.110$ but an
+intercept of $-0.0072 \pm 0.0057$, which excludes zero. The smallest timestep drives it entirely, and
+a post-hoc finer grid puts the minimum there at $r = 0.875$ on all three seeds, a real $12\%$ low
+bias rather than grid coarseness. That is the regime where the whole separation is only $1.03\times$
+and the residual curve is flat to within $2\%$.
 
-\paragraph{What this does not settle, and why we report it anyway.}
+\paragraph{What this does not settle.}
 Table~\ref{tab:timestep} is a statement about the data with the model in the loop, and we cannot
-cleanly remove the data. Our statistic $\rho_{\mathrm{obs}}$ evaluates how well a candidate is
-conserved \emph{along given trajectories}, so a model trained at one timestep and a dataset generated
-at another both influence the argmin. A registered cross-evaluation control settles which dominates,
-and the answer is unfavourable: crossing models against datasets, the argmin follows the
-\emph{evaluation set} in all six cells and the checkpoint in none ($0/3$ on both off-diagonals). The
-same control voids a companion experiment that appeared to identify the integration \emph{scheme};
-semi-implicit Euler and velocity Verlet reduce to the identical position recurrence
-$\theta_{t+1} = 2\theta_t - \theta_{t-1} + a(\theta_t)\Delta t^2$, differing only in whether
-$\dot\theta$ is labelled by a backward or a central difference --- a variable the pixels never show.
+cleanly remove the data. Our statistic $\rho_{\mathrm{obs}}$ measures how well a candidate is
+conserved along given trajectories, so a model trained at one timestep and a dataset generated at
+another both influence the argmin. A registered cross-evaluation control settles which dominates, and
+the answer is unfavourable: crossing models against datasets, the argmin follows the \emph{evaluation
+set} in all six cells and the checkpoint in none ($0/3$ on both off-diagonals). The same control
+voids a companion experiment that appeared to identify the integration \emph{scheme}; semi-implicit
+Euler and velocity Verlet reduce to the identical position recurrence
+$\theta_{t+1} = 2\theta_t - \theta_{t-1} + a(\theta_t)\Delta t^2$. They differ only in whether
+$\dot\theta$ carries a backward or a central difference label, and the pixels never show that
+variable.
 
-Two alternative instruments fail as well. Measuring conservation along the model's \emph{own}
-imagined rollout removes the evaluation trajectory entirely, but has no power here: the sweep
-contrast is $1.12$--$1.45\times$ against $\sim\!5.7\times$ for the one-step measure, and within a
-single model the argmin spans the full grid across horizons $2$--$100$. A forced choice across
-timesteps is unreadable for a different reason: a model evaluated at a timestep it was not trained on
-is $\sim\!90\times$ worse in one-step error ($0.007 \to 0.6$ rad), giving a prediction error nine
-times the separation between candidates. A pre-committed gate withheld what would otherwise have read
-as a clean positive.
+Two alternative instruments fail as well. Measuring conservation along the model's own imagined
+rollout removes the evaluation trajectory entirely, but it has no power here. The sweep contrast is
+$1.12$--$1.45\times$ against $\sim\!5.7\times$ for the one-step measure, and within a single model
+the argmin spans the full grid across horizons $2$--$100$. A forced choice across timesteps is
+unreadable for a different reason. A model run at a timestep it never trained on is
+$\sim\!90\times$ worse in one-step error ($0.007 \to 0.6$ rad), so its prediction error is nine times
+the separation between candidates. A pre-committed gate withheld what would otherwise have read as a
+clean positive.
 
-So the model-side claim is \textbf{not shown false --- shown unsubstantiable with these assets}.
-Separating model from data needs a model that is in distribution at more than one timestep, which we
-do not have. What survives is the data-side fact, which is provable and which we verify: on ground
+So we have not shown the model-side claim false; we have shown it unsubstantiable with these assets.
+Separating model from data needs a model that is in distribution at more than one timestep, and we do
+not have one. What survives is the data-side fact, which is provable and which we verify. On ground
 truth the integrator's predicted coefficient is conserved $591\times$ better than textbook energy
 with nothing fitted, and correcting that $\mathcal{O}(\Delta t)$ term flips the intervention from
-harmful to repairing on every model. That is enough to explain the perfect probe's failure --- it was
-fitted to a quantity \emph{the generating process does not conserve}, and no probe hygiene detects
-this, because nothing is wrong with the probe; the target is. It is not enough to claim the model
-learned the integrator, and we do not.
+harmful to repairing on every model. That is enough to explain the perfect probe's failure: we had
+fitted the probe to a quantity the generating process does not conserve, and no probe hygiene detects
+this, because nothing is wrong with the probe. The target is wrong. It is not enough to claim the
+model learned the integrator, and we do not.
 
 The residual is worth recording either way: median $\rho_{\mathrm{obs}}$ at $c^\star$ is
 $7.5\times10^{-3}$ against the label-free scalar's $6.9\times10^{-3}$, a gap of $1.10\times$, so the
 shadow quantity accounts for essentially all of the $6.7\times$ gap in
-Section~\ref{sec:dissociation}. The sweep is also internally decisive about the probing point, which
-needs no model-versus-data attribution at all: at $c^\star$ the readout correlates with textbook
-energy \emph{worse} than at $c=0$ ($0.977$ against $0.9999$) while being conserved six times better
-and repairing the rollout instead of harming it. Correlation with the labelled quantity and fitness
-for the dynamics move in opposite directions along a single one-parameter family. The label-free
-method's advantage has a name that likewise does not depend on this section: it optimises
-conservation under the learned transition, so it is not restricted to targets a human knows how to
-write down, and here it recovered an $\mathcal{O}(\Delta t)$ correction nobody supplied.
+Section~\ref{sec:dissociation}. The sweep is also internally decisive about the probing point, and
+that reading needs no model-versus-data attribution at all. At $c^\star$ the readout correlates with
+textbook energy worse than at $c=0$ ($0.977$ against $0.9999$), while it is conserved six times
+better and repairs the rollout instead of harming it. Correlation with the labelled quantity and
+fitness for the dynamics move in opposite directions along a single one-parameter family. The
+label-free method's advantage likewise does not depend on this section. It optimises conservation
+under the learned transition, so it does not need a target a human knows how to write down, and here
+it recovered an $\mathcal{O}(\Delta t)$ correction nobody supplied.
