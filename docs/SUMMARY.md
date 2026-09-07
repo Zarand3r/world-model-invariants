@@ -60,6 +60,8 @@ comparison — the random ones were pushed 29× harder. Corrected, the result ge
 seeds becomes 3 of 3). Anyone using the old code should apply the fix in
 `docs/UPGRADE_FROM_PUBLISHED.md`.
 
-**Odds of a main-track conference acceptance.** ~30% for the paper as it stands. ~45–60% if the
-timestep question is settled. These estimates have moved a lot; the ranking of what to do next is
-more reliable than the numbers.
+**Odds of a main-track conference acceptance.** ~25% for the paper as it stands, down from ~30%
+after the checkpoint-selection result closed our cheapest remaining direction and confirmed the "no
+practical use" objection a third time. ~45–55% if the timestep question is settled — the only step
+that moves the number rather than the error bars. These estimates have moved a lot; the ceiling for
+this evidence base without a mechanism is roughly 30%, and that is the reliable part.
