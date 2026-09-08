@@ -7,8 +7,8 @@
 
 | # | experiment | status | result | gates |
 |---|---|---|---|---|
-| **0** | **F14 — cross-fit audit.** Fit `C` and the supervised probe on one set of trajectories, freeze, score on a disjoint set. Does the 6.7× survive? | **running** | — | 2, 3, and how every number is stated |
-| **0b** | **F6 presentation fix.** Stop quoting the slope and the argmin as two results — they are algebraically one. State the two-parameter fit (2.611, intercept excludes 0) and that P3 failed. | **queued** | — | write-up only |
+| **0** | **F14 — cross-fit audit.** Fit `C` and the supervised probe on one set, freeze, score on a disjoint set. | **done** | **survives: 6.22× median cross-fit vs 6.7× in-sample** (7.27/5.93/6.22), P1 3/3, frozen `C` still `ρ_E` 0.92–0.98. Falsifier did not fire. | — |
+| **0b** | **F6 presentation fix.** Slope and argmin are algebraically one result. State the two-parameter fit and that P3 failed. | **done** | Applied to the derived summaries. `paper1.2/` prose left alone — changing what it claims is the author's call. | write-up only |
 | **1** | **F13 — timestep attribution.** Conditioned on `dt`; evaluate on fixed data sweeping only the conditioning. | **running** | seed 4 trained, **G0 passed** (dt-use 0.854 ≤ 0.90). Seeds 3, 5 training. No verdict yet. | 2, 3 |
 | **2** | **Paper 1 v2.** Corrected null, 2-DoF, E18, the five negatives. | **queued** | — | submission |
 | **3** | **Newton Stage A.** Recover `Q,P` with `ΔQ ∝ P`, `ΔP ∝ f(Q)`; inspect the recovered `f`. | **queued** | — | 4 |

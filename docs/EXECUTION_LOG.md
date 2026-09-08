@@ -8325,3 +8325,45 @@ now because it will have survived the control a reviewer will demand. If it coll
 we need to know before submission rather than after.
 
 F13 continues training; it is unaffected by any of this.
+
+---
+
+## 2026-09-08 --- F14: the headline SURVIVES cross-fitting. 6.22x against 6.7x in-sample.
+
+The audit found E18's `6.7x` was measured with `C` fitted and scored on the same 52 trajectories, and
+that the label-free arm is fitted to minimise the very statistic it is then graded on. F14 fits on
+`frames[0:204]`, freezes coefficients, `h_mean`, the PCA subspace and the rank basis, and scores on
+the disjoint `frames[204:256]` --- the exact slice the in-sample number uses, so it is like-for-like.
+
+### Result
+
+| seed | label-free `rho_obs` | supervised `rho_obs` | gap | label-free `rho_E` |
+|---|---|---|---|---|
+| 3 | 0.00625 | 0.04547 | **7.27x** | 0.975 |
+| 4 | 0.00768 | 0.04558 | **5.93x** | 0.923 |
+| 5 | 0.00721 | 0.04483 | **6.22x** | 0.940 |
+
+**Median `6.22x` cross-fit against `6.7x` in-sample** --- a 7% shrinkage. P1 passes **3/3** against a
+registered bar of 2/3 at `>=3x`. The falsifier did not fire.
+
+G1 and P3 both pass: the frozen `C` still correlates with true energy at `0.923--0.975` on held-out
+trajectories, so it is the **same quantity** carried across, not a different one refitted. Seed 3's
+gap is *larger* cross-fit than in-sample.
+
+### What this changes
+
+The paper's surviving headline now carries the control a reviewer would have demanded, and it barely
+moved. Before today the `6.7x` was in-sample and nobody had checked; now the claim is that a
+label-free scalar found on one set of trajectories, frozen, and applied to trajectories it was never
+fitted on, is still preserved `6.2x` better by the model's own transition than a probe that reads
+true energy almost perfectly. That is a materially stronger statement than the one we had.
+
+It also means the E18 result was **not** the artifact the audit flagged as possible. The audit was
+right to demand the check and right that it had never been run; the check came back clean.
+
+### The rest of the audit still stands
+
+Finding 3 is discharged. Findings 1 and 2 --- that F6's slope and argmin are algebraically one fact,
+and that the quoted `2.484 +/- 0.058` is the origin-forced fit whose intercept assumption the
+registered P3 test rejected --- are **presentation defects, not measurement defects**, and are
+addressed by roadmap item 0b rather than by an experiment.

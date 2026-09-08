@@ -75,7 +75,11 @@ A DreamerV3 world model trained only on pendulum video learns a conserved scalar
 `H~ = H + (dt/2) mg(l/2) thetadot sin(theta)`. The correction coefficient is a property of the
 *discretisation*, so varying the simulator's timestep must move it, and it does: across a 4x range
 the recovered coefficient tracks the integrator's prediction with slope **2.484 ± 0.058** against a
-parameter-free **2.500**.
+parameter-free **2.500**. **Two caveats added 2026-09-08:** that slope is the *origin-forced* fit —
+the two-parameter fit the preregistration demanded gives **2.611 ± 0.110** with an intercept whose CI
+excludes zero, and P3 was recorded as failing. And because `c_recovered` is *defined* as
+`argmin_r × c*(dt)` exactly (12/12), the slope and "the argmin lands on the prediction" are
+algebraically **one** result, not two independent ones.
 
 The interpretability consequence: a probe fitted to *true* energy reaches `|rho| = 0.9999` yet is
 **6.7x** less preserved by the model's own transition than a label-free scalar, and enforcing it
