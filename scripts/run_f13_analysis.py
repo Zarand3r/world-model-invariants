@@ -144,7 +144,22 @@ def main():
             x = np.array(DTS); y = np.array([m["arms"][str(t)]["argmin_c"] for t in DTS])
             slopes.append(float((x @ y) / (x @ x)))
         p3 = sum(m["spearman_cond_vs_argmin"] >= 0.8 for m in ms if m["eval_data"] == EVAL_SETS[1])
-        summ = {"G0_seeds_using_dt": f"{g0ok}/{len(prim)}", "G0_pass": bool(g0ok >= 2),
+        # TRACKING FRACTION -- added 2026-09-08 after both registered statistics passed on data
+        # that refutes the hypothesis. P1 (Spearman) is scale-free, so an 8% move scores 1.0 if it
+        # is monotone. P2's band admits a CONSTANT: argmin fixed at the eval data's 0.125 scores
+        # 2.197 against perfect tracking's 2.500. Neither can see magnitude, which is the whole
+        # question. This one can: 1.0 = tracks the conditioning, 0.0 = pinned at the data's value.
+        def tracking_fraction(m):
+            y = np.array([m["arms"][str(t)]["argmin_c"] for t in DTS])
+            pred = np.array([c_star(t) for t in DTS])
+            flat = np.full_like(pred, pred[list(DTS).index(0.05)])   # the eval data's own value
+            denom = float(((pred - flat) ** 2).sum())
+            return float(((y - flat) * (pred - flat)).sum() / denom) if denom > 0 else float("nan")
+        tf = [tracking_fraction(m) for m in prim]
+        summ = {"tracking_fraction": [round(v, 3) for v in tf],
+                "tracking_fraction_median": round(float(np.median(tf)), 3),
+                "P1_and_P2_are_insensitive_to_magnitude": True,
+                "G0_seeds_using_dt": f"{g0ok}/{len(prim)}", "G0_pass": bool(g0ok >= 2),
                 "G1_pass": bool(all(m["G1_all_contrast_ok"] for m in prim)),
                 "spearman_per_seed": [round(m["spearman_cond_vs_argmin"], 3) for m in prim],
                 "P1_seeds": f"{p1}/{len(prim)}", "P1_pass": bool(p1 >= 2),
@@ -156,6 +171,9 @@ def main():
         print(f"  Spearman(conditioning dt, argmin c) per seed: {summ['spearman_per_seed']}")
         print(f"  slopes vs predicted 2.5: {summ['slopes']}")
         print(f"  P1 {summ['P1_pass']}   P2 {summ['P2_pass']}   P3 {summ['P3_seeds_control_eval']}")
+        print(f"  TRACKING FRACTION {summ['tracking_fraction']} (median {summ['tracking_fraction_median']})")
+        print( "    1.0 = argmin follows the conditioning (model);  0.0 = pinned at the eval data's value")
+        print( "    P1 and P2 both PASS here and both are blind to magnitude -- read this instead.")
         if not summ["G0_pass"]:
             print("  G0 FAILED -- the model ignores the conditioning. P1 is NOT readable, and this")
             print("  is an uninformative outcome, not a negative one.")

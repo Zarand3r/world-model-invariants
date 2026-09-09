@@ -9,7 +9,7 @@
 |---|---|---|---|---|
 | **0** | **F14 — cross-fit audit.** Fit `C` and the supervised probe on one set, freeze, score on a disjoint set. | **done** | **survives: 6.22× median cross-fit vs 6.7× in-sample** (7.27/5.93/6.22), P1 3/3, frozen `C` still `ρ_E` 0.92–0.98. Falsifier did not fire. | — |
 | **0b** | **F6 presentation fix.** Slope and argmin are algebraically one result. State the two-parameter fit and that P3 failed. | **done** | Applied to the derived summaries. `paper1.2/` prose left alone — changing what it claims is the author's call. | write-up only |
-| **1** | **F13 — timestep attribution.** Conditioned on `dt`; evaluate on fixed data sweeping only the conditioning. | **running** | seed 4 trained, **G0 passed** (dt-use 0.854 ≤ 0.90). Seeds 3, 5 training. No verdict yet. | 2, 3 |
+| **1** | **F13 — timestep attribution.** Conditioned on `dt`; evaluate on fixed data sweeping only the conditioning. | **done — NEGATIVE** | **Tracking fraction 0.074** (0.074/0.074/0.111): the argmin is ~93% pinned at the *evaluation data's* value. G0 passed 3/3 strongly (0.24–0.31); G1 passed. **The timestep claim fails.** My registered P1/P2 both reported pass and are both blind to magnitude — see the log. | — |
 | **2** | **Paper 1 v2.** Corrected null, 2-DoF, E18, the five negatives. | **queued** | — | submission |
 | **3** | **Newton Stage A.** Recover `Q,P` with `ΔQ ∝ P`, `ΔP ∝ f(Q)`; inspect the recovered `f`. | **queued** | — | 4 |
 | **4** | **Newton Stage B.** Variable-mass environment, held-out `(F₂,m₂)`. | **queued** | — | 5 |

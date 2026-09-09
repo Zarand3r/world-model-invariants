@@ -8367,3 +8367,64 @@ Finding 3 is discharged. Findings 1 and 2 --- that F6's slope and argmin are alg
 and that the quoted `2.484 +/- 0.058` is the origin-forced fit whose intercept assumption the
 registered P3 test rejected --- are **presentation defects, not measurement defects**, and are
 addressed by roadmap item 0b rather than by an experiment.
+
+---
+
+## 2026-09-08 --- F13: the coefficient follows the DATA. The timestep claim fails.
+
+Three seeds trained on mixed-timestep data with `dt` in the conditioning channel, then evaluated on a
+**fixed** dataset while sweeping only the conditioning. Data identical across arms; nothing left for
+a confound to act on.
+
+### Gates
+
+- **G0 passes 3/3, strongly.** The model genuinely uses the conditioning: one-step error with the
+  true `dt` against shuffled gives **0.309 / 0.240 / 0.275**, far below the registered `0.9`.
+- **G1 passes** on the primary evaluation set (contrast 3.2--9.0x).
+- The **control** evaluation set (`dt = 0.02`) largely **fails G1** (contrast 1.24--2.02x), so P3 is
+  mostly unreadable there. Consistent with F6's own table, where `dt = 0.02` had the weakest
+  separation of all four timesteps (1.03x).
+
+### Result
+
+With the evaluation data held fixed at `dt = 0.05`, the recovered argmin, against a prediction
+spanning `0.050 -> 0.200`:
+
+| seed | cond 0.02 | 0.035 | 0.05 | 0.08 | total move | predicted move |
+|---|---|---|---|---|---|---|
+| 3 | 0.1250 | 0.1250 | 0.1250 | 0.1375 | +0.0125 | +0.1500 |
+| 4 | 0.1125 | 0.1250 | 0.1250 | 0.1250 | +0.0125 | +0.1500 |
+| 5 | 0.1125 | 0.1125 | 0.1250 | 0.1250 | +0.0125 | +0.1500 |
+
+**Tracking fraction 0.074 / 0.074 / 0.111, median 0.074** --- where 1.0 means the argmin follows the
+model's conditioning and 0.0 means it is pinned at the evaluation data's own value.
+
+**The recovered coefficient is ~93% a property of the evaluation data.** The falsifier fires.
+
+### My registered statistics both PASSED, and both are broken
+
+The script reported **P1 True, P2 True**. Both are wrong for this question, and I registered them:
+
+- **P1 (Spearman >= 0.8)** is **scale-free**. The argmin moves 8% of the predicted amount, but the
+  move is monotone, so Spearman is exactly **1.0** on 3/3 seeds.
+- **P2 (slope in 1.25--5.0)** cannot distinguish the hypotheses at all. A **constant** argmin at the
+  evaluation data's `0.125` scores **2.197**; perfect tracking scores **2.500**. The observed
+  `2.13--2.29` sits *closer to constant*.
+
+Neither statistic can see magnitude, and magnitude is the entire question. Added a
+**tracking fraction** that can, and it says `0.074`.
+
+This is the fifth time this week a checking artefact was weaker than the claim it was meant to test,
+and the first time it would have produced a **false positive on the paper's headline**. Had I
+reported the registered summary as written, I would have told Richard the timestep claim was
+confirmed.
+
+### Where this leaves the paper
+
+**The timestep claim fails.** With the scheme half already provably untestable from pixels, **the
+title's "integrator" claim is finished** --- not unresolved, settled. The small residual (7--11%,
+monotone on 3/3) is real but is not the claim; F6's presentation implies ~100%.
+
+What survives is unaffected and, after F14, better evidenced than a week ago: the probing
+dissociation cross-fits at `6.2x`, the causal interventions hold with the corrected null, the `767x`
+architecture gap is properly separated, and five preregistered negatives bound the claim.

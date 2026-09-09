@@ -1,6 +1,6 @@
 # Executive summary
 
-*Updated 2026-09-08 (F14). Kept current after every significant development — see CLAUDE.md.*
+*Updated 2026-09-08 (F13, F14). Kept current after every significant development — see CLAUDE.md.*
 
 We are testing whether a world model trained only on video of a swinging pendulum learns physics it
 actually obeys. The distinction that matters: a probe can read a quantity out of the model's internal
@@ -15,8 +15,8 @@ down before each experiment.
 - **Now: correct and strengthen paper 1, post it as v2.** One published result is wrong (see
   Results); the fix makes it stronger. Add the two-degrees-of-freedom system, the supervised-probe
   control, and the four negatives.
-- **Next: settle the big open question by training a model that is told its own timestep.** Needs new
-  training. Now the only route left to the stronger claim.
+- ~~Settle the timestep question by training a model told its own timestep.~~ **Done — it failed.**
+  See Results. The stronger claim is now closed.
 - **Biggest lever, highest cost: repeat the result on a standard benchmark**, not a pendulum. The
   objection every reviewer will raise.
 - **Not doing:** more seeds, more toy systems, or anything comparing the two integration schemes —
@@ -56,9 +56,13 @@ prediction" — one number, not two independent ones. And that 2.484 is a fit fo
 origin; the two-parameter fit the preregistration actually asked for gives 2.611 with an intercept
 excluding zero, and it was recorded as failing.
 
-**Open.** Whether the model tracks its simulator's *timestep* is unresolved. The measurement showing
-it might be reading the training data rather than the model, and the tests that would tell them apart
-do not work with the models we have. Not disproven — untested.
+**Settled, and negative.** The model does **not** track its simulator's timestep. We trained models
+told their own timestep, then held the evaluation data completely fixed and changed only what we told
+the model. The recovered quantity barely moved — about **7%** of the way toward the model's setting,
+and **93%** determined by the data it was measured on. The model demonstrably *uses* the timestep to
+predict (its predictions get much worse with the wrong one), but it does not carry it into what it
+conserves. **With the scheme half already impossible to test from video, the paper's "learns its
+simulator's integrator" claim is finished — not open, closed.**
 
 **Dead.** The claim that the model learns its simulator's integration *scheme* is impossible to test
 from video, and always was: the two schemes we compared produce identical motion and differ only in
