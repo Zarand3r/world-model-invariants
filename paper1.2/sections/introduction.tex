@@ -19,14 +19,18 @@ merely encoding it. Enforcing that quantity cuts drift in decoded physical energ
 unseen trajectories. Setting it steers the imagined world's true energy, and the effect survives 50
 steps into autonomous imagination.
 
-Why should the two come apart at all, when we trained the model on pendulums? One candidate answer is
-that the training data does not conserve textbook energy either. It comes from a symplectic
-integrator, which conserves a nearby shadow $\tilde H = H + \mathcal{O}(\Delta t)$
-\citep{hairer2006geometric}. On ground truth that predicted coefficient is conserved $591\times$
-better than $H$ with nothing fitted, and correcting the $\mathcal{O}(\Delta t)$ term flips the
-intervention from harmful to repairing on every model. We offer this as an account of the data, and
-Section~\ref{sec:mechanism} is explicit that our instruments cannot decide the corresponding claim
-about the \emph{model}.
+Why should the two come apart at all, when we trained the model on pendulums? Because the training
+data does not conserve textbook energy either. It comes from a symplectic integrator, which conserves
+a nearby shadow $\tilde H = H + \mathcal{O}(\Delta t)$ \citep{hairer2006geometric}. On ground truth
+the trajectories conserve that shadow quantity $591\times$ better than $H$ with nothing fitted, and
+correcting the $\mathcal{O}(\Delta t)$ term flips the intervention from harmful to repairing on every
+model. The probe was fitted to the wrong target, and probe hygiene cannot detect that.
+
+We then tested the stronger claim this suggests, that the model itself has internalised the
+integrator, and we report it as falsified. Training models with the timestep in a conditioning
+channel and sweeping only what we tell them moves the recovered coefficient by $7\%$ of the predicted
+amount. The coefficient belongs to the data, not to the model. Section~\ref{sec:mechanism} gives the
+experiment and the two registered predictors of our own that passed it wrongly.
 
 \paragraph{Why this matters for interpretability.}
 A probe can be perfect and still wrong. We fit a polynomial readout to \emph{true} physical energy,
@@ -67,7 +71,7 @@ nothing, because the correction is scale-invariant in the constraint.
 (iii) \textbf{Causal evidence}: the model deploys the selected direction, on 512 unseen trajectories
 and 50 steps into autonomous imagination, against magnitude-matched nulls that fail 0 of 60 and 0 of
 75.
-(iv) \textbf{An account of the gap, with its evidential status separated}: the shadow Hamiltonian of
+(iv) \textbf{An explanation of the gap, and a falsified extension of it}: the shadow Hamiltonian of
 the generating integrator explains why the perfect probe targets the wrong quantity, and we verify
 that on ground truth. We also report in full why the parallel claim about the model resists
 measurement here.

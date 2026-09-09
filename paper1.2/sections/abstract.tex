@@ -2,11 +2,11 @@
 A world model can encode a quantity that its own dynamics never preserve. We test whether the energy
 a probe decodes from a frozen DreamerV3 trained only on pendulum video is the energy its transition
 preserves. A polynomial probe fitted to true energy reaches correlation $0.9999$, while the model's
-transition preserves that direction $6.7\times$ worse than a scalar recovered without labels. During
-autonomous rollouts, the recovered scalar drifts. Projecting the latent back toward its level set
-cuts decoded physical energy drift by $55$ to $76\%$, whereas 0 of 60 matched random directions beat
-it. The recovery and the repair both transfer to a two-degree-of-freedom oscillator. These results
-distinguish a scalar the dynamics use from one they merely carry and expose a concrete failure mode
-of interpretability: a probe can certify near-perfect recovery of a quantity the model's transition
-does not preserve.
+transition preserves that direction $6.2\times$ worse than a scalar recovered without labels and
+frozen before scoring. During autonomous rollouts, the recovered scalar drifts. Projecting the latent
+back toward its level set cuts decoded physical energy drift by $55$ to $76\%$, whereas 0 of 60
+matched random directions beat it. The recovery and the repair both transfer to a
+two-degree-of-freedom oscillator. These results distinguish a scalar the dynamics use from one they
+merely carry and expose a concrete failure mode of interpretability: a probe can certify
+near-perfect recovery of a quantity the model's transition does not preserve.
 \end{abstract}

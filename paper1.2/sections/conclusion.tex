@@ -7,14 +7,17 @@ $|\rho| = 0.9999$, and enforcing it \emph{harms} the imagined physics, while a l
 that the transition actually preserves repairs it. Decodability and dynamical structure are separate
 properties of a representation, and probing measures only the first.
 
-We can say why the target was wrong without being able to say what the model internalised. The
-training data comes from a symplectic integrator and does not conserve textbook energy either. On
-ground truth the trajectories conserve the integrator's predicted quantity $591\times$ better than $H$ with
-nothing fitted, and applying that correction flips the intervention from harmful to repairing on
-every model. The stronger reading, that the network has learned the numerical scheme, we could not
-establish. Our one-step statistic depends on which trajectories we evaluate it on, and the two
-instruments that would remove that dependence are respectively powerless and unreadable on these
-models. We report that in full, because the alternative is a headline the measurement does not carry.
+We can say why the target was wrong. The training data comes from a symplectic integrator and does
+not conserve textbook energy either. On ground truth the trajectories conserve the integrator's
+predicted quantity $591\times$ better than $H$ with nothing fitted, and applying that correction
+flips the intervention from harmful to repairing on every model. The probe was fitted to a quantity
+the generating process does not conserve.
+
+The stronger reading, that the network itself learned the integrator, we tested and lost. Models
+trained with their own timestep in a conditioning channel move the recovered coefficient by $7\%$ of
+the predicted amount when we sweep the conditioning and hold the data fixed. The coefficient is a
+property of the data. We report this because it is the inference a reader would otherwise draw, and
+because two of our own registered predictors passed it before we replaced them.
 
 None of the causal results rest on it. A probe fitted to true energy at $|\rho| = 0.9999$ identifies
 a direction the dynamics do not use, and enforcing it degrades the model's imagined physics. The

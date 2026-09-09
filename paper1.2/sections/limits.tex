@@ -42,13 +42,11 @@ angular-momentum correlation $0.94$--$0.98$, while the joint fit isolates either
 measurements. Flow alignment selects a single direction inside that subspace, and it has no unique
 answer when two exist.
 
-\paragraph{We cannot attribute the shadow correction to the model rather than the data.}
-Section~\ref{sec:mechanism} establishes the account on the data side and reports, in the same place,
-why the model side resists measurement here. We compute $\rho_{\mathrm{obs}}$ along evaluation
-trajectories, and a registered cross-evaluation control shows the argmin follows the evaluation set
-in $6/6$ cells and the checkpoint in $0/6$. Of the two alternatives that remain, the rollout
-statistic has no power, at a contrast of $1.12$--$1.45\times$. The cross-timestep forced choice is
-unreadable, because a model evaluated off its training timestep is $\sim\!90\times$ worse in one-step
-error. Deciding the question needs a model in distribution at more than one timestep. Until then the
-claim is unsubstantiated rather than refuted, and we construct the paper's other results so that they
-do not depend on it.
+\paragraph{The model does not carry the integrator, and we looked.}
+Section~\ref{sec:mechanism} reports the negative directly rather than leaving it as an open question.
+The explanation of the probe's failure is a property of the training data and survives; the stronger
+claim that the network internalised the integrator's coefficient does not. We note that the
+experiment which settled it, conditioning the model on its own timestep, is also the one our earlier
+instruments could not perform, and that two registered predictors passed on it before we replaced
+them with one sensitive to magnitude.
+
