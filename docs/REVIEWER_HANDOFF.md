@@ -9,8 +9,9 @@
 For a co-author, an internal reviewer, or a future maintainer. What the paper claims, what the
 evidence is, what failed, what to distrust, and how to check any of it yourself.
 
-**Status:** ICLR 2025 submission format, **9-page main text** (16 with appendix and references),
-double-blind anonymised. **70/70** mechanical number checks (all now anchored to the claim they
+**Status:** **Not submitted anywhere, and not under review.** Typeset with the ICLR 2025 template
+and anonymised, which is a formatting choice made so the option stays open --- not a submission.
+**9-page main text** (16 with appendix and references). **70/70** mechanical number checks (all now anchored to the claim they
 support, with a mutation harness proving 26/26 catch their claim being falsified) and **58** tests
 pass. `origin/main`
 remains pinned at the last published state (`20fa8b4`, 2026-08-24); all work is local on
