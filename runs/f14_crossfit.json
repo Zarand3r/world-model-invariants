@@ -1,0 +1,99 @@
+{
+ "models": [
+  {
+   "ckpt": "runs/dreamer_ref_s3_step6500.pt",
+   "unsupervised": {
+    "rho_obs": 0.006254090461879969,
+    "rho_E": 0.9754036130798801
+   },
+   "supervised": {
+    "rho_obs": 0.04546576365828514,
+    "rho_E": 0.9999125576078677
+   },
+   "gap_crossfit": 7.269764314316971,
+   "G1_readout_meaningful": true
+  },
+  {
+   "ckpt": "runs/dreamer_ref_s4_step6500.pt",
+   "unsupervised": {
+    "rho_obs": 0.0076846773736178875,
+    "rho_E": 0.9228713534878733
+   },
+   "supervised": {
+    "rho_obs": 0.045576438307762146,
+    "rho_E": 0.9998662664472977
+   },
+   "gap_crossfit": 5.9308200060850575,
+   "G1_readout_meaningful": true
+  },
+  {
+   "ckpt": "runs/dreamer_ref_s5_step6500.pt",
+   "unsupervised": {
+    "rho_obs": 0.0072107273153960705,
+    "rho_E": 0.9402112272179958
+   },
+   "supervised": {
+    "rho_obs": 0.04482532665133476,
+    "rho_E": 0.9998822095914817
+   },
+   "gap_crossfit": 6.21647785177307,
+   "G1_readout_meaningful": true
+  }
+ ],
+ "summary": {
+  "gaps_crossfit": [
+   7.27,
+   5.93,
+   6.22
+  ],
+  "median_gap_crossfit": 6.22,
+  "in_sample_gap": 6.7,
+  "G1_pass": true,
+  "P1_seeds_ge_3x": 3,
+  "P1_pass": true,
+  "falsifier_fired": false,
+  "rho_E_crossfit": [
+   0.975,
+   0.923,
+   0.94
+  ]
+ },
+ "provenance": {
+  "runs": [
+   {
+    "argv": [
+     "scripts/run_f14_crossfit.py",
+     "--out",
+     "runs/f14_crossfit.json"
+    ],
+    "cwd": "/home/rbao/world-model-invariants-extension",
+    "utc": "2026-09-08T22:20:52+00:00",
+    "git": "f3a19128f7d48083732ff153bfca4a10b57eaddd",
+    "git_dirty": true,
+    "python": "3.13.13",
+    "inputs": {
+     "runs/dreamer_ref_s3_step6500.pt": {
+      "sha256": "706cc31890259decf020cc925021f5a5fc56e4fc55c896a8dc6d8d22ee6c33e1",
+      "mtime": "2026-08-26T21:03:29+00:00",
+      "bytes": 53828901
+     },
+     "runs/dreamer_ref_s4_step6500.pt": {
+      "sha256": "69f4f4eda49f4079d950d1e134fb268cb22425666840b37421d4e2ec293c0484",
+      "mtime": "2026-08-26T22:52:55+00:00",
+      "bytes": 53828901
+     },
+     "runs/dreamer_ref_s5_step6500.pt": {
+      "sha256": "9146998bba3ac59b6282c4df70fc32208a157a4452b2e1337801c1239ded9a0a",
+      "mtime": "2026-08-27T00:28:08+00:00",
+      "bytes": 53828901
+     },
+     "runs/pendulum_pixels.npz": {
+      "sha256": "9eed2d0776a177961113f711b4ba4bd69d3db1a1c0f6f9c5519364824d910e8b",
+      "mtime": "2026-08-26T20:36:36+00:00",
+      "bytes": 6799505
+     }
+    }
+   }
+  ]
+ }
+}

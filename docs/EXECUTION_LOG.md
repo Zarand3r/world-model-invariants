@@ -8259,3 +8259,172 @@ paper's boundary section. It is also the third failed attempt to give this work 
 that pattern is now worth stating plainly in the paper rather than discovering a fourth time.
 
 `paper1.2/` untouched.
+
+---
+
+## 2026-09-07 --- The roadmap workflow audited our own headline numbers. Three findings, all verified.
+
+An 11-agent workflow was run to design and adversarially critique three extension directions. Its
+most valuable output was not a direction. Its feasibility critics read the run records and the code
+and found three defects in claims I have been repeating. **I verified all three myself before
+recording them**; the workflow's agents are no more trustworthy than any other checking tool.
+
+### 1. F6's headline slope is algebraically equivalent to "argmin is near 1"
+
+`c_recovered` is **defined** as `argmin_r * c*(dt)`, exactly, on **12 of 12** models. So the
+origin-forced slope of `c_recovered` against `dt` is `2.5 x` (a weighted mean of `argmin_r`) and
+nothing more:
+
+    origin-forced slope from c_recovered   2.4842
+    same quantity from argmin_r alone      2.4842   (identical by algebra)
+    mean argmin_r 0.9583, slope/2.5 = 0.9937
+
+**"Slope 2.484 against a parameter-free 2.500" and "the argmin lands on the prediction" are the same
+fact stated twice.** Presenting them as separate lines of evidence overstates the result. This was
+not recorded anywhere and I did not know it.
+
+### 2. The quoted `2.484 +/- 0.058` is the constrained fit whose assumption the registered test rejected
+
+F6's preregistration demanded slope **and** intercept. The two-parameter fit gives
+
+    slope 2.611 +/- 0.110,  intercept -0.00722 +/- 0.00566   (CI excludes zero)   P3_pass: false
+
+The `2.484 +/- 0.058` everyone quotes is the **origin-forced** fit --- it assumes the intercept that
+the registered test rejected. The roadmap and `verify_paper_numbers.py` do label it "origin-forced"
+and do record P3 as failing, so the repository has been honest. **My verbal summaries were not**: I
+have repeatedly quoted `2.484 +/- 0.058 against a parameter-free 2.500` as the headline without the
+caveat that the registered test asked a different question and failed it.
+
+### 3. E18's `6.7x` is measured with `C` fitted in-sample
+
+`run_e18_supervised_baseline.py` encodes `fr[ANALYSIS]` --- 52 trajectories --- calls
+`cached_fit(Z, F)` on exactly those, and scores `rho_obs` on the same `Z`, `F`. **Model held out,
+`C` in-sample.**
+
+Both arms are fitted in-sample, which is symmetric, but the asymmetry that matters is what each is
+fitted *for*: the label-free arm is fitted to minimise conservation error and is then scored on
+conservation error, on the same trajectories. E9 does hold out trajectories for the **repair**
+result, so that half is clean. The `6.7x` gap is not, and the cross-fit control has never been run.
+
+This touches the surviving headline --- the one the reframe and the Newton program both rest on ---
+so it outranks every new direction in the packet.
+
+### What the workflow got right about sequencing
+
+It also caught that one of its own proposed experiments duplicates F13, which is training on this
+machine right now, and that E17b's sample-size concern was already discharged in this log. Both
+correct.
+
+### Consequence
+
+The top-ranked next action is no longer a new experiment. It is a **cross-fit audit** of the two
+headline numbers: fit `C` and the supervised probe on one set of trajectories, freeze coefficients
+and frame, score on a disjoint set, and report what survives. Under a day, under one GPU-hour, on
+existing checkpoints. If the `6.7x` gap holds at `>=3x` cross-fit, the claim is stronger than it is
+now because it will have survived the control a reviewer will demand. If it collapses below `2x`,
+we need to know before submission rather than after.
+
+F13 continues training; it is unaffected by any of this.
+
+---
+
+## 2026-09-08 --- F14: the headline SURVIVES cross-fitting. 6.22x against 6.7x in-sample.
+
+The audit found E18's `6.7x` was measured with `C` fitted and scored on the same 52 trajectories, and
+that the label-free arm is fitted to minimise the very statistic it is then graded on. F14 fits on
+`frames[0:204]`, freezes coefficients, `h_mean`, the PCA subspace and the rank basis, and scores on
+the disjoint `frames[204:256]` --- the exact slice the in-sample number uses, so it is like-for-like.
+
+### Result
+
+| seed | label-free `rho_obs` | supervised `rho_obs` | gap | label-free `rho_E` |
+|---|---|---|---|---|
+| 3 | 0.00625 | 0.04547 | **7.27x** | 0.975 |
+| 4 | 0.00768 | 0.04558 | **5.93x** | 0.923 |
+| 5 | 0.00721 | 0.04483 | **6.22x** | 0.940 |
+
+**Median `6.22x` cross-fit against `6.7x` in-sample** --- a 7% shrinkage. P1 passes **3/3** against a
+registered bar of 2/3 at `>=3x`. The falsifier did not fire.
+
+G1 and P3 both pass: the frozen `C` still correlates with true energy at `0.923--0.975` on held-out
+trajectories, so it is the **same quantity** carried across, not a different one refitted. Seed 3's
+gap is *larger* cross-fit than in-sample.
+
+### What this changes
+
+The paper's surviving headline now carries the control a reviewer would have demanded, and it barely
+moved. Before today the `6.7x` was in-sample and nobody had checked; now the claim is that a
+label-free scalar found on one set of trajectories, frozen, and applied to trajectories it was never
+fitted on, is still preserved `6.2x` better by the model's own transition than a probe that reads
+true energy almost perfectly. That is a materially stronger statement than the one we had.
+
+It also means the E18 result was **not** the artifact the audit flagged as possible. The audit was
+right to demand the check and right that it had never been run; the check came back clean.
+
+### The rest of the audit still stands
+
+Finding 3 is discharged. Findings 1 and 2 --- that F6's slope and argmin are algebraically one fact,
+and that the quoted `2.484 +/- 0.058` is the origin-forced fit whose intercept assumption the
+registered P3 test rejected --- are **presentation defects, not measurement defects**, and are
+addressed by roadmap item 0b rather than by an experiment.
+
+---
+
+## 2026-09-08 --- F13: the coefficient follows the DATA. The timestep claim fails.
+
+Three seeds trained on mixed-timestep data with `dt` in the conditioning channel, then evaluated on a
+**fixed** dataset while sweeping only the conditioning. Data identical across arms; nothing left for
+a confound to act on.
+
+### Gates
+
+- **G0 passes 3/3, strongly.** The model genuinely uses the conditioning: one-step error with the
+  true `dt` against shuffled gives **0.309 / 0.240 / 0.275**, far below the registered `0.9`.
+- **G1 passes** on the primary evaluation set (contrast 3.2--9.0x).
+- The **control** evaluation set (`dt = 0.02`) largely **fails G1** (contrast 1.24--2.02x), so P3 is
+  mostly unreadable there. Consistent with F6's own table, where `dt = 0.02` had the weakest
+  separation of all four timesteps (1.03x).
+
+### Result
+
+With the evaluation data held fixed at `dt = 0.05`, the recovered argmin, against a prediction
+spanning `0.050 -> 0.200`:
+
+| seed | cond 0.02 | 0.035 | 0.05 | 0.08 | total move | predicted move |
+|---|---|---|---|---|---|---|
+| 3 | 0.1250 | 0.1250 | 0.1250 | 0.1375 | +0.0125 | +0.1500 |
+| 4 | 0.1125 | 0.1250 | 0.1250 | 0.1250 | +0.0125 | +0.1500 |
+| 5 | 0.1125 | 0.1125 | 0.1250 | 0.1250 | +0.0125 | +0.1500 |
+
+**Tracking fraction 0.074 / 0.074 / 0.111, median 0.074** --- where 1.0 means the argmin follows the
+model's conditioning and 0.0 means it is pinned at the evaluation data's own value.
+
+**The recovered coefficient is ~93% a property of the evaluation data.** The falsifier fires.
+
+### My registered statistics both PASSED, and both are broken
+
+The script reported **P1 True, P2 True**. Both are wrong for this question, and I registered them:
+
+- **P1 (Spearman >= 0.8)** is **scale-free**. The argmin moves 8% of the predicted amount, but the
+  move is monotone, so Spearman is exactly **1.0** on 3/3 seeds.
+- **P2 (slope in 1.25--5.0)** cannot distinguish the hypotheses at all. A **constant** argmin at the
+  evaluation data's `0.125` scores **2.197**; perfect tracking scores **2.500**. The observed
+  `2.13--2.29` sits *closer to constant*.
+
+Neither statistic can see magnitude, and magnitude is the entire question. Added a
+**tracking fraction** that can, and it says `0.074`.
+
+This is the fifth time this week a checking artefact was weaker than the claim it was meant to test,
+and the first time it would have produced a **false positive on the paper's headline**. Had I
+reported the registered summary as written, I would have told Richard the timestep claim was
+confirmed.
+
+### Where this leaves the paper
+
+**The timestep claim fails.** With the scheme half already provably untestable from pixels, **the
+title's "integrator" claim is finished** --- not unresolved, settled. The small residual (7--11%,
+monotone on 3/3) is real but is not the claim; F6's presentation implies ~100%.
+
+What survives is unaffected and, after F14, better evidenced than a week ago: the probing
+dissociation cross-fits at `6.2x`, the causal interventions hold with the corrected null, the `767x`
+architecture gap is properly separated, and five preregistered negatives bound the claim.

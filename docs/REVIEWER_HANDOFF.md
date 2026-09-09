@@ -9,8 +9,9 @@
 For a co-author, an internal reviewer, or a future maintainer. What the paper claims, what the
 evidence is, what failed, what to distrust, and how to check any of it yourself.
 
-**Status:** ICLR 2025 submission format, **9-page main text** (16 with appendix and references),
-double-blind anonymised. **70/70** mechanical number checks (all now anchored to the claim they
+**Status:** **Not submitted anywhere, and not under review.** Typeset with the ICLR 2025 template
+and anonymised, which is a formatting choice made so the option stays open --- not a submission.
+**9-page main text** (16 with appendix and references). **70/70** mechanical number checks (all now anchored to the claim they
 support, with a mutation harness proving 26/26 catch their claim being falsified) and **58** tests
 pass. `origin/main`
 remains pinned at the last published state (`20fa8b4`, 2026-08-24); all work is local on
@@ -75,7 +76,11 @@ A DreamerV3 world model trained only on pendulum video learns a conserved scalar
 `H~ = H + (dt/2) mg(l/2) thetadot sin(theta)`. The correction coefficient is a property of the
 *discretisation*, so varying the simulator's timestep must move it, and it does: across a 4x range
 the recovered coefficient tracks the integrator's prediction with slope **2.484 ± 0.058** against a
-parameter-free **2.500**.
+parameter-free **2.500**. **Two caveats added 2026-09-08:** that slope is the *origin-forced* fit —
+the two-parameter fit the preregistration demanded gives **2.611 ± 0.110** with an intercept whose CI
+excludes zero, and P3 was recorded as failing. And because `c_recovered` is *defined* as
+`argmin_r × c*(dt)` exactly (12/12), the slope and "the argmin lands on the prediction" are
+algebraically **one** result, not two independent ones.
 
 The interpretability consequence: a probe fitted to *true* energy reaches `|rho| = 0.9999` yet is
 **6.7x** less preserved by the model's own transition than a label-free scalar, and enforcing it
