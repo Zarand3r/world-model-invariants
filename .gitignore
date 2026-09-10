@@ -29,8 +29,7 @@ venv/
 .vscode/
 runs/model_cache/
 
-# vendored third-party checkout (nested git repo); see docs/REPRODUCE.md
-# vendored third-party checkout: a git submodule pinned in .gitmodules, not ignored
+# vendored third-party checkout: tracked as a git submodule pinned in .gitmodules, not ignored
 logs/
 
 paper/project_context.md
@@ -42,3 +41,9 @@ paper2/figures/*.png
 
 # built PDF is committed: it is the deliverable
 !paper/main.pdf
+
+# bench: node deps, the built UI, and the extraction cache are all regenerable
+viz/web/node_modules/
+viz/web/dist/
+runs/viz_cache/
+viz/web/*.tsbuildinfo

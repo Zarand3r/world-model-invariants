@@ -71,7 +71,7 @@ def test_dreamer_encode_is_deterministic():
 
     from latent_noether.dreamer_adapter import DreamerV3Adapter
 
-    ck = "runs/dreamer_ref_s0.pt"
+    ck = "runs/dreamer_ref_s3.pt"
     if not __import__("pathlib").Path(ck).exists():
         import pytest
         pytest.skip("trained Dreamer checkpoint not present")
